@@ -107,11 +107,11 @@ for n,L in people.items():
         nm=' - '.join(x for x in [l.get('place'),l.get('turno')] if x)+(' · '+l['name'] if l.get('name') else '')
         sids=l.get('songIds') or []
         mus='\n'.join('- '+json.loads(D['s_'+i]['j']).get('title','') for i in sids if 's_'+i in D)
-        desc='Você: '+roles+'\n'+('Repertório:\n'+mus if mus else 'Repertório a definir')+'\n\n'+SITE
+        desc='Você: '+roles+'\n'+('Banda pronta: '+l['hBanda']+'\n' if l.get('hBanda') else '')+('Repertório:\n'+mus if mus else 'Repertório a definir')+'\n\n'+SITE
         lid=l.get('id') or ''
         ev.append(('culto-'+lid,'Culto · '+nm,'DTSTART;VALUE=DATE:'+d.replace('-',''),'DTEND;VALUE=DATE:'+nxt(d),adr(l.get('place')),desc))
         ph=l.get('passHora') or ''
-        if _re.match(r'^\d{1,2}:\d{2}$',ph): ev.append(('pass-'+lid,'Passagem de som · '+nm,'DTSTART;TZID=America/Sao_Paulo:'+tt(d,ph),'DTEND;TZID=America/Sao_Paulo:'+tt(d,ph,60),adr(l.get('place')),desc))
+        if _re.match(r'^\d{1,2}:\d{2}$',ph): ev.append(('pass-'+lid,'Passagem de som · '+nm,'DTSTART;TZID=America/Sao_Paulo:'+tt(d,ph),'DTEND;TZID=America/Sao_Paulo:'+(tt(d,l['passFim']) if _re.match(r'^\d{1,2}:\d{2}$',l.get('passFim') or '') else tt(d,ph,60)),adr(l.get('place')),desc))
         ed=l.get('ensData') or '';eh=l.get('ensHora') or ''
         if ed and not l.get('semEns'):
             if _re.match(r'^\d{1,2}:\d{2}$',eh): ev.append(('ens-'+lid,'Ensaio · '+nm,'DTSTART;TZID=America/Sao_Paulo:'+tt(ed,eh),'DTEND;TZID=America/Sao_Paulo:'+tt(ed,eh,120),l.get('ensLocal') or l.get('place') or '',desc))
