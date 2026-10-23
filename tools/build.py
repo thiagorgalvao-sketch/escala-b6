@@ -11,6 +11,8 @@ here=os.path.dirname(os.path.abspath(__file__))
 s=open(APP,encoding='utf-8').read();sh=open(os.path.join(here,'shim.js')).read()
 i=s.find('<script');assert i>0
 s=s[:i]+'<script>'+sh+'</script>\n'+s[i:]
+HEAD='<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" href="icon-192.png"><meta name="apple-mobile-web-app-title" content="Escala B6">'
+s=s.replace('</head>',HEAD+'</head>',1)
 def load(d):
     o={}
     for f in os.listdir(d) if d and os.path.isdir(d) else []:
@@ -73,4 +75,51 @@ open(os.path.join(OUT,'index.html'),'w',encoding='utf-8').write(s)
 D={k:{'j':json.dumps(v,ensure_ascii=False)} for k,v in {**lists,**songs}.items()}
 json.dump(D,open(os.path.join(OUT,'pub.json'),'w'),ensure_ascii=False,separators=(',',':'))
 if MISSING: print('faltando:',' '.join(sorted(MISSING)))
+# ===== agenda por pessoa (assinatura webcal)
+import unicodedata,re as _re
+def slug(n): return _re.sub(r'[^a-z0-9]+','-',unicodedata.normalize('NFD',n).encode('ascii','ignore').decode().lower()).strip('-')
+RL={'vm':'Voz masculina','vf':'Voz feminina','so':'Soprano','co':'Contralto','te':'Tenor','bt':'Bateria','bx':'Baixo','tc':'Teclado','gt':'Guitarra','vi':'Violão'}
+ADR={'maua':'Av. Cap. João, 1337 - Matriz, Mauá - SP, 09360-120','santo andre':'Av. Pedro Américo, 36 - Vila Humaita, Santo André - SP, 09110-560'}
+def adr(p): k=unicodedata.normalize('NFD',p or '').encode('ascii','ignore').decode().lower().strip();return ADR.get(k,p or '')
+SITE='https://thiagorgalvao-sketch.github.io/escala-b6/'
+def esc(t): return str(t or '').replace('\\','\\\\').replace(';','\\;').replace(',','\\,').replace('\n','\\n')
+def tt(d,h,add=0):
+    a,b=map(int,h.split(':'));x=a*60+b+add;return d.replace('-','')+'T%02d%02d00'%((x//60)%24,x%60)
+def nxt(d):
+    x=datetime.date.fromisoformat(d)+datetime.timedelta(days=1);return x.strftime('%Y%m%d')
+lim=(datetime.date.fromisoformat(today)-datetime.timedelta(days=45)).isoformat()
+people={}
+for k,l in lists.items():
+    for r,n in (l.get('banda') or {}).items():
+        n=(n or '').strip()
+        if n and r in RL: people.setdefault(n,[]).append((l,r))
+agd=os.path.join(OUT,'agenda');os.makedirs(agd,exist_ok=True)
+for f in os.listdir(agd): os.remove(os.path.join(agd,f))
+stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+for n,L in people.items():
+    ev=[]
+    seen=set()
+    for l,r in L:
+        d=l.get('date') or ''
+        if not d or d<lim or id(l) in seen: continue
+        seen.add(id(l))
+        roles=', '.join(RL[x] for x,v in (l.get('banda') or {}).items() if (v or '').strip()==n and x in RL)
+        nm=' - '.join(x for x in [l.get('place'),l.get('turno')] if x)+(' · '+l['name'] if l.get('name') else '')
+        sids=l.get('songIds') or []
+        mus='\n'.join('- '+json.loads(D['s_'+i]['j']).get('title','') for i in sids if 's_'+i in D)
+        desc='Você: '+roles+'\n'+('Repertório:\n'+mus if mus else 'Repertório a definir')+'\n\n'+SITE
+        lid=l.get('id') or ''
+        ev.append(('culto-'+lid,'Culto · '+nm,'DTSTART;VALUE=DATE:'+d.replace('-',''),'DTEND;VALUE=DATE:'+nxt(d),adr(l.get('place')),desc))
+        ph=l.get('passHora') or ''
+        if _re.match(r'^\d{1,2}:\d{2}$',ph): ev.append(('pass-'+lid,'Passagem de som · '+nm,'DTSTART;TZID=America/Sao_Paulo:'+tt(d,ph),'DTEND;TZID=America/Sao_Paulo:'+tt(d,ph,60),adr(l.get('place')),desc))
+        ed=l.get('ensData') or '';eh=l.get('ensHora') or ''
+        if ed and not l.get('semEns'):
+            if _re.match(r'^\d{1,2}:\d{2}$',eh): ev.append(('ens-'+lid,'Ensaio · '+nm,'DTSTART;TZID=America/Sao_Paulo:'+tt(ed,eh),'DTEND;TZID=America/Sao_Paulo:'+tt(ed,eh,120),l.get('ensLocal') or l.get('place') or '',desc))
+            else: ev.append(('ens-'+lid,'Ensaio · '+nm,'DTSTART;VALUE=DATE:'+ed.replace('-',''),'DTEND;VALUE=DATE:'+nxt(ed),l.get('ensLocal') or l.get('place') or '',desc))
+    o=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Escala B6//PT-BR','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Escala B6 · '+n.split(' ')[0],'X-WR-TIMEZONE:America/Sao_Paulo','REFRESH-INTERVAL;VALUE=DURATION:PT6H','X-PUBLISHED-TTL:PT6H',
+       'BEGIN:VTIMEZONE','TZID:America/Sao_Paulo','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:-0300','TZOFFSETTO:-0300','TZNAME:-03','END:STANDARD','END:VTIMEZONE']
+    for u,t,a,b,loc,ds in ev: o+=['BEGIN:VEVENT','UID:'+u+'@escala-b6','DTSTAMP:'+stamp,a,b,'SUMMARY:'+esc(t),'LOCATION:'+esc(loc),'DESCRIPTION:'+esc(ds),'END:VEVENT']
+    o.append('END:VCALENDAR')
+    open(os.path.join(agd,slug(n)+'.ics'),'w',encoding='utf-8',newline='').write('\r\n'.join(o)+'\r\n')
+print('agendas',len(people))
 print('ok cultos',len(lists),'musicas',len(songs),'futuros sem publicar',sum(1 for k,l in lists.items() if k not in P and (l.get('date') or '')>=today))
