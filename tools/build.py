@@ -109,16 +109,27 @@ for n,L in people.items():
         mus='\n'.join('- '+json.loads(D['s_'+i]['j']).get('title','') for i in sids if 's_'+i in D)
         desc='Você: '+roles+'\n'+('Banda pronta: '+l['hBanda']+'\n' if l.get('hBanda') else '')+('Repertório:\n'+mus if mus else 'Repertório a definir')+'\n\n'+SITE
         lid=l.get('id') or ''
-        ev.append(('culto-'+lid,'Culto · '+nm,'DTSTART;VALUE=DATE:'+d.replace('-',''),'DTEND;VALUE=DATE:'+nxt(d),adr(l.get('place')),desc))
-        ph=l.get('passHora') or ''
-        if _re.match(r'^\d{1,2}:\d{2}$',ph): ev.append(('pass-'+lid,'Passagem de som · '+nm,'DTSTART;TZID=America/Sao_Paulo:'+tt(d,ph),'DTEND;TZID=America/Sao_Paulo:'+(tt(d,l['passFim']) if _re.match(r'^\d{1,2}:\d{2}$',l.get('passFim') or '') else tt(d,ph,60)),adr(l.get('place')),desc))
+        ok=lambda h:bool(_re.match(r'^\d{1,2}:\d{2}$',h or ''))
+        def addm(h,m):
+            a,b=map(int,h.split(':'));x=a*60+b+m;return '%02d:%02d'%((x//60)%24,x%60)
+        st=l.get('hBanda') if ok(l.get('hBanda')) else (l.get('passHora') if ok(l.get('passHora')) else '')
+        pl=unicodedata.normalize('NFD',l.get('place') or '').encode('ascii','ignore').decode().lower().strip();tu=(l.get('turno') or '').lower();nmv=(l.get('name') or '').lower()
+        kk='dm' if pl=='santo andre' and 'domingo' in nmv and 'manh' in tu else ('dn' if pl=='santo andre' and 'domingo' in nmv and 'noite' in tu else '')
+        hr=[x for x in [('Banda pronta: '+l['hBanda']) if l.get('hBanda') else '',('Gain / check de sinal: '+l['hGain']) if l.get('hGain') else '',('Início da passagem: '+l['passHora']) if l.get('passHora') else '',('Término da passagem: '+l['passFim']) if l.get('passFim') else ''] if x]
+        desc='Você: '+roles+'\n\n'+(('HORÁRIOS\n'+'\n'.join(hr)+'\n\n') if hr else '')+('REPERTÓRIO\n'+mus if mus else 'Repertório a definir')+'\n\n'+SITE
+        if st:
+            en='11:30' if kk=='dm' else ('20:30' if kk=='dn' else addm(l['passFim'] if ok(l.get('passFim')) else addm(st,40),150))
+            if en<=st: en=addm(st,180)
+            ev.append(('culto-'+lid,'Culto · '+nm,'DTSTART;TZID=America/Sao_Paulo:'+tt(d,st),'DTEND;TZID=America/Sao_Paulo:'+tt(d,en),adr(l.get('place')),desc))
+        else:
+            ev.append(('culto-'+lid,'Culto · '+nm,'DTSTART;VALUE=DATE:'+d.replace('-',''),'DTEND;VALUE=DATE:'+nxt(d),adr(l.get('place')),desc))
         ed=l.get('ensData') or '';eh=l.get('ensHora') or ''
         if ed and not l.get('semEns'):
             if _re.match(r'^\d{1,2}:\d{2}$',eh): ev.append(('ens-'+lid,'Ensaio · '+nm,'DTSTART;TZID=America/Sao_Paulo:'+tt(ed,eh),'DTEND;TZID=America/Sao_Paulo:'+tt(ed,eh,120),l.get('ensLocal') or l.get('place') or '',desc))
             else: ev.append(('ens-'+lid,'Ensaio · '+nm,'DTSTART;VALUE=DATE:'+ed.replace('-',''),'DTEND;VALUE=DATE:'+nxt(ed),l.get('ensLocal') or l.get('place') or '',desc))
     o=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Escala B6//PT-BR','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Escala B6 · '+n.split(' ')[0],'X-WR-TIMEZONE:America/Sao_Paulo','REFRESH-INTERVAL;VALUE=DURATION:PT6H','X-PUBLISHED-TTL:PT6H',
        'BEGIN:VTIMEZONE','TZID:America/Sao_Paulo','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:-0300','TZOFFSETTO:-0300','TZNAME:-03','END:STANDARD','END:VTIMEZONE']
-    for u,t,a,b,loc,ds in ev: o+=['BEGIN:VEVENT','UID:'+u+'@escala-b6','DTSTAMP:'+stamp,a,b,'SUMMARY:'+esc(t),'LOCATION:'+esc(loc),'DESCRIPTION:'+esc(ds),'END:VEVENT']
+    for u,t,a,b,loc,ds in ev: o+=['BEGIN:VEVENT','UID:'+u+'@escala-b6','DTSTAMP:'+stamp,a,b,'SUMMARY:'+esc(t),'LOCATION:'+esc(loc),'DESCRIPTION:'+esc(ds),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+esc(t),'TRIGGER:-PT1H','END:VALARM','END:VEVENT']
     o.append('END:VCALENDAR')
     open(os.path.join(agd,slug(n)+'.ics'),'w',encoding='utf-8',newline='').write('\r\n'.join(o)+'\r\n')
 print('agendas',len(people))
