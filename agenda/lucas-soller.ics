@@ -17,179 +17,8 @@ TZNAME:-03
 END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
-UID:culto-e_2026-12-13_santoandre_domingomanha@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20261213
-DTEND;VALUE=DATE:20261214
-SUMMARY:Culto · Santo André - Manhã · Culto de Domingo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nBanda pronta: 07:30\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-e_2026-12-13_santoandre_domingomanha@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20261213T074500
-DTEND;TZID=America/Sao_Paulo:20261213T081000
-SUMMARY:Passagem de som · Santo André - Manhã · Culto de Domingo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nBanda pronta: 07:30\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-10-04_santoandre_domingonoite@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20261004
-DTEND;VALUE=DATE:20261005
-SUMMARY:Culto · Santo André - Noite · Culto de Domingo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nRepertório:\n- ÉS BEM-VINDO\n- CLAMAREI\n- O VENTO ENCONTRA O FOGO\n- SÓ TU ÉS SANTO\n- QUEM É ESSE?\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-e_2026-10-04_santoandre_domingonoite@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20261004T171500
-DTEND;TZID=America/Sao_Paulo:20261004T181500
-SUMMARY:Passagem de som · Santo André - Noite · Culto de Domingo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nRepertório:\n- ÉS BEM-VINDO\n- CLAMAREI\n- O VENTO ENCONTRA O FOGO\n- SÓ TU ÉS SANTO\n- QUEM É ESSE?\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-12-20_maua_domingonoite@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20261220
-DTEND;VALUE=DATE:20261221
-SUMMARY:Culto · Mauá - Noite · Culto de Domingo
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-e_2026-12-20_maua_domingonoite@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20261220T171000
-DTEND;TZID=America/Sao_Paulo:20261220T181000
-SUMMARY:Passagem de som · Mauá - Noite · Culto de Domingo
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-1oaib7s@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20261025
-DTEND;VALUE=DATE:20261026
-SUMMARY:Culto · Santo André - Noite · Culto de Domingo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nBanda pronta: 17:00\nRepertório:\n- VIDA AOS SEPULCROS\n- GRATIDÃO\n- TEU TOQUE\n- CANÇÃO QUE NÃO ENVELHECE\n- YAHWEH SE MANIFESTARÁ\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-1oaib7s@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20261025T171500
-DTEND;TZID=America/Sao_Paulo:20261025T174000
-SUMMARY:Passagem de som · Santo André - Noite · Culto de Domingo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nBanda pronta: 17:00\nRepertório:\n- VIDA AOS SEPULCROS\n- GRATIDÃO\n- TEU TOQUE\n- CANÇÃO QUE NÃO ENVELHECE\n- YAHWEH SE MANIFESTARÁ\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:ens-1oaib7s@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20261022T203000
-DTEND;TZID=America/Sao_Paulo:20261022T223000
-SUMMARY:Ensaio · Santo André - Noite · Culto de Domingo
-LOCATION:Estúdio - Lugar do Encontro Santo André
-DESCRIPTION:Você: Bateria\nBanda pronta: 17:00\nRepertório:\n- VIDA AOS SEPULCROS\n- GRATIDÃO\n- TEU TOQUE\n- CANÇÃO QUE NÃO ENVELHECE\n- YAHWEH SE MANIFESTARÁ\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-10-18_maua_domingomanha@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20261018
-DTEND;VALUE=DATE:20261019
-SUMMARY:Culto · Mauá - Manhã · Culto de Domingo
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\nRepertório:\n- SOU GRATO POR SEU AMOR\n- CLAMAREI\n- VIDA AOS SEPULCROS\n- OUTRO IGUAL NÃO HÁ\n- É ELE\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-e_2026-10-18_maua_domingomanha@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20261018T074000
-DTEND;TZID=America/Sao_Paulo:20261018T084000
-SUMMARY:Passagem de som · Mauá - Manhã · Culto de Domingo
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\nRepertório:\n- SOU GRATO POR SEU AMOR\n- CLAMAREI\n- VIDA AOS SEPULCROS\n- OUTRO IGUAL NÃO HÁ\n- É ELE\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-11-08_maua_domingomanha@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20261108
-DTEND;VALUE=DATE:20261109
-SUMMARY:Culto · Mauá - Manhã · Culto de Domingo
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-e_2026-11-08_maua_domingomanha@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20261108T074000
-DTEND;TZID=America/Sao_Paulo:20261108T084000
-SUMMARY:Passagem de som · Mauá - Manhã · Culto de Domingo
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-11-18_santoandre_quartadoenco@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20261118
-DTEND;VALUE=DATE:20261119
-SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nBanda pronta: 18:40\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-e_2026-11-18_santoandre_quartadoenco@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20261118T185500
-DTEND;TZID=America/Sao_Paulo:20261118T192000
-SUMMARY:Passagem de som · Santo André - Noite · Quarta do Encontro
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nBanda pronta: 18:40\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-09-13_maua_domingomanha@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20260913
-DTEND;VALUE=DATE:20260914
-SUMMARY:Culto · Mauá - Manhã · Ceia do Senhor
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\nRepertório:\n- ALTAR\n- CONFIO EM DEUS\n- DIGNO É O SENHOR\n- QUEM MAIS É DIGNO\n- EM TEUS BRAÇOS\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-e_2026-09-13_maua_domingomanha@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20260913T074000
-DTEND;TZID=America/Sao_Paulo:20260913T084000
-SUMMARY:Passagem de som · Mauá - Manhã · Ceia do Senhor
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\nRepertório:\n- ALTAR\n- CONFIO EM DEUS\n- DIGNO É O SENHOR\n- QUEM MAIS É DIGNO\n- EM TEUS BRAÇOS\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-09-23_santoandre_quartadoenco@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;VALUE=DATE:20260923
-DTEND;VALUE=DATE:20260924
-SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nRepertório:\n- SOU GRATO POR SEU AMOR\n- VIDA AOS SEPULCROS\n- ALÉM DO IMPOSSÍVEL\n- DIGNO É O SENHOR\n- DIGNO DE TUDO\n- TÁ CHORANDO POR QUÊ?\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
-UID:pass-e_2026-09-23_santoandre_quartadoenco@escala-b6
-DTSTAMP:20261023T164739Z
-DTSTART;TZID=America/Sao_Paulo:20260923T185500
-DTEND;TZID=America/Sao_Paulo:20260923T195500
-SUMMARY:Passagem de som · Santo André - Noite · Quarta do Encontro
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\nRepertório:\n- SOU GRATO POR SEU AMOR\n- VIDA AOS SEPULCROS\n- ALÉM DO IMPOSSÍVEL\n- DIGNO É O SENHOR\n- DIGNO DE TUDO\n- TÁ CHORANDO POR QUÊ?\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
-END:VEVENT
-BEGIN:VEVENT
 UID:culto-e_2026-11-29_santoandre_domingonoite@escala-b6
-DTSTAMP:20261023T164739Z
+DTSTAMP:20261023T172037Z
 DTSTART;VALUE=DATE:20261129
 DTEND;VALUE=DATE:20261130
 SUMMARY:Culto · Santo André - Noite · Culto de Domingo
@@ -198,11 +27,182 @@ DESCRIPTION:Você: Bateria\nBanda pronta: 17:00\nRepertório a definir\n\nhttps:
 END:VEVENT
 BEGIN:VEVENT
 UID:pass-e_2026-11-29_santoandre_domingonoite@escala-b6
-DTSTAMP:20261023T164739Z
+DTSTAMP:20261023T172037Z
 DTSTART;TZID=America/Sao_Paulo:20261129T171500
 DTEND;TZID=America/Sao_Paulo:20261129T174000
 SUMMARY:Passagem de som · Santo André - Noite · Culto de Domingo
 LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
 DESCRIPTION:Você: Bateria\nBanda pronta: 17:00\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-10-04_santoandre_domingonoite@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20261004
+DTEND;VALUE=DATE:20261005
+SUMMARY:Culto · Santo André - Noite · Culto de Domingo
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nRepertório:\n- ÉS BEM-VINDO\n- CLAMAREI\n- O VENTO ENCONTRA O FOGO\n- SÓ TU ÉS SANTO\n- QUEM É ESSE?\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-e_2026-10-04_santoandre_domingonoite@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20261004T171500
+DTEND;TZID=America/Sao_Paulo:20261004T181500
+SUMMARY:Passagem de som · Santo André - Noite · Culto de Domingo
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nRepertório:\n- ÉS BEM-VINDO\n- CLAMAREI\n- O VENTO ENCONTRA O FOGO\n- SÓ TU ÉS SANTO\n- QUEM É ESSE?\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-11-18_santoandre_quartadoenco@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20261118
+DTEND;VALUE=DATE:20261119
+SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nBanda pronta: 18:40\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-e_2026-11-18_santoandre_quartadoenco@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20261118T185500
+DTEND;TZID=America/Sao_Paulo:20261118T192000
+SUMMARY:Passagem de som · Santo André - Noite · Quarta do Encontro
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nBanda pronta: 18:40\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-11-08_maua_domingomanha@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20261108
+DTEND;VALUE=DATE:20261109
+SUMMARY:Culto · Mauá - Manhã · Culto de Domingo
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-e_2026-11-08_maua_domingomanha@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20261108T074000
+DTEND;TZID=America/Sao_Paulo:20261108T084000
+SUMMARY:Passagem de som · Mauá - Manhã · Culto de Domingo
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-12-20_maua_domingonoite@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20261220
+DTEND;VALUE=DATE:20261221
+SUMMARY:Culto · Mauá - Noite · Culto de Domingo
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-e_2026-12-20_maua_domingonoite@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20261220T171000
+DTEND;TZID=America/Sao_Paulo:20261220T181000
+SUMMARY:Passagem de som · Mauá - Noite · Culto de Domingo
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-10-18_maua_domingomanha@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20261018
+DTEND;VALUE=DATE:20261019
+SUMMARY:Culto · Mauá - Manhã · Culto de Domingo
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\nRepertório:\n- SOU GRATO POR SEU AMOR\n- CLAMAREI\n- VIDA AOS SEPULCROS\n- OUTRO IGUAL NÃO HÁ\n- É ELE\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-e_2026-10-18_maua_domingomanha@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20261018T074000
+DTEND;TZID=America/Sao_Paulo:20261018T084000
+SUMMARY:Passagem de som · Mauá - Manhã · Culto de Domingo
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\nRepertório:\n- SOU GRATO POR SEU AMOR\n- CLAMAREI\n- VIDA AOS SEPULCROS\n- OUTRO IGUAL NÃO HÁ\n- É ELE\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-09-13_maua_domingomanha@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20260913
+DTEND;VALUE=DATE:20260914
+SUMMARY:Culto · Mauá - Manhã · Ceia do Senhor
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\nRepertório:\n- ALTAR\n- CONFIO EM DEUS\n- DIGNO É O SENHOR\n- QUEM MAIS É DIGNO\n- EM TEUS BRAÇOS\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-e_2026-09-13_maua_domingomanha@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20260913T074000
+DTEND;TZID=America/Sao_Paulo:20260913T084000
+SUMMARY:Passagem de som · Mauá - Manhã · Ceia do Senhor
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\nRepertório:\n- ALTAR\n- CONFIO EM DEUS\n- DIGNO É O SENHOR\n- QUEM MAIS É DIGNO\n- EM TEUS BRAÇOS\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-1oaib7s@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20261025
+DTEND;VALUE=DATE:20261026
+SUMMARY:Culto · Santo André - Noite · Culto de Domingo
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nBanda pronta: 17:00\nRepertório:\n- VIDA AOS SEPULCROS\n- GRATIDÃO\n- TEU TOQUE\n- CANÇÃO QUE NÃO ENVELHECE\n- YAHWEH SE MANIFESTARÁ\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-1oaib7s@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20261025T171500
+DTEND;TZID=America/Sao_Paulo:20261025T174000
+SUMMARY:Passagem de som · Santo André - Noite · Culto de Domingo
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nBanda pronta: 17:00\nRepertório:\n- VIDA AOS SEPULCROS\n- GRATIDÃO\n- TEU TOQUE\n- CANÇÃO QUE NÃO ENVELHECE\n- YAHWEH SE MANIFESTARÁ\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:ens-1oaib7s@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20261022T203000
+DTEND;TZID=America/Sao_Paulo:20261022T223000
+SUMMARY:Ensaio · Santo André - Noite · Culto de Domingo
+LOCATION:Estúdio - Lugar do Encontro Santo André
+DESCRIPTION:Você: Bateria\nBanda pronta: 17:00\nRepertório:\n- VIDA AOS SEPULCROS\n- GRATIDÃO\n- TEU TOQUE\n- CANÇÃO QUE NÃO ENVELHECE\n- YAHWEH SE MANIFESTARÁ\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-12-13_santoandre_domingomanha@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20261213
+DTEND;VALUE=DATE:20261214
+SUMMARY:Culto · Santo André - Manhã · Culto de Domingo
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nBanda pronta: 07:30\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-e_2026-12-13_santoandre_domingomanha@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20261213T074500
+DTEND;TZID=America/Sao_Paulo:20261213T081000
+SUMMARY:Passagem de som · Santo André - Manhã · Culto de Domingo
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nBanda pronta: 07:30\nRepertório a definir\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-09-23_santoandre_quartadoenco@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;VALUE=DATE:20260923
+DTEND;VALUE=DATE:20260924
+SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nRepertório:\n- SOU GRATO POR SEU AMOR\n- VIDA AOS SEPULCROS\n- ALÉM DO IMPOSSÍVEL\n- DIGNO É O SENHOR\n- DIGNO DE TUDO\n- TÁ CHORANDO POR QUÊ?\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
+END:VEVENT
+BEGIN:VEVENT
+UID:pass-e_2026-09-23_santoandre_quartadoenco@escala-b6
+DTSTAMP:20261023T172037Z
+DTSTART;TZID=America/Sao_Paulo:20260923T185500
+DTEND;TZID=America/Sao_Paulo:20260923T195500
+SUMMARY:Passagem de som · Santo André - Noite · Quarta do Encontro
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\nRepertório:\n- SOU GRATO POR SEU AMOR\n- VIDA AOS SEPULCROS\n- ALÉM DO IMPOSSÍVEL\n- DIGNO É O SENHOR\n- DIGNO DE TUDO\n- TÁ CHORANDO POR QUÊ?\n\nhttps://thiagorgalvao-sketch.github.io/escala-b6/
 END:VEVENT
 END:VCALENDAR
