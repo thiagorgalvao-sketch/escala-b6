@@ -219,7 +219,7 @@ body.band #qb,body.band #mn,body.band #mnp,body.band .bks{display:none!important
 .esg{display:flex;gap:10px;align-items:flex-start;margin-top:6px}.esl{width:56px;flex:none;color:var(--g);font-size:.8rem;padding-top:8px}
 .esr{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;flex:1}
 .esp{background:#0F1B2F;border-radius:10px;padding:6px 10px}.esp b{font-weight:600;font-size:.95rem}
-.dmb{background:#ffd60a;color:#000;font-size:.62rem;font-weight:800;border-radius:4px;padding:0 4px;vertical-align:middle}
+.dmb{display:inline-block;background:rgba(0,205,211,.12);color:#00CDD3;border:1px solid rgba(0,205,211,.5);font-size:.6rem;font-weight:700;letter-spacing:.06em;line-height:1.25;border-radius:999px;padding:0 6px;margin-left:4px;vertical-align:middle}
 .lnk{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.lkb{display:inline-flex;align-items:center;gap:6px;background:#111E33;color:#fff;border-radius:999px;padding:7px 14px;text-decoration:none;font-weight:600}.lkb svg{width:14px;height:14px}
 .lnt{color:#ffe9a8;background:#14120a;border-radius:10px;padding:8px 12px;margin:8px 0;font-size:.92rem}
 .vsl{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:.85rem}.vsl .chip{font-size:.78rem;padding:2px 8px}
@@ -1704,7 +1704,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='27/10/2026 · 230';
+const VER='27/10/2026 · 231';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
