@@ -8,11 +8,8 @@ APP,PUB,TEAM,OUT=sys.argv[1:5]
 ASSETS=sys.argv[5] if len(sys.argv)>5 else ''
 MISSING=set()
 here=os.path.dirname(os.path.abspath(__file__))
-s=open(APP,encoding='utf-8').read();sh=open(os.path.join(here,'shim.js')).read()
-i=s.find('<script');assert i>0
-s=s[:i]+'<script>'+sh+'</script>\n'+s[i:]
-HEAD='<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" href="icon-192.png"><meta name="apple-mobile-web-app-title" content="Escala B6">'
-s=s.replace('</head>',HEAD+'</head>',1)
+sys.path.insert(0,here);import siteindex
+s=siteindex.build(open(APP,encoding='utf-8').read())
 def load(d):
     o={}
     for f in os.listdir(d) if d and os.path.isdir(d) else []:
@@ -37,7 +34,7 @@ def media(u):
     with tempfile.NamedTemporaryFile(delete=False) as t:
         for f in fs:
             b=open(f,'rb').read();t.write(b[4:] if ck else b)
-    r=subprocess.run(['ffmpeg','-y','-loglevel','error','-i',t.name,'-vn','-ac','2','-b:a','160k',dst]);os.unlink(t.name)
+    r=subprocess.run(['ffmpeg','-y','-loglevel','error','-i',t.name,'-vn','-ac','2','-b:a','96k',dst]);os.unlink(t.name)
     return rel if r.returncode==0 and os.path.exists(dst) else None
 def fix(v):
     if isinstance(v,dict) and '_blob' in str(v.get('url','')):
@@ -55,7 +52,8 @@ def noblob(o):
         o['bas']=[v for v in (fix(x) for x in o['bas']) if v]
         if not o['bas']: del o['bas']
     if 'files' in o and '_blob' in json.dumps(o['files']): del o['files']
-    o.pop('hist',None);return o
+    for k in ['hist','rev','by']: o.pop(k,None)
+    return o
 lists={}
 for k in set(x for x in list(T)+list(P) if x.startswith('l_')):
     if k in P: l=P[k]
@@ -65,13 +63,23 @@ for k in set(x for x in list(T)+list(P) if x.startswith('l_')):
             for f in ['songIds','keys','cant','ord','rot','rn','tr','slot','nota','files']: l.pop(f,None)
             l['songIds']=[]
     lists[k]=noblob(l)
-need=set(i for l in lists.values() for i in (l.get('songIds') or []))
+# privacidade: no site público só primeiro nome + inicial do sobrenome (ex.: "Thiago G.")
+def short(n):
+    w=(n or '').split()
+    if len(w)<2 or w[1].startswith('('): return (n or '').strip()
+    return w[0]+' '+w[-1][0].upper()+'.'
+for l in lists.values():
+    if isinstance(l.get('banda'),dict): l['banda']={k:short(v) for k,v in l['banda'].items()}
+    if isinstance(l.get('cant'),dict): l['cant']={k:' + '.join(short(x.strip()) for x in (v or '').split('+') if x.strip()) for k,v in l['cant'].items()}
+need=set(i for l in lists.values() for i in (l.get('songIds') or []))|set(k[2:] for k in P if k.startswith('s_'))  # inclui músicas publicadas fora de repertório (ex.: Espontâneo Pastor)
 songs={}
 for i in need:
     k='s_'+i;o=P.get(k) or T.get(k)
     if o: songs[k]=noblob(dict(o))
 os.makedirs(OUT,exist_ok=True)
 open(os.path.join(OUT,'index.html'),'w',encoding='utf-8').write(s)
+open(os.path.join(OUT,'robots.txt'),'w').write('User-agent: *\nDisallow: /\n')
+import shutil;shutil.copy(os.path.join(here,'sw.js'),os.path.join(OUT,'sw.js'))
 D={k:{'j':json.dumps(v,ensure_ascii=False)} for k,v in {**lists,**songs}.items()}
 json.dump(D,open(os.path.join(OUT,'pub.json'),'w'),ensure_ascii=False,separators=(',',':'))
 if MISSING: print('faltando:',' '.join(sorted(MISSING)))
