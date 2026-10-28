@@ -81,6 +81,7 @@ if s is not None: open(os.path.join(OUT,'index.html'),'w',encoding='utf-8').writ
 open(os.path.join(OUT,'robots.txt'),'w').write('User-agent: *\nDisallow: /\n')
 import shutil;shutil.copy(os.path.join(here,'sw.js'),os.path.join(OUT,'sw.js'))
 D={k:{'j':json.dumps(v,ensure_ascii=False)} for k,v in {**lists,**songs}.items()}
+for k in [x for x in P if x.startswith('e_')]: D[k]={'j':json.dumps(P[k],ensure_ascii=False)}  # conteúdo espiritual (devocionais, jejum, links)
 json.dump(D,open(os.path.join(OUT,'pub.json'),'w'),ensure_ascii=False,separators=(',',':'))
 if MISSING: print('faltando:',' '.join(sorted(MISSING)))
 # ===== agenda por pessoa (assinatura webcal)
