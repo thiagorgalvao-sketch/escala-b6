@@ -4,6 +4,7 @@ const SBURL='https://hofrthndlstofytlapzk.supabase.co',KEY='sb_publishable_Hmstt
 /* dados locais separados da visão da banda (mesmo endereço do site) */
 try{const ls=window.localStorage,P='adm:';const W={getItem:k=>ls.getItem(P+k),setItem:(k,v)=>ls.setItem(P+k,v),removeItem:k=>ls.removeItem(P+k),clear:()=>{Object.keys(ls).filter(k=>k.startsWith(P)).forEach(k=>ls.removeItem(k))},key:i=>Object.keys(ls).filter(k=>k.startsWith(P))[i]?.slice(P.length)??null,get length(){return Object.keys(ls).filter(k=>k.startsWith(P)).length}};
  Object.defineProperty(window,'localStorage',{configurable:true,get:()=>W})}catch(e){}
+window.__B6SB=1;if(!window.supabase){const f=()=>{document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;inset:0;z-index:2147483000;background:#070D18;color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:system-ui"><div><b>Sem conexão com o servidor.</b><br><br>Verifique a internet e recarregue a página.</div></div>')};if(document.body)f();else document.addEventListener('DOMContentLoaded',f);return}
 const sb=window.supabase.createClient(SBURL,KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'b6-auth'}});
 window.__SB=sb;window.__B6SB=1;
 const css=`#b6l{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(900px 420px at 50% -120px,rgba(0,205,211,.14),transparent 70%),#070D18;display:flex;align-items:center;justify-content:center;padding:16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;color:#fff}
