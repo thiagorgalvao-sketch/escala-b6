@@ -33,9 +33,17 @@ function resetForm(em){ui(`<form id="b6f">${head}<p>Vamos enviar um link para vo
 function pwForm(title,after){ui(`<form id="b6f">${head}<p>${title}</p><input id="b6p" type="password" autocomplete="new-password" placeholder="Nova senha (mín. 8 caracteres)" minlength="8" required><input id="b6q" type="password" autocomplete="new-password" placeholder="Repita a nova senha" minlength="8" required><div class="er"></div><button type="submit">Salvar senha</button>${after?'<button type="button" class="l" id="b6v">Cancelar</button>':''}</form>`);
  if(after)box.querySelector('#b6v').onclick=()=>{hide();after()};
  box.querySelector('#b6f').onsubmit=async e=>{e.preventDefault();const a=box.querySelector('#b6p').value,b=box.querySelector('#b6q').value,er=box.querySelector('.er');
-  if(a!==b){er.textContent='As senhas não conferem.';return}er.textContent='Salvando…';const {error}=await sb.auth.updateUser({password:a});
-  if(error){er.textContent='Não foi possível salvar: '+error.message;return}hide();if(after)after();else check();try{toast('Senha alterada')}catch(x){}}}
+  if(a!==b){er.textContent='As senhas não conferem.';return}er.textContent='Salvando…';const {error}=await sb.auth.updateUser({password:a,data:{pw_ok:true}});
+  if(error){er.textContent=pwErr(error);return}hide();if(after)after();else check();try{toast('Senha alterada')}catch(x){}}}
 
+const pwErr=e=>/same|different/i.test(e.message||'')?'A nova senha precisa ser diferente da atual.':/weak|short|least|characters/i.test(e.message||'')?'Senha fraca: use pelo menos 8 caracteres, misturando letras e números.':'Não foi possível salvar: '+e.message;
+function pwFirst(session){const nm=((session.user.email||'').split('@')[0]||'').replace(/</g,'');
+ ui(`<form id="b6f">${head}<p><b style="color:#fff">Bem-vindo(a)!</b> Este é o seu primeiro acesso. Para proteger a conta, crie agora uma senha só sua, diferente da que você recebeu.</p><input id="b6p" type="password" autocomplete="new-password" placeholder="Nova senha (mín. 8 caracteres)" minlength="8" required><input id="b6q" type="password" autocomplete="new-password" placeholder="Repita a nova senha" minlength="8" required><p style="font-size:.78rem">Dica: use uma frase curta que só você saiba, com letras e números.</p><div class="er"></div><button type="submit">Salvar e entrar</button><button type="button" class="l" id="b6o">Sair</button></form>`);
+ box.querySelector('#b6o').onclick=async()=>{try{localStorage.removeItem(OK)}catch(e){}await sb.auth.signOut();loginForm()};
+ box.querySelector('#b6f').onsubmit=async e=>{e.preventDefault();const a=box.querySelector('#b6p').value,b=box.querySelector('#b6q').value,er=box.querySelector('.er');
+  if(a.length<8){er.textContent='Use pelo menos 8 caracteres.';return}if(a!==b){er.textContent='As senhas não conferem.';return}
+  er.className='er';er.textContent='Salvando…';const {error}=await sb.auth.updateUser({password:a,data:{pw_ok:true}});
+  if(error){er.textContent=pwErr(error);return}try{localStorage.setItem(OK,session.user.id)}catch(x){}hide();okRes(session);setTimeout(()=>{try{toast('Senha criada. Bem-vindo(a)!')}catch(x){}},800)}}
 async function mfaForm(msg){const {data}=await sb.auth.mfa.listFactors();const f=data&&data.totp&&data.totp.find(x=>x.status==='verified');if(!f){check();return}
  ui(`<form id="b6f">${head}<p>Digite o código de 6 dígitos do seu aplicativo autenticador.</p><input id="b6c" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required><div class="er">${msg||''}</div><button type="submit">Confirmar</button><button type="button" class="l" id="b6o">Sair</button></form>`);
  box.querySelector('#b6o').onclick=async()=>{await sb.auth.signOut();loginForm()};
@@ -62,6 +70,7 @@ async function check(){if(recovering)return;
  try{const a=await sb.auth.mfa.getAuthenticatorAssuranceLevel();if(a.data&&a.data.nextLevel==='aal2'&&a.data.currentLevel!=='aal2'){mfaForm();return}}catch(e){}
  let adm=null;try{const {data,error}=await sb.rpc('is_admin');if(error)throw error;adm=data===true}catch(e){if(localStorage.getItem(OK)===session.user.id){hide();okRes(session);return}loginForm('Sem conexão com o servidor. Tente de novo.');return}
  if(!adm){try{localStorage.removeItem(OK)}catch(e){}await sb.auth.signOut();loginForm('Esta conta não tem acesso de administrador.');return}
+ if(!(session.user.user_metadata||{}).pw_ok){pwFirst(session);return}
  try{localStorage.setItem(OK,session.user.id)}catch(e){}hide();okRes(session)}
 window.b6Conta=async()=>{const {data:{session}}=await sb.auth.getSession();const em=session&&session.user.email||'';let mf=false;try{const r=await sb.auth.mfa.listFactors();mf=!!(r.data&&r.data.totp&&r.data.totp.some(x=>x.status==='verified'))}catch(e){}
  try{dlg.close()}catch(e){}
