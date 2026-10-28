@@ -50,4 +50,5 @@ jobs:
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh issue create --repo "${{ github.repository }}" --title "⚠ Falha ao baixar as bibliotecas do site" --body "Veja: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          gh issue create --repo "${{ github.repository }}" --title "⚠ Falha ao baixar as bibliotecas do site" --body "Veja: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
