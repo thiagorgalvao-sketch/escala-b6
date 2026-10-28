@@ -2,7 +2,7 @@
 # - injeta o shim (dados vêm de pub.json, sem escrita)
 # - links do PWA e noindex (o site não aparece em buscadores)
 # - remove dados de importação/migração que a banda não usa (página mais leve)
-import os,re,sys
+import os,re,sys,json
 here=os.path.dirname(os.path.abspath(__file__))
 HEAD=('<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">'
       '<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">'
@@ -19,3 +19,5 @@ if __name__=='__main__':
     a,o=sys.argv[1:3]
     open(o,'w',encoding='utf-8').write(build(open(a,encoding='utf-8').read()))
     print('index',os.path.getsize(o))
+    m=re.search(r"const VER='([^']+)'",open(a,encoding='utf-8').read())
+    if m: json.dump({'v':m.group(1)},open(os.path.join(os.path.dirname(os.path.abspath(o)),'versao.json'),'w'),ensure_ascii=False);print('versao',m.group(1))

@@ -35,6 +35,22 @@ function pwForm(title,after){ui(`<form id="b6f">${head}<p>${title}</p><input id=
  box.querySelector('#b6f').onsubmit=async e=>{e.preventDefault();const a=box.querySelector('#b6p').value,b=box.querySelector('#b6q').value,er=box.querySelector('.er');
   if(a!==b){er.textContent='As senhas não conferem.';return}er.textContent='Salvando…';const {error}=await sb.auth.updateUser({password:a});
   if(error){er.textContent='Não foi possível salvar: '+error.message;return}hide();if(after)after();else check();try{toast('Senha alterada')}catch(x){}}}
+
+async function mfaForm(msg){const {data}=await sb.auth.mfa.listFactors();const f=data&&data.totp&&data.totp.find(x=>x.status==='verified');if(!f){check();return}
+ ui(`<form id="b6f">${head}<p>Digite o código de 6 dígitos do seu aplicativo autenticador.</p><input id="b6c" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required><div class="er">${msg||''}</div><button type="submit">Confirmar</button><button type="button" class="l" id="b6o">Sair</button></form>`);
+ box.querySelector('#b6o').onclick=async()=>{await sb.auth.signOut();loginForm()};
+ box.querySelector('#b6f').onsubmit=async e=>{e.preventDefault();const er=box.querySelector('.er');er.textContent='Verificando…';
+  const {error}=await sb.auth.mfa.challengeAndVerify({factorId:f.id,code:box.querySelector('#b6c').value.trim()});
+  if(error){er.textContent='Código inválido. Confira o horário do celular e tente de novo.';return}check()}}
+async function mfaOn(){const old=(await sb.auth.mfa.listFactors()).data;for(const x of (old&&old.all||[]).filter(x=>x.status!=='verified'))try{await sb.auth.mfa.unenroll({factorId:x.id})}catch(e){}
+ const {data,error}=await sb.auth.mfa.enroll({factorType:'totp',friendlyName:'Escala B6 '+new Date().toISOString().slice(0,16)});
+ if(error){ui(`<form>${head}<div class="er">Não foi possível ativar: ${error.message}</div><button type="button" id="b6v">Voltar</button></form>`);box.querySelector('#b6v').onclick=()=>window.b6Conta();return}
+ ui(`<form id="b6f">${head}<p>1. Instale um app autenticador (Google Authenticator, Microsoft Authenticator ou similar).<br>2. Leia o QR code abaixo com ele.<br>3. Digite o código de 6 dígitos que aparecer.</p><img src="${data.totp.qr_code}" alt="QR code" style="width:180px;height:180px;background:#fff;border-radius:12px;padding:8px;align-self:center"><p style="font-size:.78rem;word-break:break-all">Sem câmera? Use esta chave: <b style="color:#fff">${data.totp.secret}</b></p><input id="b6c" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required><div class="er"></div><button type="submit">Ativar</button><button type="button" class="l" id="b6v">Cancelar</button></form>`);
+ box.querySelector('#b6v').onclick=async()=>{try{await sb.auth.mfa.unenroll({factorId:data.id})}catch(e){}window.b6Conta()};
+ box.querySelector('#b6f').onsubmit=async e=>{e.preventDefault();const er=box.querySelector('.er');er.textContent='Verificando…';
+  const {error}=await sb.auth.mfa.challengeAndVerify({factorId:data.id,code:box.querySelector('#b6c').value.trim()});
+  if(error){er.textContent='Código inválido. Tente de novo.';return}hide();try{toast('Verificação em duas etapas ativada')}catch(x){}}}
+async function mfaOff(){const {data}=await sb.auth.mfa.listFactors();for(const x of (data&&data.all)||[]){const {error}=await sb.auth.mfa.unenroll({factorId:x.id});if(error){ui(`<form>${head}<div class="er">Não foi possível desativar: ${error.message}</div><button type="button" id="b6v">Voltar</button></form>`);box.querySelector('#b6v').onclick=()=>window.b6Conta();return}}hide();try{toast('Verificação em duas etapas desativada')}catch(x){}}
 let recovering=false;
 sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY'){recovering=true;pwForm('Crie a sua nova senha.')}});
 const OK='b6adm';
@@ -43,13 +59,14 @@ async function check(){if(recovering)return;
  if(!navigator.onLine){const u=offSess();if(u){hide();okRes({user:u});try{setTimeout(()=>setSt('Offline'),1500)}catch(e){}return}}
  let session=null;try{const r=await sb.auth.getSession();session=r.data.session}catch(e){}
  if(!session){const u=offSess();if(u&&!navigator.onLine){hide();okRes({user:u});return}loginForm();return}
+ try{const a=await sb.auth.mfa.getAuthenticatorAssuranceLevel();if(a.data&&a.data.nextLevel==='aal2'&&a.data.currentLevel!=='aal2'){mfaForm();return}}catch(e){}
  let adm=null;try{const {data,error}=await sb.rpc('is_admin');if(error)throw error;adm=data===true}catch(e){if(localStorage.getItem(OK)===session.user.id){hide();okRes(session);return}loginForm('Sem conexão com o servidor. Tente de novo.');return}
  if(!adm){try{localStorage.removeItem(OK)}catch(e){}await sb.auth.signOut();loginForm('Esta conta não tem acesso de administrador.');return}
  try{localStorage.setItem(OK,session.user.id)}catch(e){}hide();okRes(session)}
-window.b6Conta=async()=>{const {data:{session}}=await sb.auth.getSession();const em=session&&session.user.email||'';
+window.b6Conta=async()=>{const {data:{session}}=await sb.auth.getSession();const em=session&&session.user.email||'';let mf=false;try{const r=await sb.auth.mfa.listFactors();mf=!!(r.data&&r.data.totp&&r.data.totp.some(x=>x.status==='verified'))}catch(e){}
  try{dlg.close()}catch(e){}
- ui(`<form>${head}<p>Conectado como <b style="color:#fff">${em.replace(/</g,'')}</b></p><button type="button" id="b6s">Trocar senha</button><button type="button" class="l" id="b6o" style="color:#ff8a8a">Sair deste aparelho</button><button type="button" class="l" id="b6v">Voltar ao app</button></form>`);
- box.querySelector('#b6v').onclick=hide;box.querySelector('#b6s').onclick=()=>pwForm('Escolha a nova senha.',()=>{});
+ ui(`<form>${head}<p>Conectado como <b style="color:#fff">${em.replace(/</g,'')}</b></p><button type="button" id="b6s">Trocar senha</button><button type="button" class="l" id="b6m">${mf?'Desativar verificação em duas etapas':'Ativar verificação em duas etapas'}</button><button type="button" class="l" id="b6o" style="color:#ff8a8a">Sair deste aparelho</button><button type="button" class="l" id="b6v">Voltar ao app</button></form>`);
+ box.querySelector('#b6m').onclick=()=>mf?mfaOff():mfaOn();box.querySelector('#b6v').onclick=hide;box.querySelector('#b6s').onclick=()=>pwForm('Escolha a nova senha.',()=>{});
  box.querySelector('#b6o').onclick=async()=>{try{localStorage.removeItem(OK)}catch(e){}await sb.auth.signOut();try{Object.keys(window.localStorage).length}catch(e){}location.reload()}};
 /* banco: mesmas operações que o app usava no Claude */
 const TB={team:'team',pub:'pub'};
@@ -61,7 +78,7 @@ function coll(path){const t=TB[path];return{
   delete:async()=>{if(!t)return;const {error}=await sb.from(t).delete().eq('id',id);if(error)throw error}})}}
 const db={collection:coll,doc:p=>{const i=p.lastIndexOf('/');return coll(p.slice(0,i)).doc(p.slice(i+1))}};
 const user={isOwner:async()=>true,canEdit:async()=>true,id:async()=>{const {data:{session}}=await sb.auth.getSession();return session?session.user.id:''},
- profiles:async ids=>{const {data}=await sb.from('admins').select('user_id,nome,email').in('user_id',ids||[]);const o={};(data||[]).forEach(a=>o[a.user_id]={name:a.nome||a.email});return o}};
+ profiles:async ids=>{const {data}=await sb.from('admins').select('user_id,nome,email').in('user_id',ids||[]);const o={u_Nx1LSv4OSbBHt9e0NPxSOA:{name:'Thiago Galvão'}};(data||[]).forEach(a=>o[a.user_id]={name:a.nome||a.email});return o}};
 /* arquivos (áudios, PDFs, imagens) no Storage do Supabase */
 const ext=t=>({'audio/mpeg':'mp3','audio/mp4':'m4a','audio/x-m4a':'m4a','audio/wav':'wav','audio/x-wav':'wav','video/mp4':'mp4','application/pdf':'pdf','image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[t]||'bin');
 const assets={upload:async(b,o)=>{const ty=(o&&o.type)||b.type||'application/octet-stream',id=(crypto.randomUUID?crypto.randomUUID().replace(/-/g,''):Date.now().toString(36)+Math.random().toString(36).slice(2))+'.'+ext(ty);

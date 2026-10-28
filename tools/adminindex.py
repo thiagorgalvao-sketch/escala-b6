@@ -1,5 +1,5 @@
 # Gera a página de administração (login pelo Supabase): python3 adminindex.py APP.html OUT/admin/index.html
-import os,sys
+import os,sys,re,json
 here=os.path.dirname(os.path.abspath(__file__))
 HEAD=('<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">'
       '<link rel="icon" type="image/png" href="../icon-192.png"><link rel="apple-touch-icon" href="../icon-180.png">'
@@ -14,3 +14,5 @@ if __name__=='__main__':
     a,o=sys.argv[1:3];os.makedirs(os.path.dirname(o),exist_ok=True)
     open(o,'w',encoding='utf-8').write(build(open(a,encoding='utf-8').read()))
     print('admin',os.path.getsize(o))
+    m=re.search(r"const VER='([^']+)'",open(a,encoding='utf-8').read())
+    if m: json.dump({'v':m.group(1)},open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(o))),'versao.json'),'w'),ensure_ascii=False);print('versao',m.group(1))
