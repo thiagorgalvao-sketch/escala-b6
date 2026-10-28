@@ -90,7 +90,7 @@ def slug(n): return _re.sub(r'[^a-z0-9]+','-',unicodedata.normalize('NFD',n).enc
 RL={'vm':'Voz masculina','vf':'Voz feminina','so':'Soprano','co':'Contralto','te':'Tenor','bt':'Bateria','bx':'Baixo','tc':'Teclado','gt':'Guitarra','vi':'Violão'}
 ADR={'maua':'Av. Cap. João, 1337 - Matriz, Mauá - SP, 09360-120','santo andre':'Av. Pedro Américo, 36 - Vila Humaita, Santo André - SP, 09110-560'}
 def adr(p): k=unicodedata.normalize('NFD',p or '').encode('ascii','ignore').decode().lower().strip();return ADR.get(k,p or '')
-SITE='https://thiagorgalvao-sketch.github.io/escala-b6/'
+SITE='https://fervor.website/'
 def esc(t): return str(t or '').replace('\\','\\\\').replace(';','\\;').replace(',','\\,').replace('\n','\\n')
 def tt(d,h,add=0):
     a,b=map(int,h.split(':'));x=a*60+b+add;return d.replace('-','')+'T%02d%02d00'%((x//60)%24,x%60)
