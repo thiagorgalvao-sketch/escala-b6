@@ -1214,8 +1214,8 @@ function secD(){const g=k=>{try{return +localStorage.getItem(k)||0}catch(e){retu
  const row=(ok,t,d)=>`<div class="sxr ${ok?'ok':'bad'}"><span class="sei">${ok?'✓':'!'}</span><div><b>${t}</b><small class="mut">${d}</small></div></div>`;
  dlg.innerHTML=`<h2>Segurança e backup</h2><div class="secl">
  ${row(!syOld,'Sincronização com a nuvem',DBX?('Última: '+agoT(lsy)+' · '+(S.role=='editor'?'você é editor':'você é o responsável')+' · área da equipe'):'Este aparelho não está salvando na nuvem')}
- ${row(!bkOld,'Backup baixado neste aparelho',bkd?'Último: '+agoT(bkd)+(bkOld?' — recomendado a cada 7 dias':''):'Nenhum backup baixado ainda')}
- ${row(true,'Backup automático','Toda segunda às 5h50, no Google Drive (pasta “Escala B6 Backups”)')}
+ ${window.__B6SB?row(true,'Backup automático','Todo domingo às 23h17, no GitHub (repositório privado escala-b6-backup)'):row(!bkOld,'Backup baixado neste aparelho',bkd?'Último: '+agoT(bkd)+(bkOld?' — recomendado a cada 7 dias':''):'Nenhum backup baixado ainda')}
+ ${window.__B6SB?'':row(true,'Backup automático','Toda segunda às 5h50, no Google Drive (pasta “Escala B6 Backups”)')}
  ${row(true,'Lixeira',(S.trash||[]).length+' item(ns) recuperável(is) por '+TDAYS+' dias')}
  ${row(true,'Proteção contra exclusão',g('rep.skip')?g('rep.skip')+' exclusão(ões) indevida(s) bloqueada(s) neste aparelho':'Nenhuma exclusão indevida detectada')}
  ${row(true,'Edição simultânea',g('rep.cf')?g('rep.cf')+' conflito(s) resolvido(s) sem perda':'Nenhum conflito')}
@@ -1730,7 +1730,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='27/10/2026 · 236';
+const VER='28/10/2026 · 237';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -1865,7 +1865,7 @@ function hashGo(){const h=location.hash||'';let m=/^#r=(.+)$/.exec(h);if(m&&S.li
 /* backup reminder (12) */
 function bkMark(){try{localStorage.setItem('rep.bkd',String(Date.now()))}catch(e){}}
 async function bkDl(){const d=JSON.stringify({songs:S.songs,lists:S.lists}),fn='EscalaB6-backup-'+td()+'.json';let ok=0;try{const dl=window.claude&&await claude.use('downloads');if(dl){await dl.save({filename:fn,data:new TextEncoder().encode(d).buffer});ok=1}}catch(e){}if(!ok){try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([d],{type:'application/json'}));a.download=fn;document.body.appendChild(a);a.click();a.remove();ok=1}catch(e){}}if(ok){bkMark();toast('Backup baixado')}else say('Não foi possível baixar. Use o botão Copiar.')}
-function bkRem(){if(S.band)return;try{if(!localStorage.getItem('rep.tour'))return}catch(e){}let d=0,z=0;try{d=+localStorage.getItem('rep.bkd')||0;z=+localStorage.getItem('rep.bkz')||0}catch(e){}const n=Date.now();if(n-d<30*864e5||n<z)return;const e=document.createElement('div');e.id='bkr';e.innerHTML=`<span>${d?'Seu último backup foi há mais de 30 dias.':'Você ainda não fez um backup.'}</span><button class="sm pri" onclick="this.parentNode.remove();bk()">Fazer backup</button><button class="sm" onclick="try{localStorage.setItem('rep.bkz',String(Date.now()+7*864e5))}catch(e){}this.parentNode.remove()">Depois</button>`;document.body.appendChild(e)}
+function bkRem(){if(S.band||window.__B6SB)return;try{if(!localStorage.getItem('rep.tour'))return}catch(e){}let d=0,z=0;try{d=+localStorage.getItem('rep.bkd')||0;z=+localStorage.getItem('rep.bkz')||0}catch(e){}const n=Date.now();if(n-d<30*864e5||n<z)return;const e=document.createElement('div');e.id='bkr';e.innerHTML=`<span>${d?'Seu último backup foi há mais de 30 dias.':'Você ainda não fez um backup.'}</span><button class="sm pri" onclick="this.parentNode.remove();bk()">Fazer backup</button><button class="sm" onclick="try{localStorage.setItem('rep.bkz',String(Date.now()+7*864e5))}catch(e){}this.parentNode.remove()">Depois</button>`;document.body.appendChild(e)}
 /* change notice for band (15) */
 const fpL=l=>JSON.stringify([l.date,l.songIds,l.keys||{},l.ord||{}]);
 function seenG(){try{return JSON.parse(localStorage.getItem('rep.seen')||'{}')}catch(e){return{}}}
