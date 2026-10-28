@@ -7,6 +7,7 @@ import json,os,sys,datetime,glob,subprocess,tempfile
 APP,PUB,TEAM,OUT=sys.argv[1:5]
 ASSETS=sys.argv[5] if len(sys.argv)>5 else ''
 MISSING=set()
+ROBOTS='User-agent: facebookexternalhit\nAllow: /\n\nUser-agent: WhatsApp\nAllow: /\n\nUser-agent: Twitterbot\nAllow: /\n\nUser-agent: TelegramBot\nAllow: /\n\nUser-agent: *\nDisallow: /\n'
 here=os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0,here);import siteindex
 s=siteindex.build(open(APP,encoding='utf-8').read()) if APP!='-' else None
@@ -78,7 +79,7 @@ for i in need:
     if o: songs[k]=noblob(dict(o))
 os.makedirs(OUT,exist_ok=True)
 if s is not None: open(os.path.join(OUT,'index.html'),'w',encoding='utf-8').write(s)
-open(os.path.join(OUT,'robots.txt'),'w').write('User-agent: *\nDisallow: /\n')
+open(os.path.join(OUT,'robots.txt'),'w').write(ROBOTS)
 import shutil;shutil.copy(os.path.join(here,'sw.js'),os.path.join(OUT,'sw.js'))
 D={k:{'j':json.dumps(v,ensure_ascii=False)} for k,v in {**lists,**songs}.items()}
 for k in [x for x in P if x.startswith('e_')]: D[k]={'j':json.dumps(P[k],ensure_ascii=False)}  # conteúdo espiritual (devocionais, jejum, links)

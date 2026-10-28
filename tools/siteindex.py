@@ -6,7 +6,9 @@ import os,re,sys,json
 here=os.path.dirname(os.path.abspath(__file__))
 HEAD=('<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">'
       '<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">'
-      '<link rel="icon" type="image/png" href="icon-192.png"><meta name="apple-mobile-web-app-title" content="Escala B6">')
+      '<link rel="icon" type="image/svg+xml" href="favicon.svg"><link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">'
+      '<meta property="og:type" content="website"><meta property="og:site_name" content="Fervor"><meta property="og:title" content="Fervor"><meta property="og:description" content="Escala, repertórios e devocionais da banda. “Sejam fervorosos no espírito, servindo ao Senhor.” (Romanos 12:11)"><meta property="og:url" content="https://fervor.website/"><meta property="og:image" content="https://fervor.website/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo Fervor: letra F dentro de uma chama"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://fervor.website/og.png"><meta name="description" content="Escala, repertórios e devocionais da banda.">'
+      '<meta name="apple-mobile-web-app-title" content="Escala B6">')
 STRIP={'SEED':'[]','EV2':'[]','PD':'[]','VMIMP':'{}'}
 def build(s):
     for k,v in STRIP.items():
