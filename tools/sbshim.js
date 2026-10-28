@@ -37,14 +37,20 @@ function pwForm(title,after){ui(`<form id="b6f">${head}<p>${title}</p><input id=
   if(error){er.textContent='Não foi possível salvar: '+error.message;return}hide();if(after)after();else check();try{toast('Senha alterada')}catch(x){}}}
 let recovering=false;
 sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY'){recovering=true;pwForm('Crie a sua nova senha.')}});
-async function check(){if(recovering)return;const {data:{session}}=await sb.auth.getSession();if(!session){loginForm();return}
- if(!(await isAdm())){await sb.auth.signOut();loginForm('Esta conta não tem acesso de administrador.');return}
- hide();okRes(session)}
+const OK='b6adm';
+function offSess(){try{const r=JSON.parse(localStorage.getItem('b6-auth')||'null');const u=r&&(r.user||(r.currentSession&&r.currentSession.user));return u&&localStorage.getItem(OK)===u.id?u:null}catch(e){return null}}
+async function check(){if(recovering)return;
+ if(!navigator.onLine){const u=offSess();if(u){hide();okRes({user:u});try{setTimeout(()=>setSt('Offline'),1500)}catch(e){}return}}
+ let session=null;try{const r=await sb.auth.getSession();session=r.data.session}catch(e){}
+ if(!session){const u=offSess();if(u&&!navigator.onLine){hide();okRes({user:u});return}loginForm();return}
+ let adm=null;try{const {data,error}=await sb.rpc('is_admin');if(error)throw error;adm=data===true}catch(e){if(localStorage.getItem(OK)===session.user.id){hide();okRes(session);return}loginForm('Sem conexão com o servidor. Tente de novo.');return}
+ if(!adm){try{localStorage.removeItem(OK)}catch(e){}await sb.auth.signOut();loginForm('Esta conta não tem acesso de administrador.');return}
+ try{localStorage.setItem(OK,session.user.id)}catch(e){}hide();okRes(session)}
 window.b6Conta=async()=>{const {data:{session}}=await sb.auth.getSession();const em=session&&session.user.email||'';
  try{dlg.close()}catch(e){}
  ui(`<form>${head}<p>Conectado como <b style="color:#fff">${em.replace(/</g,'')}</b></p><button type="button" id="b6s">Trocar senha</button><button type="button" class="l" id="b6o" style="color:#ff8a8a">Sair deste aparelho</button><button type="button" class="l" id="b6v">Voltar ao app</button></form>`);
  box.querySelector('#b6v').onclick=hide;box.querySelector('#b6s').onclick=()=>pwForm('Escolha a nova senha.',()=>{});
- box.querySelector('#b6o').onclick=async()=>{await sb.auth.signOut();try{Object.keys(window.localStorage).length}catch(e){}location.reload()}};
+ box.querySelector('#b6o').onclick=async()=>{try{localStorage.removeItem(OK)}catch(e){}await sb.auth.signOut();try{Object.keys(window.localStorage).length}catch(e){}location.reload()}};
 /* banco: mesmas operações que o app usava no Claude */
 const TB={team:'team',pub:'pub'};
 const row=(id,r)=>({id,exists:!!r,data:()=>r?{j:r.j,u:r.u,by:r.by}:undefined});
