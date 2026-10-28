@@ -579,7 +579,7 @@ const css=`#b6l{position:fixed;inset:0;z-index:2147483000;background:radial-grad
 #b6l input{font:inherit;font-size:16px;padding:12px;border-radius:10px;border:1px solid #2A3D5A;background:#070D18;color:#fff}
 #b6l button{font:inherit;font-weight:700;padding:12px;border-radius:10px;border:0;background:#00CDD3;color:#04252C;cursor:pointer}
 #b6l button.l{background:transparent;color:#00CDD3;font-weight:600;padding:4px}#b6l .er{color:#ff8a8a;min-height:1em;font-size:.88rem}
-#b6l .ok{color:#7CCEDB;font-size:.88rem}#b6l .bd{width:44px;height:44px;border-radius:50%;border:2px solid #00CDD3;display:grid;place-items:center;font-weight:800}`;
+#b6l .ok{color:#7CCEDB;font-size:.88rem}#b6l .bd{width:44px;height:44px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-weight:800}`;
 let box=null;
 function ui(html){if(!box){const s=document.createElement('style');s.textContent=css;document.head.appendChild(s);box=document.createElement('div');box.id='b6l';document.body.appendChild(box)}box.innerHTML=html;box.hidden=false;const i=box.querySelector('input');if(i)setTimeout(()=>i.focus(),50)}
 const hide=()=>{if(box)box.hidden=true};
