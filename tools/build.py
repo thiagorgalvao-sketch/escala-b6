@@ -9,7 +9,7 @@ ASSETS=sys.argv[5] if len(sys.argv)>5 else ''
 MISSING=set()
 here=os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0,here);import siteindex
-s=siteindex.build(open(APP,encoding='utf-8').read())
+s=siteindex.build(open(APP,encoding='utf-8').read()) if APP!='-' else None
 def load(d):
     o={}
     for f in os.listdir(d) if d and os.path.isdir(d) else []:
@@ -77,7 +77,7 @@ for i in need:
     k='s_'+i;o=P.get(k) or T.get(k)
     if o: songs[k]=noblob(dict(o))
 os.makedirs(OUT,exist_ok=True)
-open(os.path.join(OUT,'index.html'),'w',encoding='utf-8').write(s)
+if s is not None: open(os.path.join(OUT,'index.html'),'w',encoding='utf-8').write(s)
 open(os.path.join(OUT,'robots.txt'),'w').write('User-agent: *\nDisallow: /\n')
 import shutil;shutil.copy(os.path.join(here,'sw.js'),os.path.join(OUT,'sw.js'))
 D={k:{'j':json.dumps(v,ensure_ascii=False)} for k,v in {**lists,**songs}.items()}
