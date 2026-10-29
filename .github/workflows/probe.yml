@@ -1,0 +1,11 @@
+name: Sonda temporária de cifras
+on:
+  workflow_dispatch:
+  push:
+    paths: ['tools/probe/**']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/probe/probe.py
