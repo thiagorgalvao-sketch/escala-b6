@@ -1,0 +1,10 @@
+name: Sonda temporária de cifras
+on:
+  push:
+    paths: ['tools/probe/**']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash tools/probe/p.sh
