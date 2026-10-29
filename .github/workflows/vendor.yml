@@ -18,28 +18,27 @@ jobs:
           node-version: '20'
       - name: Baixa e verifica
         run: |
-          set -e
-          mkdir -p vendor /tmp/v && cd /tmp/v
-          SB=$(jq -r '."@supabase/supabase-js"' $GITHUB_WORKSPACE/tools/vendor.json)
-          PJ=$(jq -r '."pdfjs-dist"' $GITHUB_WORKSPACE/tools/vendor.json)
-          JP=$(jq -r '."jspdf"' $GITHUB_WORKSPACE/tools/vendor.json)
-          npm pack "@supabase/supabase-js@$SB" "pdfjs-dist@$PJ" "jspdf@$JP" >/dev/null
+          cat > /tmp/v.sh <<'SH'
+          set -ex
+          mkdir -p "$GITHUB_WORKSPACE/vendor" /tmp/v && cd /tmp/v
+          SB=$(jq -r '."@supabase/supabase-js"' "$GITHUB_WORKSPACE/tools/vendor.json")
+          PJ=$(jq -r '."pdfjs-dist"' "$GITHUB_WORKSPACE/tools/vendor.json")
+          JP=$(jq -r '."jspdf"' "$GITHUB_WORKSPACE/tools/vendor.json")
+          npm pack "@supabase/supabase-js@$SB" "pdfjs-dist@$PJ" "jspdf@$JP"
+          ls -la
           for f in *.tgz; do mkdir -p "x_$f" && tar xzf "$f" -C "x_$f"; done
-          cp x_supabase-supabase-js-$SB.tgz/package/dist/umd/supabase.min.js $GITHUB_WORKSPACE/vendor/supabase.min.js
-          cp x_pdfjs-dist-$PJ.tgz/package/build/pdf.min.mjs $GITHUB_WORKSPACE/vendor/pdf.min.mjs
-          cp x_pdfjs-dist-$PJ.tgz/package/build/pdf.worker.min.mjs $GITHUB_WORKSPACE/vendor/pdf.worker.min.mjs
-          cp x_jspdf-$JP.tgz/package/dist/jspdf.umd.min.js $GITHUB_WORKSPACE/vendor/jspdf.umd.min.js
-          cd $GITHUB_WORKSPACE/vendor
-          python3 - <<'PY'
-          import hashlib,base64,json,os
-          v=json.load(open('../tools/vendor.json'))
-          m={'versoes':v,'sri':{}}
-          for f in sorted(os.listdir('.')):
-              if f.endswith(('.js','.mjs')):
-                  m['sri'][f]='sha384-'+base64.b64encode(hashlib.sha384(open(f,'rb').read()).digest()).decode()
-          json.dump(m,open('manifest.json','w'),indent=1)
-          print(json.dumps(m,indent=1))
-          PY
+          cp "x_supabase-supabase-js-$SB.tgz/package/dist/umd/supabase.min.js" "$GITHUB_WORKSPACE/vendor/supabase.min.js"
+          cp "x_pdfjs-dist-$PJ.tgz/package/build/pdf.min.mjs" "$GITHUB_WORKSPACE/vendor/pdf.min.mjs"
+          cp "x_pdfjs-dist-$PJ.tgz/package/build/pdf.worker.min.mjs" "$GITHUB_WORKSPACE/vendor/pdf.worker.min.mjs"
+          cp "x_jspdf-$JP.tgz/package/dist/jspdf.umd.min.js" "$GITHUB_WORKSPACE/vendor/jspdf.umd.min.js"
+          cd "$GITHUB_WORKSPACE/vendor"
+          python3 "$GITHUB_WORKSPACE/tools/vendor_sri.py"
+          SH
+          if ! bash /tmp/v.sh > /tmp/v.log 2>&1; then
+            echo "::error::$(tail -c 900 /tmp/v.log | tr '\n' ' ')"
+            exit 1
+          fi
+          echo "::notice::$(cat "$GITHUB_WORKSPACE/vendor/manifest.json" | tr '\n' ' ')"
       - name: Salva
         run: |
           git config user.name "escala-b6-bot"
