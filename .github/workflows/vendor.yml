@@ -27,7 +27,9 @@ jobs:
           npm pack "@supabase/supabase-js@$SB" "pdfjs-dist@$PJ" "jspdf@$JP"
           ls -la
           for f in *.tgz; do mkdir -p "x_$f" && tar xzf "$f" -C "x_$f"; done
-          cp "x_supabase-supabase-js-$SB.tgz/package/dist/umd/supabase.min.js" "$GITHUB_WORKSPACE/vendor/supabase.min.js"
+          find "x_supabase-supabase-js-$SB.tgz/package/dist" -maxdepth 2 | head -40
+          U=$(ls "x_supabase-supabase-js-$SB.tgz/package/dist/umd/"supabase*.js | head -1)
+          cp "$U" "$GITHUB_WORKSPACE/vendor/supabase.min.js"
           cp "x_pdfjs-dist-$PJ.tgz/package/build/pdf.min.mjs" "$GITHUB_WORKSPACE/vendor/pdf.min.mjs"
           cp "x_pdfjs-dist-$PJ.tgz/package/build/pdf.worker.min.mjs" "$GITHUB_WORKSPACE/vendor/pdf.worker.min.mjs"
           cp "x_jspdf-$JP.tgz/package/dist/jspdf.umd.min.js" "$GITHUB_WORKSPACE/vendor/jspdf.umd.min.js"
