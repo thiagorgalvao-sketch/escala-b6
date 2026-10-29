@@ -1,18 +1,15 @@
 // Escala B6 - service worker do site da banda
 // Página e dados: rede primeiro, cópia salva quando estiver sem internet.
 // Áudios (media/): não passam por aqui; o app guarda os do culto no aparelho (IndexedDB).
-const C='escalab6-v8',SHELL=['./','index.html','pub.json','manifest.webmanifest','icon-180.png','icon-192.png','icon-512.png','admin/','admin/index.html'];
+const C='escalab6-v7',SHELL=['./','index.html','pub.json','manifest.webmanifest','icon-180.png','icon-192.png','icon-512.png','admin/','admin/index.html'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(SHELL)).catch(()=>{}));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET')return;const u=new URL(r.url);
  if(u.host==='cdn.jsdelivr.net'){e.respondWith(caches.open(C).then(c=>c.match(r).then(m=>m||fetch(r).then(x=>{if(x&&(x.ok||x.type==='opaque'))c.put(r,x.clone());return x}))));return}
  if(u.origin!==location.origin||u.pathname.includes('/media/')||r.headers.has('range'))return;
- const key=u.origin+u.pathname,nav=r.mode==='navigate',cached=()=>caches.match(key,{ignoreSearch:true}).then(m=>m||(nav?caches.match('index.html',{ignoreSearch:true}).then(x=>x||caches.match('./')):undefined));
- const net=fetch(r).then(x=>{if(x&&x.status===200&&x.type==='basic'){const c=x.clone();return caches.open(C).then(k=>k.put(key,c)).catch(()=>{}).then(()=>x)}return x});e.waitUntil(net.catch(()=>{}));
- // internet lenta: depois de 2,5 s abre a cópia salva e a versão nova fica guardada para a próxima vez
- const slow=nav||/\.(html|json)$/.test(u.pathname)||u.pathname.endsWith('/');
- e.respondWith(new Promise(res=>{let ok=0;const give=x=>{if(!ok&&x){ok=1;res(x)}};const t=slow?setTimeout(()=>cached().then(give),2500):0;
-  net.then(x=>{clearTimeout(t);give(x)},()=>{clearTimeout(t);cached().then(m=>{give(m||Response.error())})})}))});
+ const key=u.origin+u.pathname;
+ e.respondWith(fetch(r).then(x=>{if(x&&x.status===200&&x.type==='basic'){const c=x.clone();caches.open(C).then(k=>k.put(key,c)).catch(()=>{})}return x})
+  .catch(()=>caches.match(key,{ignoreSearch:true}).then(m=>m||(r.mode==='navigate'?caches.match('index.html',{ignoreSearch:true}).then(x=>x||caches.match('./')):undefined)||Response.error())))});
 
 // avisos no celular (notificações de repertório publicado)
 self.addEventListener('push',e=>{let d={};try{d=e.data?e.data.json():{}}catch(x){d={title:'Escala B6',body:e.data?e.data.text():''}}
