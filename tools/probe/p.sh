@@ -7,3 +7,4 @@ curl -s -m 40 "https://r.jina.ai/$U" -H "X-Target-Selector: pre" -o out/j3.txt
 curl -s -m 40 "https://r.jina.ai/$U" -H "X-Return-Format: text" -H "X-Target-Selector: .cifra_cnt" -o out/j4.txt
 curl -s -m 40 "https://r.jina.ai/https://www.cifraclub.com.br/aline-barros/ressuscita-me/" -H "X-Return-Format: html" -H "X-Target-Selector: pre" -o out/j5.html
 curl -s -m 40 "https://r.jina.ai/https://www.cifraclub.com.br/nair-nany/melhor-amigo/imprimir.html" -o out/j6.txt
+# 1793290317

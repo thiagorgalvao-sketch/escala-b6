@@ -2,11 +2,14 @@ name: Sonda temporária de cifras
 on:
   push:
     paths: ['tools/probe/**']
+permissions:
+  contents: write
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: bash tools/probe/p.sh
-      - uses: actions/upload-artifact@v4
-        with: {name: out, path: out}
+      - run: |
+          git config user.name sonda; git config user.email sonda@x
+          git checkout -q --orphan probe-out; git rm -rq --cached . ; git add out; git commit -qm out; git push -qf origin probe-out
