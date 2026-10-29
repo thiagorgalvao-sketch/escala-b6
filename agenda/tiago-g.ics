@@ -18,7 +18,7 @@ END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
 UID:culto-e_2026-10-04_santoandre_domingonoite@escala-b6
-DTSTAMP:20261028T224033Z
+DTSTAMP:20261029T055627Z
 DTSTART;TZID=America/Sao_Paulo:20261004T171500
 DTEND;TZID=America/Sao_Paulo:20261004T203000
 SUMMARY:Culto · Santo André - Noite · Culto de Domingo
@@ -32,7 +32,7 @@ END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:culto-e_2026-09-23_santoandre_quartadoenco@escala-b6
-DTSTAMP:20261028T224033Z
+DTSTAMP:20261029T055627Z
 DTSTART;TZID=America/Sao_Paulo:20260923T185500
 DTEND;TZID=America/Sao_Paulo:20260923T220500
 SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
@@ -41,20 +41,6 @@ DESCRIPTION:Você: Guitarra\n\nHORÁRIOS\nInício da passagem: 18:55\n\nREPERTÓ
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:Culto · Santo André - Noite · Quarta do Encontro
-TRIGGER:-PT1H
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-09-13_maua_domingomanha@escala-b6
-DTSTAMP:20261028T224033Z
-DTSTART;TZID=America/Sao_Paulo:20260913T074000
-DTEND;TZID=America/Sao_Paulo:20260913T105000
-SUMMARY:Culto · Mauá - Manhã · Ceia do Senhor
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Guitarra\n\nHORÁRIOS\nInício da passagem: 07:40\n\nREPERTÓRIO\n- Altar\n- Confio em Deus\n- Digno É o Senhor\n- Quem Mais É Digno\n- Em Teus Braços\n\nhttps://fervor.website/
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Culto · Mauá - Manhã · Ceia do Senhor
 TRIGGER:-PT1H
 END:VALARM
 END:VEVENT
