@@ -1,5 +1,5 @@
 (()=>{const N=async()=>null;
-const SBU='https://hofrthndlstofytlapzk.supabase.co',KEY='sb_publishable_Hmstttzx95SEN24Olsuk0g_AuPGnkX7',SB=SBU+'/rest/v1/pub?select=id,j&order=id',CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+const SBU='https://hofrthndlstofytlapzk.supabase.co',KEY='sb_publishable_Hmstttzx95SEN24Olsuk0g_AuPGnkX7',SB=SBU+'/rest/v1/pub?select=id,j&order=id',CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js',VSB=new URL('vendor/supabase.min.js',location.href).href;
 const lg=k=>{try{return localStorage.getItem(k)}catch(e){return null}},ls=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
 const toObj=a=>{const o={};a.forEach(x=>o[x.id]={j:x.j});return o};
 /* modo aberto (padrão): leitura anônima do Supabase, com a cópia pub.json como reserva */
@@ -13,7 +13,7 @@ window.__FVCFG=()=>CFG;
 let sb=null,okRes;const ready=new Promise(r=>okRes=r);
 const keep=()=>lg('fv-keep')!=='0';
 const store={getItem:k=>{try{return(keep()?localStorage:sessionStorage).getItem(k)}catch(e){return null}},setItem:(k,v)=>{try{(keep()?localStorage:sessionStorage).setItem(k,v)}catch(e){}},removeItem:k=>{try{localStorage.removeItem(k);sessionStorage.removeItem(k)}catch(e){}}};
-const loadJs=()=>new Promise((ok,no)=>{if(window.supabase)return ok();const s=document.createElement('script');s.src=CDN;s.onload=ok;s.onerror=()=>no(new Error('cdn'));document.head.appendChild(s)});
+const ld=u=>new Promise((ok,no)=>{if(window.supabase)return ok();const s=document.createElement('script');s.src=u;if(u==CDN)s.crossOrigin='anonymous';s.onload=()=>window.supabase?ok():no(new Error('lib'));s.onerror=()=>no(new Error('lib'));document.head.appendChild(s)}),loadJs=()=>ld(VSB).catch(()=>ld(CDN));
 const css=`#fvl{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(900px 420px at 50% -120px,rgba(0,205,211,.16),transparent 70%),#070D18;display:flex;align-items:center;justify-content:center;padding:16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;color:#fff;overflow:auto}
 #fvl form{width:100%;max-width:360px;background:#111E33;border:1px solid #2A3D5A;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:12px}
 #fvl h1{font-size:1.4rem;margin:0;letter-spacing:.16em}#fvl p{margin:0;color:#A2B1C4;font-size:.9rem;line-height:1.45}

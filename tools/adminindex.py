@@ -6,7 +6,8 @@ HEAD=('<meta name="robots" content="noindex,nofollow,noarchive"><meta name="refe
       '<meta property="og:type" content="website"><meta property="og:site_name" content="Fervor"><meta property="og:title" content="Fervor"><meta property="og:description" content="Escala, repertórios e devocionais da banda. “Sejam fervorosos no espírito, servindo ao Senhor.” (Romanos 12:11)"><meta property="og:url" content="https://fervor.website/"><meta property="og:image" content="https://fervor.website/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo Fervor: letra F dentro de uma chama"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://fervor.website/og.png"><meta name="description" content="Escala, repertórios e devocionais da banda.">'
       '<link rel="apple-touch-icon" href="../icon-180.png">'
       '<meta name="apple-mobile-web-app-title" content="B6 Admin">')
-SB='<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>'
+SB=('<script src="../vendor/supabase.min.js"></script>'
+    '<script>window.supabase||document.write(\'<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"><\\/script>\')</script>')
 def build(s):
     sh=open(os.path.join(here,'sbshim.js'),encoding='utf-8').read()
     i=s.find('<script');assert i>0
