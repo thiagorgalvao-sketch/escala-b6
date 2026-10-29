@@ -570,7 +570,7 @@ body.nobnb.band{padding-top:0}body.nobnb.band header{top:0}body.nobnb #bnb{displ
 .dfl{display:flex;flex-direction:column;gap:6px}.dfc{display:grid;grid-template-columns:78px 1fr auto;gap:8px;align-items:center;text-align:left;background:#111E33;border:0;border-radius:10px;padding:8px 10px;min-height:0;color:#fff;font-size:.86rem}.dfc b{font-variant-numeric:tabular-nums}.dfc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#C8D2DF}.dfc i{font-style:normal;font-size:.75rem;font-weight:700;border-radius:999px;padding:2px 8px}.dfc i.w{background:#3a2f00;color:#ffd60a}.dfc i.ok{background:#0A2A36;color:#00CDD3}.dfc i.r{background:#102235;color:#64b5f6}
 .dmi{display:flex;flex-direction:column;gap:6px}.dmi div{display:grid;grid-template-columns:minmax(0,1.2fr) 2fr 40px;gap:8px;align-items:center;font-size:.86rem}.dmi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dmi u{display:block;height:8px;background:#152540;border-radius:4px;text-decoration:none;overflow:hidden}.dmi u b{display:block;height:100%;background:#00CDD3;border-radius:4px}.dmi em{font-style:normal;text-align:right;color:#C8D2DF;font-variant-numeric:tabular-nums}.dmi small{grid-column:1/-1;color:#8FA1B8;font-size:.74rem;margin-top:-3px}
 .dk{position:relative}.dk b span{font-size:1.1rem;color:#8FA1B8;font-weight:600}.dk i{display:block;font-style:normal;font-size:.75rem;color:#A2B1C4;margin-top:4px}.dk.ok{border-color:#1f4d2e}.dk.ok i{color:#00CDD3}.dk.wa{border-color:#4d4100}.dk.wa i{color:#ffd60a}
-</style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap"><style id="brand">.acts .vsbt:not(.on){display:none!important}
+</style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap"><style id="brand">.acts .vsbt:not(.on){display:inline-flex!important;opacity:.28;filter:grayscale(1)}
 #lvl li:not(:has(.acts .on)) .acts{display:none}
 #lvl li:not(:has(.acts .on)){padding-bottom:0!important}
 .acts .lks2,.acts .lks2 span{color:#00CDD3!important}
@@ -2153,7 +2153,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='29/10/2026 · 267';
+const VER='29/10/2026 · 268';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
