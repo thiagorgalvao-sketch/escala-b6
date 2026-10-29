@@ -1,0 +1,13 @@
+{
+ "versoes": {
+  "@supabase/supabase-js": "2.49.4",
+  "pdfjs-dist": "4.10.38",
+  "jspdf": "2.5.1"
+ },
+ "sri": {
+  "jspdf.umd.min.js": "sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk",
+  "pdf.min.mjs": "sha384-+0ti2moQlmLN7WZHE2RHIf5lV8hHxhxEalN0il3YZceG26fUPyOkR0hp9daxk1i7",
+  "pdf.worker.min.mjs": "sha384-ToeVvShCxKc6CEvhHeMt0Q8A06pSPDbAlngO9nokrDmh914gk/pYd0N7D0a4Lz2o",
+  "supabase.min.js": "sha384-rwykjmWNwVxboyFmvK9OXN0wj9hnMHA2aAHtits54DuACyCq0M2PrSNxhRb+hvXT"
+ }
+}
