@@ -1,0 +1,43 @@
+name: Testes automáticos
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'admin/**', 'sw.js', 'pub.json', 'tools/app.html', 'tools/shim.js', 'tools/sbshim.js', 'tools/tests/**', '.github/workflows/tests.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: testes
+  cancel-in-progress: true
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepara o navegador de testes
+        run: |
+          pip install -q playwright==1.48.0
+          python -m playwright install --with-deps chromium > /dev/null
+      - name: Roda os testes
+        run: |
+          set -o pipefail
+          python tools/tests/run.py | tee /tmp/r.txt
+      - name: Resumo
+        if: always()
+        run: |
+          { echo '### Testes do Fervor'; echo '```'; cat /tmp/r.txt 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Avisa se algo falhou
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          F=$(grep '✘' /tmp/r.txt | head -10 | sed 's/^/- /')
+          gh issue create --repo "${{ github.repository }}" --title "⚠ Testes automáticos falharam ($(git log -1 --format=%s | cut -c1-60))" --body "$(printf 'O que falhou:\n%s\n\nVeja: %s/%s/actions/runs/%s' "$F" "${{ github.server_url }}" "${{ github.repository }}" "${{ github.run_id }}")"
