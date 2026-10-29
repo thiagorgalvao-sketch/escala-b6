@@ -1,24 +1,20 @@
-# Sonda temporária: verifica formatos de busca/página de cifra (não grava conteúdo, só estrutura)
 import urllib.request,urllib.parse,re,json,html
-UA={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36','Accept-Language':'pt-BR,pt;q=0.9'}
-def get(u):
+H1={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36','Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8','Accept-Language':'pt-BR,pt;q=0.9,en;q=0.8','Referer':'https://www.google.com/'}
+def get(u,h=H1):
     try:
-        r=urllib.request.urlopen(urllib.request.Request(u,headers=UA),timeout=25);return r.status,r.read().decode('utf-8','replace')
-    except Exception as e: return getattr(e,'code',0),str(e)
-def note(m): print('::notice::'+m.replace('\n',' ')[:1800])
-q='melhor amigo nair nany'
-for u in ['https://solr.sscdn.co/cc/h2/?q='+urllib.parse.quote(q),'https://solr.sscdn.co/cc/c7/?q='+urllib.parse.quote(q)]:
-    st,t=get(u);note(f'SOLR {u[-40:]} status={st} len={len(t)} head={t[:700]}')
-st,t=get('https://www.cifraclub.com.br/nair-nany/melhor-amigo/')
-note(f'PAGE status={st} len={len(t)} pre={len(re.findall(r"<pre",t))} cifra_tom={"cifra_tom" in t} h1={re.findall(r"<h1[^>]*>(.*?)</h1>",t)[:2]} h2={[re.sub("<[^>]+>","",x)[:60] for x in re.findall(r"<h2[^>]*>(.*?)</h2>",t,re.S)[:2]]}')
-m=re.search(r'<pre[^>]*>([\s\S]*?)</pre>',t)
-if m:
+        r=urllib.request.urlopen(urllib.request.Request(u,headers=h),timeout=25);return r.status,r.read().decode('utf-8','replace')
+    except Exception as e:
+        b='';
+        try:b=e.read().decode('utf-8','replace')[:120]
+        except Exception:pass
+        return getattr(e,'code',0),str(e)[:80]+' '+b
+def note(m): print('::notice::'+m.replace('\n',' ')[:1500])
+def info(t):
+    m=re.search(r'<pre[^>]*>([\s\S]*?)</pre>',t)
+    if not m: return 'sem pre'
     pre=html.unescape(re.sub(r'<[^>]+>','',m.group(1)));L=pre.split('\n')
-    secs=[x.strip() for x in L if re.match(r'^\s*\[[^\]]+\]',x)]
-    note(f'PRE lines={len(L)} secoes={secs[:20]} tags={sorted(set(re.findall(r"<(\w+)",m.group(1))))} tom_ctx={re.sub(r"<[^>]+>"," ",t[t.find("cifra_tom"):t.find("cifra_tom")+300])[:200] if "cifra_tom" in t else ""}')
-    note('PRE_CHORDS '+' | '.join(x for x in L if x.strip() and re.fullmatch(r'[\sA-G#b/m0-9()+°ºMadijsu\-|]+',x))[:600])
-st,t=get('https://html.duckduckgo.com/html/?q='+urllib.parse.quote('cifraclub '+q))
-links=re.findall(r'cifraclub\.com\.br/([a-z0-9\-]+)/([a-z0-9\-]+)/',html.unescape(urllib.parse.unquote(t)))
-note(f'DDG status={st} len={len(t)} links={links[:6]}')
-st,t=get('https://www.cifraclub.com.br/?q='+urllib.parse.quote(q))
-note(f'CCSEARCH status={st} len={len(t)} links={re.findall(r"href=\"/([a-z0-9-]+)/([a-z0-9-]+)/\"",t)[:6]} gcse={"cse" in t}')
+    return f'pre_lines={len(L)} secoes={[x.strip() for x in L if re.match(r"^\s*\[[^\]]+\]",x)][:12]} tags={sorted(set(re.findall(r"<(\w+)",m.group(1))))}'
+for u in ['https://www.cifraclub.com.br/nair-nany/melhor-amigo/','https://www.cifraclub.com.br/nair-nany/melhor-amigo/imprimir.html','https://m.cifraclub.com.br/nair-nany/melhor-amigo/','https://cifraclub.com.br/nair-nany/melhor-amigo/','https://www.cifras.com.br/cifra/nair-nany/melhor-amigo','https://www.letras.mus.br/nair-nany/melhor-amigo/']:
+    st,t=get(u);note(f'{u} -> {st} len={len(t)} {info(t) if st==200 else t[:160]}')
+st,t=get('https://www.cifraclub.com.br/nair-nany/melhor-amigo/',{'User-Agent':'curl/8.5.0','Accept':'*/*'})
+note(f'curl-UA -> {st} {t[:120] if st!=200 else info(t)}')
