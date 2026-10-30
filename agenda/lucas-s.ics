@@ -17,22 +17,8 @@ TZNAME:-03
 END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
-UID:culto-e_2026-11-29_santoandre_domingonoite@escala-b6
-DTSTAMP:20261030T130547Z
-DTSTART;TZID=America/Sao_Paulo:20261129T170000
-DTEND;TZID=America/Sao_Paulo:20261129T203000
-SUMMARY:Culto · Santo André - Noite · Culto de Domingo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nBanda pronta: 17:00\nGain / check de sinal: 17:00\nInício da passagem: 17:15\nTérmino da passagem: 17:40\n\nRepertório a definir\n\nhttps://fervor.website/
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Culto · Santo André - Noite · Culto de Domingo
-TRIGGER:-PT1H
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
 UID:culto-e_2026-10-18_maua_domingomanha@escala-b6
-DTSTAMP:20261030T130547Z
+DTSTAMP:20261030T222654Z
 DTSTART;TZID=America/Sao_Paulo:20261018T074000
 DTEND;TZID=America/Sao_Paulo:20261018T105000
 SUMMARY:Culto · Mauá - Manhã · Culto de Domingo
@@ -45,50 +31,8 @@ TRIGGER:-PT1H
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:culto-1oaib7s@escala-b6
-DTSTAMP:20261030T130547Z
-DTSTART;TZID=America/Sao_Paulo:20261025T170000
-DTEND;TZID=America/Sao_Paulo:20261025T201000
-SUMMARY:Culto · Santo André - Noite · Batismo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nBanda pronta: 17:00\nGain / check de sinal: 17:00\nInício da passagem: 17:15\nTérmino da passagem: 17:40\n\nREPERTÓRIO\n- Vida aos Sepulcros\n- Gratidão\n- Teu Toque\n- Canção Que Não Envelhece\n- Yahweh Se Manifestará\n- Em Tua Presença\n- Que Ele Cresça\n- Agnus Dei\n\nhttps://fervor.website/
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Culto · Santo André - Noite · Batismo
-TRIGGER:-PT1H
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:ens-1oaib7s@escala-b6
-DTSTAMP:20261030T130547Z
-DTSTART;TZID=America/Sao_Paulo:20261022T203000
-DTEND;TZID=America/Sao_Paulo:20261022T223000
-SUMMARY:Ensaio · Santo André - Noite · Batismo
-LOCATION:Estúdio - Lugar do Encontro Santo André
-DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nBanda pronta: 17:00\nGain / check de sinal: 17:00\nInício da passagem: 17:15\nTérmino da passagem: 17:40\n\nREPERTÓRIO\n- Vida aos Sepulcros\n- Gratidão\n- Teu Toque\n- Canção Que Não Envelhece\n- Yahweh Se Manifestará\n- Em Tua Presença\n- Que Ele Cresça\n- Agnus Dei\n\nhttps://fervor.website/
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Ensaio · Santo André - Noite · Batismo
-TRIGGER:-PT1H
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:culto-e_2026-10-04_santoandre_domingonoite@escala-b6
-DTSTAMP:20261030T130547Z
-DTSTART;TZID=America/Sao_Paulo:20261004T171500
-DTEND;TZID=America/Sao_Paulo:20261004T203000
-SUMMARY:Culto · Santo André - Noite · Culto de Domingo
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nInício da passagem: 17:15\n\nREPERTÓRIO\n- És Bem-Vindo\n- Clamarei\n- O Vento Encontra o Fogo\n- Só Tu És Santo\n- Quem É Esse?\n\nhttps://fervor.website/
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Culto · Santo André - Noite · Culto de Domingo
-TRIGGER:-PT1H
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
 UID:culto-e_2026-09-23_santoandre_quartadoenco@escala-b6
-DTSTAMP:20261030T130547Z
+DTSTAMP:20261030T222654Z
 DTSTART;TZID=America/Sao_Paulo:20260923T185500
 DTEND;TZID=America/Sao_Paulo:20260923T220500
 SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
@@ -102,7 +46,7 @@ END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:culto-e_2026-12-13_santoandre_domingomanha@escala-b6
-DTSTAMP:20261030T130547Z
+DTSTAMP:20261030T222654Z
 DTSTART;TZID=America/Sao_Paulo:20261213T073000
 DTEND;TZID=America/Sao_Paulo:20261213T113000
 SUMMARY:Culto · Santo André - Manhã · Culto de Domingo
@@ -115,22 +59,64 @@ TRIGGER:-PT1H
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:culto-e_2026-11-18_santoandre_quartadoenco@escala-b6
-DTSTAMP:20261030T130547Z
-DTSTART;TZID=America/Sao_Paulo:20261118T184000
-DTEND;TZID=America/Sao_Paulo:20261118T215000
-SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
+UID:culto-1oaib7s@escala-b6
+DTSTAMP:20261030T222654Z
+DTSTART;TZID=America/Sao_Paulo:20261025T170000
+DTEND;TZID=America/Sao_Paulo:20261025T201000
+SUMMARY:Culto · Santo André - Noite · Batismo
 LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nBanda pronta: 18:40\nGain / check de sinal: 18:40\nInício da passagem: 18:55\nTérmino da passagem: 19:20\n\nRepertório a definir\n\nhttps://fervor.website/
+DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nBanda pronta: 17:00\nGain / check de sinal: 17:00\nInício da passagem: 17:15\nTérmino da passagem: 17:40\n\nREPERTÓRIO\n- Vida aos Sepulcros\n- Gratidão\n- Teu Toque\n- Canção Que Não Envelhece\n- Yahweh Se Manifestará\n- Em Tua Presença\n- Que Ele Cresça\n- Agnus Dei\n\nhttps://fervor.website/
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Culto · Santo André - Noite · Quarta do Encontro
+DESCRIPTION:Culto · Santo André - Noite · Batismo
+TRIGGER:-PT1H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:ens-1oaib7s@escala-b6
+DTSTAMP:20261030T222654Z
+DTSTART;TZID=America/Sao_Paulo:20261022T203000
+DTEND;TZID=America/Sao_Paulo:20261022T223000
+SUMMARY:Ensaio · Santo André - Noite · Batismo
+LOCATION:Estúdio - Lugar do Encontro Santo André
+DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nBanda pronta: 17:00\nGain / check de sinal: 17:00\nInício da passagem: 17:15\nTérmino da passagem: 17:40\n\nREPERTÓRIO\n- Vida aos Sepulcros\n- Gratidão\n- Teu Toque\n- Canção Que Não Envelhece\n- Yahweh Se Manifestará\n- Em Tua Presença\n- Que Ele Cresça\n- Agnus Dei\n\nhttps://fervor.website/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Ensaio · Santo André - Noite · Batismo
+TRIGGER:-PT1H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-11-08_maua_domingomanha@escala-b6
+DTSTAMP:20261030T222654Z
+DTSTART;TZID=America/Sao_Paulo:20261108T074000
+DTEND;TZID=America/Sao_Paulo:20261108T105000
+SUMMARY:Culto · Mauá - Manhã · Culto de Domingo
+LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
+DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nInício da passagem: 07:40\n\nRepertório a definir\n\nhttps://fervor.website/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Culto · Mauá - Manhã · Culto de Domingo
+TRIGGER:-PT1H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-11-29_santoandre_domingonoite@escala-b6
+DTSTAMP:20261030T222654Z
+DTSTART;TZID=America/Sao_Paulo:20261129T170000
+DTEND;TZID=America/Sao_Paulo:20261129T203000
+SUMMARY:Culto · Santo André - Noite · Culto de Domingo
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nBanda pronta: 17:00\nGain / check de sinal: 17:00\nInício da passagem: 17:15\nTérmino da passagem: 17:40\n\nRepertório a definir\n\nhttps://fervor.website/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Culto · Santo André - Noite · Culto de Domingo
 TRIGGER:-PT1H
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:culto-e_2026-12-20_maua_domingonoite@escala-b6
-DTSTAMP:20261030T130547Z
+DTSTAMP:20261030T222654Z
 DTSTART;TZID=America/Sao_Paulo:20261220T171000
 DTEND;TZID=America/Sao_Paulo:20261220T202000
 SUMMARY:Culto · Mauá - Noite · Culto de Domingo
@@ -143,16 +129,30 @@ TRIGGER:-PT1H
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:culto-e_2026-11-08_maua_domingomanha@escala-b6
-DTSTAMP:20261030T130547Z
-DTSTART;TZID=America/Sao_Paulo:20261108T074000
-DTEND;TZID=America/Sao_Paulo:20261108T105000
-SUMMARY:Culto · Mauá - Manhã · Culto de Domingo
-LOCATION:Av. Cap. João\, 1337 - Matriz\, Mauá - SP\, 09360-120
-DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nInício da passagem: 07:40\n\nRepertório a definir\n\nhttps://fervor.website/
+UID:culto-e_2026-10-04_santoandre_domingonoite@escala-b6
+DTSTAMP:20261030T222654Z
+DTSTART;TZID=America/Sao_Paulo:20261004T171500
+DTEND;TZID=America/Sao_Paulo:20261004T203000
+SUMMARY:Culto · Santo André - Noite · Culto de Domingo
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nInício da passagem: 17:15\n\nREPERTÓRIO\n- És Bem-Vindo\n- Clamarei\n- O Vento Encontra o Fogo\n- Só Tu És Santo\n- Quem É Esse?\n\nhttps://fervor.website/
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Culto · Mauá - Manhã · Culto de Domingo
+DESCRIPTION:Culto · Santo André - Noite · Culto de Domingo
+TRIGGER:-PT1H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:culto-e_2026-11-18_santoandre_quartadoenco@escala-b6
+DTSTAMP:20261030T222654Z
+DTSTART;TZID=America/Sao_Paulo:20261118T184000
+DTEND;TZID=America/Sao_Paulo:20261118T215000
+SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
+LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
+DESCRIPTION:Você: Bateria\n\nHORÁRIOS\nBanda pronta: 18:40\nGain / check de sinal: 18:40\nInício da passagem: 18:55\nTérmino da passagem: 19:20\n\nRepertório a definir\n\nhttps://fervor.website/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Culto · Santo André - Noite · Quarta do Encontro
 TRIGGER:-PT1H
 END:VALARM
 END:VEVENT
