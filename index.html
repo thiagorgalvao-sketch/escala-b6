@@ -1120,7 +1120,8 @@ async function faixasSep(){if(!D.stemsSrc||!D.stemsSrc.url)return;if(!window.__S
  const set=t=>{const e=$('#fxs');if(e)e.textContent=t};
  try{set('Separando as faixas… isso pode levar até 2 minutos.');
   const {data,error}=await __SB.functions.invoke('separar-faixas',{body:{url:D.stemsSrc.url,musica_id:D.id||('nova-'+Date.now())}});
-  if(error)throw error;if(!data||!data.faixas)throw new Error((data&&data.erro)||'resposta inválida');
+  if(error){let msg=error.message||'erro';try{if(error.context&&error.context.json){const j=await error.context.json();if(j&&j.erro)msg=j.erro}}catch(e2){}throw new Error(msg)}
+  if(!data||!data.faixas)throw new Error((data&&data.erro)||'resposta inválida');
   D.stems={...data.faixas,em:new Date().toISOString().slice(0,10)};set('');sfR();toast('Faixas separadas com sucesso')}
  catch(e){set('');say('Não consegui separar as faixas: '+(e&&e.message||'erro')+'. Confira se a função "separar-faixas" está publicada no Supabase e o serviço no Modal está no ar.')}}
 async function vsClean(ids,ex){if(!ids||!ids.length)return;try{const as=await claude.use('assets');if(!as)return;for(const i of ids)if(!vsRef(i,ex))for(const j of String(i).split(','))await as.delete(j)}catch(e){}}
@@ -2207,7 +2208,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='30/10/2026 · 278';
+const VER='30/10/2026 · 279';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
