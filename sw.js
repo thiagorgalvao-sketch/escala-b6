@@ -1,7 +1,7 @@
 // Escala B6 - service worker do site da banda
 // Página e dados: rede primeiro, cópia salva quando estiver sem internet.
 // Áudios (media/): não passam por aqui; o app guarda os do culto no aparelho (IndexedDB).
-const C='escalab6-v7',SHELL=['./','index.html','pub.json','manifest.webmanifest','icon-180.png','icon-192.png','icon-512.png','admin/','admin/index.html'];
+const C='escalab6-v8',SHELL=['./','index.html','pub.json','manifest.webmanifest','icon-180.png','icon-192.png','icon-512.png','admin/','admin/index.html'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(SHELL)).catch(()=>{}));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET')return;const u=new URL(r.url);
