@@ -1092,28 +1092,62 @@ function palLink(id){lnkAsk('Link de referência da paleta',(u)=>{S.palImg=S.pal
 function vsDel(){ask('Remover o VS desta música?',()=>{D._del=D._del||[];if(D.vs&&D.vs.id)D._del.push(D.vs.id);D.vs=null;sfR()},'Remover')}
 const FXL=[['vocal','Vocal'],['bateria','Bateria'],['baixo','Baixo'],['guitarra','Guitarra'],['teclado','Teclado'],['outros','Outros']];
 const FXCOL={vocal:'#FF6B81',bateria:'#FFC94D',baixo:'#4FD1FF',guitarra:'#6BE37A',teclado:'#B98BFF',outros:'#9FB3C8'};
-const FXCSS='<style>#dlg2 .fxmr{display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:9px 10px;background:#0E1B30;border-radius:10px;border:1px solid #1A2B45}#dlg2 .fxmn{font-weight:700;font-size:.8rem;flex:none;width:90px}#dlg2 .fxr{display:flex;align-items:center;gap:7px;margin:5px 0;padding:7px 8px;background:#0B1627;border-radius:10px;border-left:4px solid var(--fc,#00CDD3)}#dlg2 .fxn{width:62px;flex:none;font-size:.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#dlg2 .fxbtn{flex:none;width:25px;height:25px;padding:0;border-radius:6px;background:#15223A;border:1px solid #223455;color:#8FA1B8;font-size:.66rem;font-weight:800;cursor:pointer;min-height:0}#dlg2 .fxbtn.mon{background:#FF5D5D;border-color:#FF5D5D;color:#fff}#dlg2 .fxbtn.son{background:#00CDD3;border-color:#00CDD3;color:#000}#dlg2 .fxsl{flex:1;accent-color:var(--fc,#00CDD3)}#dlg2 .fxpc{width:32px;flex:none;font-size:.7rem;text-align:right;color:var(--g)}#dlg2 .fxtr{display:flex;align-items:center;gap:8px;margin-top:10px}#dlg2 .fxpp{flex:none;width:36px;height:36px;border-radius:50%;background:#00CDD3;color:#000;border:0;font-size:.95rem;cursor:pointer;min-height:0;padding:0}#dlg2 .fxtm{font-size:.7rem;color:var(--g);width:34px;text-align:center}</style>';
-let FXA=[],FXT=null,FXSOLO=null,FXMASTER=1;
+const FXAB={vocal:'VO',bateria:'BT',baixo:'BX',guitarra:'GT',teclado:'TC',outros:'OU'};
+const FXCSS='<style>#dlg2 .fxmr{display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:9px 10px;background:#0E1B30;border-radius:10px;border:1px solid #1A2B45}#dlg2 .fxmn{font-weight:700;font-size:.8rem;flex:none;width:90px}#dlg2 .fxtrk{margin:7px 0}#dlg2 .fxr{display:flex;align-items:center;gap:6px;padding:7px 8px;background:#0B1627;border-radius:10px 10px 0 0;border-left:4px solid var(--fc,#00CDD3);cursor:grab}#dlg2 .fxr:active{cursor:grabbing}#dlg2 .fxic{flex:none;width:28px;height:20px;border-radius:5px;background:var(--fc,#00CDD3);color:#06121F;font-size:.6rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;letter-spacing:.01em}#dlg2 .fxn{width:56px;flex:none;font-size:.78rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#dlg2 .fxbtn{flex:none;width:24px;height:24px;padding:0;border-radius:6px;background:#15223A;border:1px solid #223455;color:#8FA1B8;font-size:.64rem;font-weight:800;cursor:pointer;min-height:0}#dlg2 .fxbtn.mon{background:#FF5D5D;border-color:#FF5D5D;color:#fff}#dlg2 .fxbtn.son{background:#00CDD3;border-color:#00CDD3;color:#000}#dlg2 .fxsl{flex:1;accent-color:var(--fc,#00CDD3);min-width:40px}#dlg2 .fxpc{width:30px;flex:none;font-size:.68rem;text-align:right;color:var(--g)}#dlg2 .fxdl{flex:none;width:24px;height:24px;border-radius:6px;background:#15223A;border:1px solid #223455;color:#8FA1B8;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-size:.72rem}#dlg2 .fxwf{display:block;width:100%;height:24px;border-radius:0 0 10px 10px;background:#060D18;cursor:pointer;margin:0}#dlg2 .fxtr{display:flex;align-items:center;gap:8px;margin-top:10px}#dlg2 .fxpp{flex:none;width:36px;height:36px;border-radius:50%;background:#00CDD3;color:#000;border:0;font-size:.95rem;cursor:pointer;min-height:0;padding:0}#dlg2 .fxpp:disabled{opacity:.4;cursor:default}#dlg2 .fxtm{font-size:.7rem;color:var(--g);width:34px;text-align:center}</style>';
+let FXA=[],FXT=null,FXSOLO=null,FXMASTER=1,FXORDER=[],FXSONG=null,FXDRAG=null,FXKEY=null;
 function fxFmt(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function fxPrefKey(id){return 'fxprefs_'+id}
+function fxLoadPrefs(id){try{const r=localStorage.getItem(fxPrefKey(id));return r?JSON.parse(r):null}catch(e){return null}}
+function fxSavePrefs(){if(!FXSONG)return;try{const p={vol:{},mute:{},solo:FXSOLO,master:Math.round(FXMASTER*100),order:FXORDER};FXA.forEach(t=>{p.vol[t.k]=Math.round(t.vol*100);p.mute[t.k]=t.mute});localStorage.setItem(fxPrefKey(FXSONG),JSON.stringify(p))}catch(e){}}
 function fxmMix(){FXA.forEach(t=>{const base=FXSOLO?(t.k==FXSOLO?t.vol:0):(t.mute?0:t.vol);t.a.volume=Math.max(0,Math.min(1,base*FXMASTER))})}
 function fxmPaint(){FXA.forEach(t=>{const so=$('#fxo_'+t.k);if(so)so.classList.toggle('son',FXSOLO==t.k);const mu=$('#fxm_'+t.k);if(mu)mu.classList.toggle('mon',FXSOLO?FXSOLO!=t.k:t.mute)})}
 function fxmStop(){FXA.forEach(t=>t.a.pause());if(FXT){clearInterval(FXT);FXT=null}const b=$('#fxpp');if(b)b.textContent='▶'}
+function fxmRenderRows(){const el=$('#fxrows');if(!el)return;
+ el.innerHTML=FXORDER.map(k=>{const t=FXA.find(x=>x.k==k);if(!t)return'';const n=(FXL.find(x=>x[0]==k)||[k,k])[1];
+  return`<div class="fxtrk" style="--fc:${FXCOL[k]}"><div class="fxr" draggable="true" ondragstart="fxDragStart(event,'${k}')" ondragover="event.preventDefault()" ondrop="fxDrop(event,'${k}')"><span class="fxic" title="${n}">${FXAB[k]||n.slice(0,2).toUpperCase()}</span><span class="fxn">${n}</span><button type="button" class="fxbtn${FXSOLO?(FXSOLO!=k?' mon':''):(t.mute?' mon':'')}" id="fxm_${k}" title="Mudo" aria-label="Mudo ${n}" onclick="fxmMute('${k}')">M</button><button type="button" class="fxbtn${FXSOLO==k?' son':''}" id="fxo_${k}" title="Solo" aria-label="Solo ${n}" onclick="fxmSolo('${k}')">S</button><input type="range" class="fxsl" min="0" max="100" value="${Math.round(t.vol*100)}" oninput="fxmVol('${k}',this.value)"><span class="fxpc" id="fxv_${k}">${Math.round(t.vol*100)}%</span><a class="fxdl" href="${t.url}" download title="Baixar ${n}" aria-label="Baixar ${n}">&#8595;</a></div><canvas class="fxwf" id="fxwf_${k}" height="24" onclick="fxWaveSeek(event,'${k}')"></canvas></div>`}).join('')}
+function fxDragStart(e,k){FXDRAG=k;try{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',k)}catch(e2){}}
+function fxDrop(e,k){e.preventDefault();const from=FXDRAG;FXDRAG=null;if(!from||from==k)return;const oi=FXORDER.indexOf(from),ni=FXORDER.indexOf(k);if(oi<0||ni<0)return;FXORDER.splice(oi,1);FXORDER.splice(ni,0,from);fxmRenderRows();fxSavePrefs()}
+async function fxDrawWave(k,url){try{const cv=$('#fxwf_'+k);if(!cv)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+ const r=await fetch(url);const buf=await r.arrayBuffer();const ac=new AC();const ab=await ac.decodeAudioData(buf);
+ const cv2=$('#fxwf_'+k);if(!cv2)return;const data=ab.getChannelData(0);
+ const w=cv2.width=cv2.clientWidth||280,h=cv2.height=24,step=Math.max(1,Math.floor(data.length/w));
+ const ctx=cv2.getContext('2d');ctx.clearRect(0,0,w,h);ctx.fillStyle=FXCOL[k]||'#00CDD3';
+ for(let i=0;i<w;i++){let mn=1,mx=-1;const base=i*step;for(let j=0;j<step;j++){const v=data[base+j];if(v===undefined)break;if(v<mn)mn=v;if(v>mx)mx=v}
+  const y1=(1+mn)*h/2,y2=(1+mx)*h/2;ctx.fillRect(i,Math.min(y1,y2),1,Math.max(1,Math.abs(y2-y1)))}
+ if(ac.close)ac.close()}catch(e){}}
+function fxWaveSeek(e,k){if(!FXA.length)return;const r=e.currentTarget.getBoundingClientRect(),ratio=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));fxmSeek(Math.round(ratio*1000))}
 function fxmOpen(id){const s=S.songs.find(x=>x.id==id);if(!s||!s.stems)return;
- const ks=FXL.filter(([k])=>s.stems[k]);
+ const avail=FXL.filter(([k])=>s.stems[k]);
+ const saved=fxLoadPrefs(id)||{};
+ FXORDER=(saved.order||[]).filter(k=>avail.some(([kk])=>kk==k));
+ avail.forEach(([k])=>{if(!FXORDER.includes(k))FXORDER.push(k)});
+ FXSONG=id;
  d2.style.width='min(520px,94vw)';
- d2.innerHTML=FXCSS+`<h3 style="margin-top:0;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" width="20" height="20" style="flex:none"><path d="M4 21V10M4 6V3M12 21v-7M12 10V3M20 21v-4M20 13V3M2 10h4M10 6h4M18 13h4"/></svg>Stems · ${esc(s.title)}</h3>`
-  +`<div class="fxmr"><span class="fxmn">Volume geral</span><input type="range" class="fxsl" id="fxmaster" min="0" max="100" value="100" oninput="fxmMaster(this.value)"><span class="fxpc" id="fxmv">100%</span></div>`
-  +ks.map(([k,n])=>`<div class="fxr" style="--fc:${FXCOL[k]}"><span class="fxn">${n}</span><button type="button" class="fxbtn" id="fxm_${k}" title="Mudo" aria-label="Mudo ${n}" onclick="fxmMute('${k}')">M</button><button type="button" class="fxbtn" id="fxo_${k}" title="Solo" aria-label="Solo ${n}" onclick="fxmSolo('${k}')">S</button><input type="range" class="fxsl" min="0" max="100" value="100" oninput="fxmVol('${k}',this.value)"><span class="fxpc" id="fxv_${k}">100%</span></div>`).join('')
-  +`<div class="fxtr"><button type="button" class="fxpp" id="fxpp" title="Tocar" aria-label="Tocar" onclick="fxmPlay()">▶</button><span class="fxtm" id="fxt0">0:00</span><input type="range" id="fxseek" min="0" max="1000" value="0" oninput="fxmSeek(this.value)" style="flex:1;accent-color:#00CDD3"><span class="fxtm" id="fxt1">0:00</span></div>`
+ d2.innerHTML=FXCSS+`<h3 style="margin-top:0;margin-bottom:2px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" width="20" height="20" style="flex:none"><path d="M4 21V10M4 6V3M12 21v-7M12 10V3M20 21v-4M20 13V3M2 10h4M10 6h4M18 13h4"/></svg>Stems · ${esc(s.title)}</h3>`
+  +`<small id="fxload" class="mut" style="display:block;margin:0 0 10px">Carregando faixas…</small>`
+  +`<div class="fxmr"><span class="fxmn">Volume geral</span><input type="range" class="fxsl" id="fxmaster" min="0" max="100" value="${Math.round((saved.master!=null?saved.master/100:1)*100)}" oninput="fxmMaster(this.value)"><span class="fxpc" id="fxmv">${saved.master!=null?saved.master:100}%</span></div>`
+  +`<div id="fxrows"></div>`
+  +`<div class="fxtr"><button type="button" class="fxpp" id="fxpp" title="Tocar" aria-label="Tocar" disabled onclick="fxmPlay()">▶</button><span class="fxtm" id="fxt0">0:00</span><input type="range" id="fxseek" min="0" max="1000" value="0" oninput="fxmSeek(this.value)" style="flex:1;accent-color:#00CDD3"><span class="fxtm" id="fxt1">0:00</span></div>`
   +'<div class="ac" style="margin-top:12px"><button onclick="fxmClose()">Fechar</button></div>';
- FXA=ks.map(([k])=>{const a=new Audio(s.stems[k]);a.preload='metadata';return{k,a,mute:false,vol:1}});
- FXSOLO=null;FXMASTER=1;
+ FXA=avail.map(([k])=>{const a=new Audio(s.stems[k]);a.preload='metadata';
+  const sv=saved.vol&&saved.vol[k]!=null?saved.vol[k]/100:1,sm=!!(saved.mute&&saved.mute[k]);
+  return{k,a,url:s.stems[k],mute:sm,vol:sv}});
+ FXSOLO=saved.solo&&FXA.some(t=>t.k==saved.solo)?saved.solo:null;
+ FXMASTER=saved.master!=null?saved.master/100:1;
+ fxmRenderRows();
+ fxmMix();
+ let pending=FXA.length||1;
+ const markLoaded=()=>{pending--;if(pending<=0){const ld=$('#fxload');if(ld){const d=FXA[0]&&FXA[0].a.duration;ld.textContent=d?('Duração: '+fxFmt(d)):'';}const b=$('#fxpp');if(b)b.disabled=false}};
+ if(!FXA.length)markLoaded();
+ FXA.forEach(t=>{if(t.a.readyState>=1)markLoaded();else t.a.addEventListener('loadedmetadata',markLoaded,{once:true})});
+ avail.forEach(([k])=>fxDrawWave(k,s.stems[k]));
+ if(!FXKEY){FXKEY=e=>{if(!d2.open)return;const at=document.activeElement&&document.activeElement.tagName;if(e.code=='Space'&&at!='BUTTON'&&at!='INPUT'){e.preventDefault();fxmPlay()}};document.addEventListener('keydown',FXKEY)}
  d2.showModal()}
 function fxmClose(){fxmStop();FXA=[];FXSOLO=null;d2.close()}
-function fxmVol(k,v){const t=FXA.find(x=>x.k==k);if(!t)return;t.vol=Math.max(0,Math.min(1,v/100));fxmMix();const e=$('#fxv_'+k);if(e)e.textContent=Math.round(v)+'%'}
-function fxmMaster(v){FXMASTER=Math.max(0,Math.min(1,v/100));fxmMix();const e=$('#fxmv');if(e)e.textContent=Math.round(v)+'%'}
-function fxmMute(k){const t=FXA.find(x=>x.k==k);if(!t)return;t.mute=!t.mute;fxmMix();fxmPaint()}
-function fxmSolo(k){FXSOLO=FXSOLO==k?null:k;fxmMix();fxmPaint()}
+function fxmVol(k,v){const t=FXA.find(x=>x.k==k);if(!t)return;t.vol=Math.max(0,Math.min(1,v/100));fxmMix();const e=$('#fxv_'+k);if(e)e.textContent=Math.round(v)+'%';fxSavePrefs()}
+function fxmMaster(v){FXMASTER=Math.max(0,Math.min(1,v/100));fxmMix();const e=$('#fxmv');if(e)e.textContent=Math.round(v)+'%';fxSavePrefs()}
+function fxmMute(k){const t=FXA.find(x=>x.k==k);if(!t)return;t.mute=!t.mute;fxmMix();fxmPaint();fxSavePrefs()}
+function fxmSolo(k){FXSOLO=FXSOLO==k?null:k;fxmMix();fxmPaint();fxSavePrefs()}
 function fxmPlay(){if(!FXA.length)return;const b=$('#fxpp');
  if(b&&b.textContent=='⏸'){fxmStop();return}
  const base=FXA[0].a.currentTime||0;FXA.forEach(t=>{t.a.currentTime=base});Promise.all(FXA.map(t=>t.a.play().catch(()=>{})));
@@ -2235,7 +2269,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='30/10/2026 · 283';
+const VER='30/10/2026 · 284';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
