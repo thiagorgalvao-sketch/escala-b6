@@ -1180,8 +1180,8 @@ async function faixasSep(){if(!D.stemsSrc||!D.stemsSrc.url)return;if(!window.__S
  try{set('Iniciando a separação… 4%');prog(4);
   const ini=await fxInv({acao:'iniciar',url:D.stemsSrc.url,musica_id:D.id||('nova-'+Date.now())});
   if(!ini.call_id)throw new Error('resposta inválida ao iniciar');
-  for(let i=0;i<80;i++){await new Promise(r=>setTimeout(r,5000));
-   const pc=Math.min(92,4+(i*5/110)*88);
+  for(let i=0;i<150;i++){await new Promise(r=>setTimeout(r,5000));
+   const pc=Math.min(92,4+(i*5/320)*88);
    prog(pc);set('Separando as faixas… '+Math.round(pc)+'%');
    const st=await fxInv({acao:'status',call_id:ini.call_id});
    if(st.status=='pronto'){D.stems={...st.faixas,em:new Date().toISOString().slice(0,10)};set('');prog(null);sfR();toast('Faixas separadas com sucesso');return}
@@ -2272,7 +2272,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='30/10/2026 · 289';
+const VER='30/10/2026 · 290';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
