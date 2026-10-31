@@ -1106,23 +1106,31 @@ function fxBufferFor(t){return(FXSEMI&&t.shifted[FXSEMI])?t.shifted[FXSEMI]:t.bu
 function fxmMix(){FXA.forEach(t=>{if(!t.gain)return;const base=FXSOLO?(t.k==FXSOLO?t.vol:0):(t.mute?0:t.vol);t.gain.gain.value=Math.max(0,Math.min(1,base*FXMASTER))})}
 function fxmPaint(){FXA.forEach(t=>{const so=$('#fxo_'+t.k);if(so)so.classList.toggle('son',FXSOLO==t.k);const mu=$('#fxm_'+t.k);if(mu)mu.classList.toggle('mon',FXSOLO?FXSOLO!=t.k:t.mute)})}
 function fxmUpdateHead(ratio){const h=$('#fxhead');if(h)h.style.left=(Math.max(0,Math.min(1,ratio||0))*100)+'%'}
-function fxStopSources(){FXA.forEach(t=>{if(t.source){t.source._manual=true;try{t.source.stop()}catch(e){}t.source=null}})}
+const FXFADE=.015;
+function fxStopSources(){const ctx=FXCTX,now=ctx?ctx.currentTime:0;
+ FXA.forEach(t=>{if(t.source){const src=t.source;src._manual=true;
+  try{if(ctx&&t.fade){t.fade.gain.cancelScheduledValues(now);t.fade.gain.setValueAtTime(t.fade.gain.value,now);t.fade.gain.linearRampToValueAtTime(0,now+FXFADE);src.stop(now+FXFADE)}else src.stop()}catch(e){try{src.stop()}catch(e2){}}
+  t.source=null}})}
 function fxCurrentOffset(){if(!FXPLAYING)return FXSTARTOFFSET;return Math.max(0,Math.min(FXDUR||0,FXCTX.currentTime-FXSTARTCTXT+FXSTARTOFFSET))}
 function fxPlayFrom(offset){if(!FXA.length||FXSHIFTING)return;const ctx=fxEnsureCtx();fxStopSources();
  offset=Math.max(0,Math.min(FXDUR||0,offset||0));
- FXA.forEach(t=>{const buf=fxBufferFor(t);if(!buf)return;const src=ctx.createBufferSource();src.buffer=buf;src.connect(t.gain);
+ const now=ctx.currentTime;
+ FXA.forEach(t=>{const buf=fxBufferFor(t);if(!buf)return;const src=ctx.createBufferSource();src.buffer=buf;src.connect(t.fade||t.gain);
   src._manual=false;src.onended=()=>{if(!src._manual)fxOnEnded()};
+  if(t.fade){t.fade.gain.cancelScheduledValues(now);t.fade.gain.setValueAtTime(0,now);t.fade.gain.linearRampToValueAtTime(1,now+FXFADE)}
   const startOff=Math.min(offset,Math.max(0,buf.duration-0.01));
-  src.start(0,startOff);t.source=src});
- FXSTARTCTXT=ctx.currentTime;FXSTARTOFFSET=offset;FXPLAYING=true;
+  src.start(now,startOff);t.source=src});
+ FXSTARTCTXT=now;FXSTARTOFFSET=offset;FXPLAYING=true;
  const b=$('#fxpp');if(b)b.textContent='⏸';
+ fxMsPlay();
  if(FXT)clearInterval(FXT);FXT=setInterval(fxTick,150)}
-function fxPause(){if(!FXPLAYING)return;FXSTARTOFFSET=fxCurrentOffset();FXPLAYING=false;fxStopSources();if(FXT){clearInterval(FXT);FXT=null}const b=$('#fxpp');if(b)b.textContent='▶'}
-function fxOnEnded(){FXPLAYING=false;FXSTARTOFFSET=0;fxStopSources();if(FXT){clearInterval(FXT);FXT=null}const b=$('#fxpp');if(b)b.textContent='▶';fxmUpdateHead(0);const sk=$('#fxseek');if(sk)sk.value='0';const t0=$('#fxt0');if(t0)t0.textContent='0:00'}
+function fxPause(){if(!FXPLAYING)return;FXSTARTOFFSET=fxCurrentOffset();FXPLAYING=false;fxStopSources();if(FXT){clearInterval(FXT);FXT=null}const b=$('#fxpp');if(b)b.textContent='▶';fxMsPause()}
+function fxOnEnded(){FXPLAYING=false;FXSTARTOFFSET=0;fxStopSources();if(FXT){clearInterval(FXT);FXT=null}const b=$('#fxpp');if(b)b.textContent='▶';fxmUpdateHead(0);const sk=$('#fxseek');if(sk)sk.value='0';const t0=$('#fxt0');if(t0)t0.textContent='0:00';fxMsPause()}
 function fxTick(){if(!FXPLAYING)return;const cur=fxCurrentOffset();if(FXDUR&&cur>=FXDUR-0.05){fxOnEnded();return}
  const sk=$('#fxseek'),t0=$('#fxt0'),t1=$('#fxt1');
  if(sk&&FXDUR)sk.value=String(Math.round((cur/FXDUR)*1000));if(t0)t0.textContent=fxFmt(cur);if(t1)t1.textContent=fxFmt(FXDUR);
- if(!FXDRAGGING)fxmUpdateHead(FXDUR?cur/FXDUR:0)}
+ if(!FXDRAGGING)fxmUpdateHead(FXDUR?cur/FXDUR:0);
+ fxMsPos(cur)}
 function fxmPlay(){if(!FXA.length||FXSHIFTING)return;if(FXPLAYING){fxPause();return}fxPlayFrom(FXSTARTOFFSET||0)}
 function fxmSeek(v){if(!FXA.length)return;const off=(v/1000)*(FXDUR||0);const t0=$('#fxt0');if(t0)t0.textContent=fxFmt(off);fxmUpdateHead(FXDUR?off/FXDUR:0);if(FXPLAYING)fxPlayFrom(off);else FXSTARTOFFSET=off}
 function fxHeadDown(e){e.preventDefault();const wrap=$('#fxrowswrap');if(!wrap||!FXA.length)return;FXDRAGGING=true;let last=0;
@@ -1130,8 +1138,22 @@ function fxHeadDown(e){e.preventDefault();const wrap=$('#fxrowswrap');if(!wrap||
  const up=()=>{document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);FXDRAGGING=false;fxmSeek(Math.round(last*1000))};
  document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);move(e)}
 
+/* ---- cache local dos arquivos de stems em IndexedDB (evita rebaixar o mesmo áudio) ---- */
+const FXDB_CAP=24;
+let FXDBP=null;
+function fxDbOpen(){if(FXDBP)return FXDBP;FXDBP=new Promise(res=>{try{const rq=indexedDB.open('fv-stems',1);rq.onupgradeneeded=()=>{try{rq.result.createObjectStore('buf')}catch(e){}};rq.onsuccess=()=>res(rq.result);rq.onerror=()=>res(null);rq.onblocked=()=>res(null)}catch(e){res(null)}});return FXDBP}
+async function fxDbGet(key){try{const db=await fxDbOpen();if(!db)return null;return await new Promise(res=>{try{const rq=db.transaction('buf','readonly').objectStore('buf').get(key);rq.onsuccess=()=>res(rq.result?rq.result.ab:null);rq.onerror=()=>res(null)}catch(e){res(null)}})}catch(e){return null}}
+async function fxDbSet(key,ab){try{const db=await fxDbOpen();if(!db)return;const tx=db.transaction('buf','readwrite'),os=tx.objectStore('buf');os.put({ab,t:Date.now()},key);
+ const all=await new Promise(res=>{const a=[];try{const rq=os.openCursor();rq.onsuccess=()=>{const c=rq.result;if(c){a.push({k:c.primaryKey,t:(c.value&&c.value.t)||0});c.continue()}else res(a)};rq.onerror=()=>res(a)}catch(e){res(a)}});
+ if(all.length>FXDB_CAP){all.sort((a,b)=>a.t-b.t);for(const x of all.slice(0,all.length-FXDB_CAP))try{os.delete(x.k)}catch(e){}}
+}catch(e){}}
 /* ---- decodificação e waveform ---- */
-async function fxDecodeTrack(t){try{const r=await fetch(t.url);const ab=await r.arrayBuffer();const ctx=fxEnsureCtx();t.buf=await ctx.decodeAudioData(ab)}catch(e){}}
+async function fxDecodeTrack(t){try{const ctx=fxEnsureCtx(),key=t.url+'|'+(t.ver||'');
+ let ab=await fxDbGet(key);
+ if(ab){t.buf=await ctx.decodeAudioData(ab);return}
+ const r=await fetch(t.url);ab=await r.arrayBuffer();
+ try{await fxDbSet(key,ab.slice(0))}catch(e){}
+ t.buf=await ctx.decodeAudioData(ab)}catch(e){}}
 function fxDrawFromBuffer(k,buf){try{const cv=$('#fxwf_'+k);if(!cv||!buf)return;const data=buf.getChannelData(0);
  const w=cv.width=cv.clientWidth||280,h=cv.height=22,step=Math.max(1,Math.floor(data.length/w));
  const c=cv.getContext('2d');c.clearRect(0,0,w,h);c.fillStyle='#00CDD3';
@@ -1223,8 +1245,8 @@ function fxmOpen(id){const s=S.songs.find(x=>x.id==id);if(!s||!s.stems)return;
   +`<div class="fxpanel"><div class="fxmr"><span class="fxmn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9v6h4l5 4V5L9 9H5z"/><path d="M16 9a4 4 0 010 6"/></svg>Volume geral</span><input type="range" class="fxsl" id="fxmaster" min="0" max="100" value="${saved.master!=null?saved.master:100}" oninput="fxmMaster(this.value)" aria-label="Volume geral"><span class="fxpc" id="fxmv">${saved.master!=null?saved.master:100}%</span></div><div class="fxtm2" id="fxtmrow"><span class="fxmn">Tom</span><span class="fxtmv mut">—</span></div><div id="fxrowswrap"><div id="fxrows"></div><div id="fxhead" class="fxhead" onpointerdown="fxHeadDown(event)"></div></div></div>`
   +`<div class="fxtr"><button type="button" class="fxpp" id="fxpp" title="Tocar" aria-label="Tocar" disabled onclick="fxmPlay()">▶</button><span class="fxtm" id="fxt0">0:00</span><input type="range" id="fxseek" min="0" max="1000" value="0" oninput="fxmSeek(this.value)" style="flex:1;accent-color:#00CDD3" aria-label="Posição na música"><span class="fxtm" id="fxt1">0:00</span></div>`
   +'<div class="ac" style="margin-top:12px"><button onclick="fxmClose()">Fechar</button></div>';
- FXA=avail.map(([k])=>{const sv=saved.vol&&saved.vol[k]!=null?saved.vol[k]/100:1,sm=!!(saved.mute&&saved.mute[k]),g=ctx.createGain();g.connect(ctx.destination);
-  return{k,url:s.stems[k],buf:null,shifted:{},gain:g,source:null,mute:sm,vol:sv}});
+ FXA=avail.map(([k])=>{const sv=saved.vol&&saved.vol[k]!=null?saved.vol[k]/100:1,sm=!!(saved.mute&&saved.mute[k]),g=ctx.createGain();g.connect(ctx.destination);const fade=ctx.createGain();fade.connect(g);
+  return{k,url:s.stems[k],ver:s.stems.em||'',buf:null,shifted:{},gain:g,fade,source:null,mute:sm,vol:sv}});
  FXSOLO=saved.solo&&FXA.some(t=>t.k==saved.solo)?saved.solo:null;
  FXMASTER=saved.master!=null?saved.master/100:1;
  fxmRenderRows();
@@ -1242,10 +1264,26 @@ function fxmOpen(id){const s=S.songs.find(x=>x.id==id);if(!s||!s.stems)return;
  if(!s.stemsTom&&s.stemsSrc&&s.stemsSrc.url){
   fxDetectKey(s.stemsSrc.url,ctx).then(k=>{if(FXSONG!=id)return;if(k)s.stemsTom=k,save();else FXTOMFAIL=true;fxTomPaint()})}
  if(!FXKEY){FXKEY=e=>{if(!d2.open)return;const at=document.activeElement&&document.activeElement.tagName;if(e.code=='Space'&&at!='BUTTON'&&at!='INPUT'&&at!='SELECT'){e.preventDefault();fxmPlay()}};document.addEventListener('keydown',FXKEY)}
+ fxMsInit(s);
  d2.showModal()}
-function fxmClose(){fxPause();FXA.forEach(t=>{try{if(t.gain)t.gain.disconnect()}catch(e){}});FXA=[];FXSOLO=null;FXSEMI=0;FXSONG=null;FXSHIFTING=false;
+function fxmClose(){fxPause();FXA.forEach(t=>{try{if(t.fade)t.fade.disconnect()}catch(e){}try{if(t.gain)t.gain.disconnect()}catch(e){}});FXA=[];FXSOLO=null;FXSEMI=0;FXSONG=null;FXSHIFTING=false;
  if(FXCTX){try{FXCTX.close()}catch(e){}FXCTX=null}
+ fxMsEnd();
  d2.close()}
+/* ---- controles de mídia na tela de bloqueio (Media Session API) ---- */
+function fxMsInit(s){try{if(!('mediaSession' in navigator))return;
+ navigator.mediaSession.metadata=new MediaMetadata({title:s.title||'Stems',artist:s.artist||'Fervor',album:'Fervor · Stems'});
+ navigator.mediaSession.setActionHandler('play',()=>{if(!FXPLAYING&&!FXSHIFTING)fxmPlay()});
+ navigator.mediaSession.setActionHandler('pause',()=>{if(FXPLAYING)fxPause()});
+ navigator.mediaSession.setActionHandler('stop',()=>fxPause());
+ navigator.mediaSession.setActionHandler('seekbackward',()=>fxmSeek(Math.max(0,Math.round(((fxCurrentOffset()-5)/(FXDUR||1))*1000))));
+ navigator.mediaSession.setActionHandler('seekforward',()=>fxmSeek(Math.min(1000,Math.round(((fxCurrentOffset()+5)/(FXDUR||1))*1000))));
+ try{navigator.mediaSession.setActionHandler('seekto',d=>{if(d&&d.seekTime!=null&&FXDUR)fxmSeek(Math.round((d.seekTime/FXDUR)*1000))})}catch(e){}
+ navigator.mediaSession.playbackState='paused'}catch(e){}}
+function fxMsPlay(){try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='playing'}catch(e){}}
+function fxMsPause(){try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='paused'}catch(e){}}
+function fxMsPos(cur){try{if('mediaSession' in navigator&&FXDUR&&navigator.mediaSession.setPositionState)navigator.mediaSession.setPositionState({duration:FXDUR,position:Math.min(cur,FXDUR),playbackRate:1})}catch(e){}}
+function fxMsEnd(){try{if(!('mediaSession' in navigator))return;navigator.mediaSession.metadata=null;['play','pause','stop','seekbackward','seekforward','seekto'].forEach(a=>{try{navigator.mediaSession.setActionHandler(a,null)}catch(e){}});navigator.mediaSession.playbackState='none'}catch(e){}}
 function fxmVol(k,v){const t=FXA.find(x=>x.k==k);if(!t)return;t.vol=Math.max(0,Math.min(1,v/100));fxmMix();const e=$('#fxv_'+k);if(e)e.textContent=Math.round(v)+'%';fxSavePrefs()}
 function fxmMaster(v){FXMASTER=Math.max(0,Math.min(1,v/100));fxmMix();const e=$('#fxmv');if(e)e.textContent=Math.round(v)+'%';fxSavePrefs()}
 function fxmMute(k){const t=FXA.find(x=>x.k==k);if(!t)return;t.mute=!t.mute;fxmMix();fxmPaint();fxSavePrefs()}
@@ -2211,9 +2249,9 @@ function rtAdd(t){rotMat();const ss=rotSongs(P);P.rot.push({m:t,n:'',a:ss[ss.len
 function rtDel(i){rotMat();P.rot.splice(i,1);rtR()}
 function rtSet(i,f,v){rotMat();if(P.rot[i])P.rot[i][f]=v}
 function rtReset(){delete P.rot;rtR()}
-function rtR(){const e=$('#rtw');if(!e||!P)return;const q=rotSeq(P),SM=Object.fromEntries(S.songs.map(s=>[s.id,s]));let n=0;
+function rtR(){const e=$('#rtw');if(!e||!P)return;const q=rotSeq(P),SM=Object.fromEntries(S.songs.map(s=>[s.id,s]));
  const it=q.map((x,j)=>{if(x.k=='m')return`<div class="rti m"><div class="rtv"><button type="button" class="sm" title="Subir" aria-label="Subir" onclick="rtMv(${x.i},-1)">▲</button><button type="button" class="sm" title="Descer" aria-label="Descer" onclick="rtMv(${x.i},1)">▼</button></div><div class="rtb"><div class="rtn"><input list="rtml" value="${esc(x.m.m)}" aria-label="Momento" onchange="rtSet(${x.i},'m',this.value.trim()||'Momento')"><input value="${esc(x.m.n||'')}" placeholder="Observação para a banda (opcional)" aria-label="Observação" onchange="rtSet(${x.i},'n',this.value.trim())"></div></div><button type="button" class="sm dng" title="Remover momento" aria-label="Remover momento" onclick="rtDel(${x.i})"><svg class="ico" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></svg></button></div>`;
-  const s=SM[x.id],o=oo(P,s.id),num=/^\d+$/.test(o),k=stK(P,s),sg=((P.cant||{})[s.id]||'').trim(),nx=q[j+1];let tr='';if(0&&nx&&nx.k=='s'){const t=trI(P,s.id,nx.id);tr=`<div class="rtt">↓ Passagem para ${esc(SM[nx.id].title)}${t&&t.t?` · <b>${t.t}</b>`:' · mesmo tom'}${t&&t.bp?` · ${t.bp}`:''}<input value="${esc((P.tr||{})[s.id]||'')}" placeholder="Como fazer a passagem (opcional)" aria-label="Passagem" onchange="(P.tr=P.tr||{})['${s.id}']=this.value.trim();rtR()"></div>`}
+  const s=SM[x.id],o=oo(P,s.id),num=/^\d+$/.test(o),k=stK(P,s),sg=((P.cant||{})[s.id]||'').trim(),nx=q[j+1];let tr='';if(nx&&nx.k=='s'){const t=trI(P,s.id,nx.id);tr=`<div class="rtt">↓ Passagem para ${esc(SM[nx.id].title)}${t&&t.t?` · <b>${t.t}</b>`:' · mesmo tom'}${t&&t.bp?` · ${t.bp}`:''}<input value="${esc((P.tr||{})[s.id]||'')}" placeholder="Como fazer a passagem (opcional)" aria-label="Passagem" onchange="(P.tr=P.tr||{})['${s.id}']=this.value.trim();rtR()"></div>`}
   return`<div class="rti"><div class="rtb"><b>${num?o+' · ':o?esc(SLN[o]||o)+' · ':''}${esc(s.title)}</b><small>Tom ${fk(k)}${s.bpm?' · '+s.bpm+' BPM':''}${sg?' · '+esc(sg):''}</small><input value="${esc((P.rn||{})[s.id]||'')}" placeholder="Observação para a banda nesta música (ex.: repetir refrão 2x)" aria-label="Observação da música" onchange="(P.rn=P.rn||{})['${s.id}']=this.value.trim()"></div></div>${tr}`}).join('');
  e.innerHTML=`<div class="ect">Roteiro do culto<button type="button" class="ehp" title="A ordem do culto com os momentos (oração, avisos, Palavra, Ceia…) e observações para a banda. As músicas seguem a ordem da aba Músicas; use ▲▼ para posicionar os momentos." aria-label="Ajuda" onclick="say(this.title)">?</button>${Array.isArray(P.rot)?'<button type="button" class="sm" style="margin-left:auto" onclick="rtReset()">Restaurar padrão</button>':''}</div>
  ${q.length?`<div class="rtl">${it}</div>`:'<p class="mut" style="margin:0">Adicione músicas na aba Músicas para montar o roteiro.</p>'}
@@ -2362,7 +2400,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='30/10/2026 · 295';
+const VER='30/10/2026 · 296';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');

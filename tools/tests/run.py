@@ -63,6 +63,13 @@ with sync_playwright() as p:
         pg.evaluate(f"stage('{lid}')"); pg.wait_for_timeout(300); i0 = pg.evaluate(f"S.lists.find(l=>l.id=='{lid}').songIds.indexOf(S.sel)")
         pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(200); i1 = pg.evaluate(f"S.lists.find(l=>l.id=='{lid}').songIds.indexOf(S.sel)")
         ok(i1 - i0 == 1, 'banda: seta do teclado no Modo Palco passa uma música', f'{i0}->{i1}'); pg.evaluate('fsExit()')
+        # 2b) player de Stems: abre e fecha com Esc sem vazar AudioContext/áudio
+        sid0 = pg.evaluate("S.songs.find(s=>s.id==S.sel)?S.sel:S.songs[0].id")
+        pg.evaluate(f"(()=>{{const s=S.songs.find(x=>x.id=='{sid0}');s.stems={{vocal:'./naoexiste-vocal.wav',bateria:'./naoexiste-bateria.wav',em:Date.now()}};fxmOpen('{sid0}')}})()")
+        pg.wait_for_timeout(400)
+        ok(pg.evaluate("d2.open===true&&FXA.length===2"), 'stems: abre o player com as faixas disponíveis')
+        pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
+        ok(pg.evaluate("d2.open===false&&FXA.length===0&&!FXCTX"), 'stems: fechar com Esc libera o áudio (sem vazamento)')
     ok(not E, 'banda: sem erros de JavaScript', '; '.join(E[:3])); c.close()
 
     # 3) painel dos administradores (Supabase simulado)
