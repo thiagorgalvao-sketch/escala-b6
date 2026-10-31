@@ -94,7 +94,29 @@ with sync_playwright() as p:
     pg.evaluate("ssong()"); pg.wait_for_timeout(500); ok(pg.evaluate('S.songs.length') == n0 + 1, 'admin: salvar música nova')
     sid = pg.evaluate("S.songs[0].id"); pg.evaluate(f"editSong('{sid}')"); pg.fill('.etit', 'Alterado'); pg.click('#dlg button:has-text("Cancelar")'); pg.wait_for_timeout(200)
     ok(pg.evaluate("dlg.open&&d2.open"), 'admin: avisa antes de sair sem salvar'); pg.evaluate("d2.close();D0='';dlg.close()")
-    # 4) proteção contra código malicioso nos textos
+    # 4) disponibilidade da equipe: borda colorida + motivo da recusa, sem caixa duplicada
+    lid2 = pg.evaluate("(S.lists.find(l=>l.songIds.length&&l.date)||{}).id")
+    if lid2:
+        pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close())")
+        pg.evaluate("(id=>{const l=S.lists.find(x=>x.id==id);l.date='2099-01-01';l.banda=Object.assign({},l.banda,{vm:'Teste Confirma',bt:'Teste Recusa'});DISP_ALL={[id]:[{nome:'Teste Confirma',status:'sim',obs:''},{nome:'Teste Recusa',status:'nao',obs:'Motivo X'}]};S.tab='lists';S.lv=id;S.lvm=1;R()})(%r)" % lid2)
+        pg.wait_for_timeout(300)
+        ok(pg.evaluate("document.querySelectorAll('.esp.dok').length") > 0, 'disponibilidade: confirmação mostra borda verde na equipe')
+        ok(pg.evaluate("document.querySelectorAll('.esp.dno').length") > 0, 'disponibilidade: recusa mostra borda vermelha na equipe')
+        ok(pg.evaluate("[...document.querySelectorAll('.espw')].some(e=>e.textContent.includes('Motivo X'))"), 'disponibilidade: motivo da recusa aparece junto ao nome')
+        ok(pg.evaluate("document.querySelectorAll('.dpx').length") == 0, 'disponibilidade: sem caixa duplicada separada')
+        pg.evaluate("DISP_ALL=null")
+    # 5) backup e restauração: textarea reflete os dados e restaurar volta ao estado salvo
+    pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close())")
+    n0s, n0l = pg.evaluate('S.songs.length'), pg.evaluate('S.lists.length')
+    pg.evaluate('bk()'); pg.wait_for_timeout(200)
+    ok(pg.evaluate("$('#bt').value.length") > 100, 'backup: gera o conteúdo com os dados atuais')
+    pg.evaluate("S.songs.push({id:'fake-test-song',title:'FAKE',artist:'',medleys:[],key:'',parts:[]})")
+    pg.evaluate('rs()'); pg.wait_for_timeout(200)
+    pg.click('#y2'); pg.wait_for_timeout(300)
+    ok(pg.evaluate('S.songs.length') == n0s and not pg.evaluate("S.songs.some(s=>s.id=='fake-test-song')"), 'backup: restaurar descarta mudanças feitas depois do backup')
+    ok(pg.evaluate('S.lists.length') == n0l, 'backup: restaurar preserva a contagem de repertórios')
+    pg.evaluate("dlg.close()")
+    # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
     ok(pg.evaluate('window.__x===undefined'), 'segurança: textos com código não são executados')
