@@ -1093,7 +1093,7 @@ const FXL=[['vocal','Voz'],['bateria','Bateria'],['baixo','Baixo'],['guitarra','
 const FXICON={vocal:'<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10v1a7 7 0 0014 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/>',bateria:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v8a7 3 0 0014 0V6"/>',baixo:'<circle cx="8" cy="17" r="3.4"/><path d="M10.2 14.8L19 3"/><path d="M17.3 3h3v3"/>',guitarra:'<circle cx="9" cy="16" r="2.6"/><path d="M10.8 14.2L18 5"/><path d="M16.6 4h2.4v2.4"/>',teclado:'<rect x="3" y="7" width="18" height="10" rx="1"/><path d="M8 7v6M12 7v6M16 7v6"/>',outros:'<circle cx="7" cy="18" r="3"/><path d="M10 18V5l9-2v14"/><circle cx="19" cy="15" r="3"/>'};
 function fxIco(k){return'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(FXICON[k]||'')+'</svg>'}
 const FXCSS='<style>#dlg2 .fxpanel{background:#0B1627;border-radius:12px;border:1px solid #16243C;overflow:hidden}#dlg2 .fxmr{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#0E1B30;border-bottom:1px solid #16243C}#dlg2 .fxmn{font-weight:700;font-size:.8rem;flex:none;display:inline-flex;align-items:center;gap:6px;color:#00CDD3}#dlg2 .fxtm2{display:flex;align-items:center;gap:6px;padding:10px 12px;background:#0E1B30;border-bottom:1px solid #16243C;flex-wrap:wrap}#dlg2 .fxtmv{font-size:.8rem}#dlg2 .fxtmsel{margin-left:auto;background:#15223A;border:1px solid #223455;color:#fff;border-radius:6px;font-size:.72rem;padding:3px 4px;max-width:120px}#dlg2 #fxrowswrap{position:relative}#dlg2 .fxhead{position:absolute;top:0;bottom:0;left:0%;width:18px;margin-left:-9px;display:flex;justify-content:center;align-items:stretch;z-index:3;cursor:ew-resize;touch-action:none}#dlg2 .fxhead::after{content:"";width:2px;background:#00CDD3;opacity:.9;pointer-events:none}#dlg2 .fxhead:active::after,#dlg2 .fxhead:hover::after{width:3px;opacity:1}#dlg2 .fxtrk{border-bottom:1px solid #16243C}#dlg2 .fxtrk:last-child{border-bottom:0}#dlg2 .fxr{display:flex;align-items:center;gap:7px;padding:8px 10px 2px}#dlg2 .fxic{flex:none;width:26px;height:22px;border-radius:5px;background:#0B3542;color:#00CDD3;display:inline-flex;align-items:center;justify-content:center}#dlg2 .fxn{flex:1;min-width:0;font-size:.78rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#dlg2 .fxrs{display:flex;align-items:center;gap:8px;padding:2px 10px 6px}#dlg2 .fxsl{flex:1;min-width:0;accent-color:#00CDD3}#dlg2 .fxpc{width:34px;flex:none;font-size:.68rem;text-align:right;color:var(--g)}#dlg2 .fxcl{flex:none;display:flex;align-items:center;gap:5px;padding-left:8px;margin-left:2px;border-left:1px solid #16243C}#dlg2 .fxbtn{flex:none;width:24px;height:24px;padding:0;border-radius:6px;background:#15223A;border:1px solid #223455;color:#8FA1B8;font-size:.64rem;font-weight:800;cursor:pointer;min-height:0}#dlg2 .fxbtn:disabled{opacity:.4;cursor:default}#dlg2 .fxbtn.mon{background:#FF5D5D;border-color:#FF5D5D;color:#fff}#dlg2 .fxbtn.son{background:#00CDD3;border-color:#00CDD3;color:#000}#dlg2 .fxdl{flex:none;width:24px;height:24px;border-radius:6px;background:#15223A;border:1px solid #223455;color:#8FA1B8;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-size:.72rem}#dlg2 .fxwf{display:block;width:100%;height:22px;background:#060D18;cursor:pointer;margin:0 0 1px}#dlg2 .fxtr{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #16243C}#dlg2 .fxpp{flex:none;width:36px;height:36px;border-radius:50%;background:#00CDD3;color:#000;border:0;font-size:.95rem;cursor:pointer;min-height:0;padding:0}#dlg2 .fxpp:disabled{opacity:.4;cursor:default}#dlg2 .fxtm{font-size:.7rem;color:var(--g);width:34px;text-align:center}</style>';
-let FXA=[],FXCTX=null,FXPLAYING=false,FXSTARTCTXT=0,FXSTARTOFFSET=0,FXDUR=0,FXT=null,FXSOLO=null,FXMASTER=1,FXSONG=null,FXKEY=null,FXSEMI=0,FXSHIFTING=false,FXDRAGGING=false;
+let FXA=[],FXCTX=null,FXPLAYING=false,FXSTARTCTXT=0,FXSTARTOFFSET=0,FXDUR=0,FXT=null,FXSOLO=null,FXMASTER=1,FXSONG=null,FXKEY=null,FXSEMI=0,FXSHIFTING=false,FXDRAGGING=false,FXTOMFAIL=false;
 function fxFmt(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 function fxPrefKey(id){return 'fxprefs_'+id}
 function fxLoadPrefs(id){try{const r=localStorage.getItem(fxPrefKey(id));return r?JSON.parse(r):null}catch(e){return null}}
@@ -1196,8 +1196,10 @@ async function fxDetectKey(url,ctx){try{
   if(sMin>bestScore){bestScore=sMin;best=KC[root]+'m'}}
  return best}catch(e){return null}}
 function fxTomPaint(){const el=$('#fxtmrow');if(!el)return;const s=S.songs.find(x=>x.id==FXSONG);const base=s&&s.stemsTom;
- if(!base){el.innerHTML='<span class="fxmn">Tom</span><span class="fxtmv mut">Detectando…</span>';return}
- const KC=['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'],bp=pk(base),cur=KC[(bp.pc+FXSEMI+12)%12]+(bp.min?'m':'');
+ const KC=['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+ if(!base){const canDetect=!!(s&&s.stemsSrc&&s.stemsSrc.url)&&!FXTOMFAIL;const opts=KC.flatMap(r=>[r,r+'m']).map(v=>`<option value="${v}">${fk(v)}</option>`).join('');
+  el.innerHTML=`<span class="fxmn">Tom</span><span class="fxtmv mut">${canDetect?'Detectando…':'Não detectado'}</span><select class="fxtmsel" onchange="fxTomSet(this.value)" title="Definir tom manualmente" aria-label="Definir tom original"><option value="" selected disabled>Definir…</option>${opts}</select>`;return}
+ const bp=pk(base),cur=KC[(bp.pc+FXSEMI+12)%12]+(bp.min?'m':'');
  const opts=KC.flatMap(r=>[r,r+'m']).map(v=>`<option value="${v}"${v==base?' selected':''}>${fk(v)}</option>`).join('');
  el.innerHTML=`<span class="fxmn">Tom</span><button type="button" class="fxbtn" onclick="fxSemi(-1)" title="Meio tom abaixo" aria-label="Meio tom abaixo">−</button><span class="fxtmv"><b>${fk(cur)}</b>${FXSEMI?` <small class="mut">(original ${fk(base)})</small>`:''}</span><button type="button" class="fxbtn" onclick="fxSemi(1)" title="Meio tom acima" aria-label="Meio tom acima">+</button>${FXSEMI?`<button type="button" class="fxbtn" onclick="fxSemi(0)" title="Voltar ao tom original" aria-label="Voltar ao tom original">↺</button>`:''}<select class="fxtmsel" onchange="fxTomSet(this.value)" title="Corrigir tom detectado" aria-label="Corrigir tom original">${opts}</select>`}
 function fxTomSet(v){const s=S.songs.find(x=>x.id==FXSONG);if(!s)return;s.stemsTom=v;save();fxTomPaint()}
@@ -1211,7 +1213,7 @@ function fxmOpen(id){const s=S.songs.find(x=>x.id==id);if(!s||!s.stems)return;
  const avail=FXL.filter(([k])=>s.stems[k]);
  const saved=fxLoadPrefs(id)||{};
  const wantSemi=Math.max(-6,Math.min(6,saved.semi||0));
- FXSONG=id;FXSEMI=0;FXSTARTOFFSET=0;FXPLAYING=false;FXDUR=0;FXSOLO=null;
+ FXSONG=id;FXSEMI=0;FXSTARTOFFSET=0;FXPLAYING=false;FXDUR=0;FXSOLO=null;FXTOMFAIL=false;
  const ctx=fxEnsureCtx();
  d2.style.width='min(520px,94vw)';
  d2.innerHTML=FXCSS+`<h3 style="margin-top:0;margin-bottom:2px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" width="20" height="20" style="flex:none"><path d="M4 21V10M4 6V3M12 21v-7M12 10V3M20 21v-4M20 13V3M2 10h4M10 6h4M18 13h4"/></svg>Stems · ${esc(s.title)}</h3>`
@@ -1227,17 +1229,16 @@ function fxmOpen(id){const s=S.songs.find(x=>x.id==id);if(!s||!s.stems)return;
  fxmMix();
  fxmUpdateHead(0);
  fxTomPaint();
- let pending=FXA.length||1,anyDur=0;
+ let pending=FXA.length||1;
  const markLoaded=async()=>{pending--;if(pending<=0){
   const ld=$('#fxload');const b=$('#fxpp');
   if(wantSemi){if(ld)ld.textContent='Processando tom…';await fxApplySemi(wantSemi)}
-  if(ld){ld.style.display=FXDUR?'none':'block';ld.textContent=FXDUR?'':''}
-  if(ld&&FXDUR){const lw=$('#fxload');if(lw){lw.style.display='block';lw.textContent='Duração: '+fxFmt(FXDUR)}}
+  if(ld)ld.style.display='none';
   if(b)b.disabled=false}};
  if(!FXA.length)markLoaded();
  FXA.forEach(t=>{fxDecodeTrack(t).then(()=>{if(t.buf){FXDUR=Math.max(FXDUR,t.buf.duration);fxDrawFromBuffer(t.k,t.buf)}markLoaded()})});
  if(!s.stemsTom&&s.stemsSrc&&s.stemsSrc.url){
-  fxDetectKey(s.stemsSrc.url,ctx).then(k=>{if(k&&FXSONG==id){s.stemsTom=k;save();fxTomPaint()}})}
+  fxDetectKey(s.stemsSrc.url,ctx).then(k=>{if(FXSONG!=id)return;if(k)s.stemsTom=k,save();else FXTOMFAIL=true;fxTomPaint()})}
  if(!FXKEY){FXKEY=e=>{if(!d2.open)return;const at=document.activeElement&&document.activeElement.tagName;if(e.code=='Space'&&at!='BUTTON'&&at!='INPUT'&&at!='SELECT'){e.preventDefault();fxmPlay()}};document.addEventListener('keydown',FXKEY)}
  d2.showModal()}
 function fxmClose(){fxPause();FXA.forEach(t=>{try{if(t.gain)t.gain.disconnect()}catch(e){}});FXA=[];FXSOLO=null;FXSEMI=0;
@@ -2360,7 +2361,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='30/10/2026 · 293';
+const VER='30/10/2026 · 294';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
