@@ -804,11 +804,11 @@ function pkPr(id){const l=S.lists.find(x=>x.id==id);if(!l)return;const ss=lSongs
  ss.forEach((s,i)=>{const k=lKey(l,s),og=fk(s.key),tr=(l.keys||{})[s.id]&&pk((l.keys||{})[s.id]).pc!=pk(s.key).pc;o.push(lPos(l,s,i+1)+' '+s.title+' — Tom '+k+(tr?' (cadastrada em '+og+')':'')+(+s.bpm?' · '+(+s.bpm)+' BPM':'')+(s.sig?' · '+s.sig:'')+' · VS '+(s.vs&&s.vs.url?'✓':'falta'))});
  const nv=ss.filter(s=>!(s.vs&&s.vs.url));if(nv.length)o.push('','Sem VS no app: '+nv.map(s=>s.title).join(', '));txD('Lista para o Prime',o.join('\n'),'Ordem, tom, BPM e compasso para montar o setlist do Prime Multitrack.')}
 const LYC=new Map();
-function lyrK(s){const t=(s.cifra||'')+'\x01'+(s.parts||[]).map(q=>q.lyric||'').join('\x01')+'\x01'+(s.vmap||[]).map(r=>r.t||'').join('\x01');let h=0;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;return h}
-function lyrL(s){const k=s.id+'|'+lyrK(s),c=LYC.get(s.id);if(c&&c.k==k)return c.v;const o=[];
+function lyrK(s){const t=(s.parts||[]).map(q=>q.lyric||'').join('\x01')+'\x01'+(s.vmap||[]).map(r=>r.t||'').join('\x01');let h=0;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;return h}
+function lyrL(s){const ph=lyrK(s),c=LYC.get(s.id);if(c&&c.cf===s.cifra&&c.ph===ph)return c.v;const o=[];
  (s.cifra||'').split('\n').forEach(x=>{const t=x.trim();if(!t||/^\[.*\]$/.test(t)||/\|-|-\|/.test(t)||isCL(x)||/^(intro|refr[aã]o|verso|ponte|pr[eé]-?refr[aã]o|final|solo|interl[uú]dio|tab)\b[:\s]*$/i.test(t))return;o.push(t)});
  (s.parts||[]).forEach(q=>{const t=(q.lyric||'').replace(/…|\.\.\./g,'').trim();if(t)o.push(t)});(s.vmap||[]).forEach(r=>{const t=(r.t||'').trim();if(t)o.push(t)});
- const v=[...new Set(o)];LYC.set(s.id,{k,v});return v}
+ const v=[...new Set(o)];LYC.set(s.id,{cf:s.cifra,ph:ph,v});return v}
 const lyrT=s=>nz(lyrL(s).join(' \n '));
 function lyrHit(s,q){const n=nz(q).trim();if(n.length<3)return'';const ws=n.split(' ').filter(Boolean);for(const l of lyrL(s)){const z=nz(l);if(z.includes(n)||ws.every(w=>z.includes(w)))return l}return''}
 const hay=s=>nz(s.title+' '+(s.artist||'')+' '+(s.medleys||[]).join(' ')+' '+(s.martists||[]).join(' ')+' '+(s.tags||[]).join(' '))+' '+lyrT(s);
@@ -2402,7 +2402,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='30/10/2026 · 297';
+const VER='30/10/2026 · 298';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
