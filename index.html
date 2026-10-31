@@ -634,7 +634,7 @@ window.__FVCFG=()=>CFG;
 let sb=null,okRes;const ready=new Promise(r=>okRes=r);
 const keep=()=>lg('fv-keep')!=='0';
 const store={getItem:k=>{try{return(keep()?localStorage:sessionStorage).getItem(k)}catch(e){return null}},setItem:(k,v)=>{try{(keep()?localStorage:sessionStorage).setItem(k,v)}catch(e){}},removeItem:k=>{try{localStorage.removeItem(k);sessionStorage.removeItem(k)}catch(e){}}};
-const ld=u=>new Promise((ok,no)=>{if(window.supabase)return ok();const s=document.createElement('script');s.src=u;if(u==CDN)s.crossOrigin='anonymous';s.onload=()=>window.supabase?ok():no(new Error('lib'));s.onerror=()=>no(new Error('lib'));document.head.appendChild(s)}),loadJs=()=>ld(VSB).catch(()=>ld(CDN));
+const ld=(u,sri)=>new Promise((ok,no)=>{if(window.supabase)return ok();const s=document.createElement('script');s.src=u;if(sri)s.integrity=sri;if(u==CDN)s.crossOrigin='anonymous';s.onload=()=>window.supabase?ok():no(new Error('lib'));s.onerror=()=>no(new Error('lib'));document.head.appendChild(s)}),loadJs=async()=>{let sri;try{const r=await fetch(new URL('vendor/manifest.json',location.href).href,{cache:'no-store'});if(r.ok){const j=await r.json();sri=(j.sri||{})['supabase.min.js']}}catch(e){}return ld(VSB,sri).catch(()=>ld(CDN))};
 const css=`#fvl{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(900px 420px at 50% -120px,rgba(0,205,211,.16),transparent 70%),#070D18;display:flex;align-items:center;justify-content:center;padding:16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;color:#fff;overflow:auto}
 #fvl form{width:100%;max-width:360px;background:#111E33;border:1px solid #2A3D5A;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:12px}
 #fvl h1{font-size:1.4rem;margin:0;letter-spacing:.16em}#fvl p{margin:0;color:#A2B1C4;font-size:.9rem;line-height:1.45}
@@ -1007,7 +1007,8 @@ function vSet(i,on){D.vmap=D.vmap||[];const m=D.vmap;if(!m[i]||!m[i].t)return;le
 function vBrush(b){VB=b;document.querySelectorAll('.vbr').forEach(x=>x.classList.toggle('on',x.dataset.b==b))}
 function vTxt(){const e=$('#vtx');if(!e)return;D.vmap=vparse(e.value,D.vmap);sfR()}
 /* leitor de PDF: versão atual (sem a falha CVE-2024-4367) hospedada junto com o app; se este link não permitir, usa a versão do cdnjs com a proteção recomendada */
-const VEND=(window.__B6SB?'../':'')+'vendor/',ljsV=(f,cdn)=>ljs(VEND+f).catch(()=>ljs(cdn));
+const VEND=(window.__B6SB?'../':'')+'vendor/';let VMF=null;async function vMan(){if(VMF)return VMF;try{const r=await fetch(VEND+'manifest.json',{cache:'no-store'});VMF=r.ok?await r.json():{}}catch(e){VMF={}}return VMF}
+async function ljsV(f,cdn){const m=await vMan();try{return await ljs(VEND+f,(m.sri||{})[f])}catch(e){return await ljs(cdn)}}
 const PJV='3.11.174',PJU='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/'+PJV+'/';let PJL=null,PJF=0,PJO=0;
 async function vLib(){if(PJL)return PJL;if(!PJF){try{const b=new URL(VEND,location.href).href,m=await import(b+'pdf.min.mjs');if(!m||!m.getDocument)throw 0;m.GlobalWorkerOptions.workerSrc=b+'pdf.worker.min.mjs';PJL=m;PJO=1;return PJL}catch(e){PJF=1}}
  return PJL=await new Promise((ok,no)=>{if(window.pdfjsLib)return ok(window.pdfjsLib);const s=document.createElement('script');s.src=PJU+'pdf.min.js';s.crossOrigin='anonymous';s.referrerPolicy='no-referrer';s.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc=PJU+'pdf.worker.min.js';ok(window.pdfjsLib)};s.onerror=()=>no(new Error('lib'));document.head.appendChild(s)})}
@@ -2402,7 +2403,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='30/10/2026 · 298';
+const VER='31/10/2026 · 299';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2519,7 +2520,7 @@ document.addEventListener('touchend',e=>{if(!t1||iOn||S.tab!='songs'||!S.sel||dl
  const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Date.now()-tT<900&&Math.abs(dx)>70&&Math.abs(dy)<60&&Math.abs(dx)>1.8*Math.abs(dy))nav(dx<0?1:-1)},{passive:true});
 var tt0;
 /* ===== v104 geral ===== */
-function ljs(u){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
+function ljs(u,sri){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;if(sri)s.integrity=sri;s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
 var SYP=0;addEventListener('beforeunload',e=>{if(SYP&&!S.band){e.preventDefault();e.returnValue=''}});
 /* undo */
 var UD=null,UDT;function uSnap(m){if(S.band)return;UD={m,j:JSON.stringify({songs:S.songs,lists:S.lists}),sel:S.sel,lv:S.lv,armed:0}}
