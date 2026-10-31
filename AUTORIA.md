@@ -23,18 +23,27 @@ Esse hash não revela o CPF hoje. Serve para, se um dia for necessário, o autor
 
 ## Verificação por assinatura GPG
 
-Esta declaração é selada por uma tag Git assinada digitalmente, usando a chave pública abaixo.
+Este documento (`AUTORIA.md`, no estado em que foi comitado) é selado por uma assinatura digital destacada, usando a chave pública abaixo.
 
 - **Chave pública:** arquivo [`pubkey.asc`](./pubkey.asc), também publicada nos servidores de chaves públicos de OpenPGP.
 - **Fingerprint:** `4DB5 1F5B 6E92 5BD9 BFE0 573B FE01 B1AD DB69 CB2A`
-- **Tag assinada:** `prova-autoria-2026-10-31`
+- **Assinatura destacada:** arquivo [`AUTORIA.md.asc`](./AUTORIA.md.asc)
 
 Para verificar (depois de importar `pubkey.asc` com `gpg --import pubkey.asc`):
 
 ```
-git tag -v prova-autoria-2026-10-31
+gpg --verify AUTORIA.md.asc AUTORIA.md
 ```
 
-## Verificação por selo de tempo (OpenTimestamps)
+## Reforço opcional: selo de tempo na blockchain (OpenTimestamps)
 
-Este arquivo também é selado com um comprovante [OpenTimestamps](https://opentimestamps.org/) (`AUTORIA.md.ots`), que ancora criptograficamente a existência deste conteúdo exato num ponto no tempo na blockchain do Bitcoin — de forma gratuita e verificável por qualquer pessoa, independente deste repositório continuar no ar.
+Além da assinatura acima e do histórico do GitHub (que já registra a data deste commit em um servidor independente), é possível ancorar este arquivo na blockchain do Bitcoin de forma gratuita, usando o [OpenTimestamps](https://opentimestamps.org/). Isso cria uma prova adicional de que este conteúdo exato existia nesta data, verificável para sempre, mesmo que o GitHub ou este repositório deixem de existir.
+
+Para gerar esse selo (rodando no seu computador, com Python instalado):
+
+```
+pip install opentimestamps-client
+ots stamp AUTORIA.md
+```
+
+Isso cria o arquivo `AUTORIA.md.ots`. Guarde-o e, se quiser, adicione-o a este repositório. Depois de algumas horas (quando a prova for confirmada na blockchain), rode `ots upgrade AUTORIA.md.ots` e depois `ots verify AUTORIA.md.ots` para confirmar.
