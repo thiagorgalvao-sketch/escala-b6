@@ -185,6 +185,8 @@ with sync_playwright() as p:
     ok(r == ['Stems do original','Stems do VS','Stems da banda','Versão original','VS','Gravação da banda','YouTube'], 'play: prioridade stems original > stems VS > stems banda > original > VS > banda > YouTube', str(r))
     r = pg.evaluate("()=>{S.tab='hoje';R();const b=[...document.querySelectorAll('.hjb button')].find(x=>/Repert/.test(x.textContent));if(!b)return 'sem botão';b.click();return S.tab=='lists'&&S.lvm==1}")
     ok(r is True, 'Hoje: botão Repertório abre o culto', str(r))
+    r = pg.evaluate("""async()=>{tourStart(1);const seen=[];for(let i=0;i<20&&$('#tour');i++){await new Promise(r=>setTimeout(r,120));const b=$('#tour .tcd b');seen.push(b?b.textContent:'');tourGo(1)}return seen}""")
+    ok(len(r) >= 6 and 'Hoje' in r and 'Tocar' in r and 'Mapa vocal' in r and 'Mais opções' in r, 'tour: mostra as funções atuais (Hoje, Tocar, Mapa vocal, Mais opções)', str(r))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
