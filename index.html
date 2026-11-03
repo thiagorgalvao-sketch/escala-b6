@@ -218,7 +218,7 @@ body.fs .pj{top:0}
 }
 @media(max-width:700px){.pj{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.pj::-webkit-scrollbar{display:none}.pj>*{flex:none}}
 @media(max-width:600px){body.qo:has(#q:not([style*="none"])) #m{padding-top:52px}}
-.wrap>div{min-width:0}body.fs .bkl{display:none!important}body.fs .hd{padding-right:52px}
+.wrap>div{min-width:0}body.fs .bkl{display:none!important}body.fs .hd{padding-right:120px}#stg .stb:last-child:not(:disabled){background:#00CDD3;color:#00262A;border:0}
 body.band #qb,body.band #mn,body.band #mnp,body.band .bks{display:none!important}.hd,.vtom,.field{--z:1}body.vv .hsub,body.vv .hd .md .mut,body.fs .hsub,body.fs .hd .md .mut,body.vv .field,body.vv .row .tk,body.vv .row .ng,body.vv .hd .orig{display:none!important}
 @media(pointer:coarse){
  .row>.sm,.hda .sm,.lt .sm,.lt .lsel,#dk button,#dk select,.emp .sm{min-height:44px}
@@ -447,7 +447,7 @@ body.vblk:has(#vsq:not([hidden])) #ib{bottom:calc(120px + env(safe-area-inset-bo
 body.vblk.fs #ib{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
 body.vblk.ink-on #m{padding-bottom:90px}
 body.fs #vsq,body.fs .qk{display:none!important}
-body.fs .acr{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:58px;margin:0;z-index:8}
+body.fs .acr{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:96px;margin:0;z-index:8}
 body.fs .acr .lab{height:40px!important;min-width:0;padding:0 12px;flex-direction:row;gap:6px}
 body.fs .acr .lab span{font-size:.8rem}
 body.fs .hdt{padding-right:170px}
@@ -2005,14 +2005,15 @@ function espNovo(){const d=devAtual();return d&&!espLs('feito')[d.id]&&d.d>=addD
 function jejAtivo(){const T=td();return espA('jej').filter(x=>x.ini&&x.fim>=T).sort((a,b)=>a.ini.localeCompare(b.ini))}
 /* ===== jeito Apple: tocar com um toque, opções num menu, tela Hoje ===== */
 const PLI='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor" stroke="none"/></svg>';
-function sgSrc(s,l){if(!s)return null;const b=baFor(s,l);
- if(b&&b.stems&&!isLk(b.url))return{t:'Stems da banda',f:`fxmOpen('${s.id}','${bh(b.url)}')`};
+function sgSrc(s,l){if(!s)return null;const b=baFor(s,l),u=l?lkFor(s,l):s.link;
+ /* prioridade: stems do original, stems do VS, stems da banda, original, VS, gravação da banda, YouTube */
+ if(s.stems)return{t:'Stems do original',f:`fxmOpen('${s.id}','o')`};
  if(s.vs&&s.vs.stems&&!isLk(s.vs.url))return{t:'Stems do VS',f:`fxmOpen('${s.id}','v')`};
- if(s.stems)return{t:'Stems',f:`fxmOpen('${s.id}','o')`};
- if(b)return{t:'Gravação da banda',f:`baGo('${s.id}','${l?l.id:''}')`};
- if(s.vs)return{t:'VS',f:`vsGo('${l?l.id:''}','${s.id}')`};
+ if(b&&b.stems&&!isLk(b.url))return{t:'Stems da banda',f:`fxmOpen('${s.id}','${bh(b.url)}')`};
  if(orSrc(s))return{t:'Versão original',f:`orGo('${s.id}')`};
- const u=l?lkFor(s,l):s.link;if(u&&ytId(u))return{t:'YouTube',f:`ytOpen(${ja(u)},'${s.id}')`};
+ if(s.vs)return{t:'VS',f:`vsGo('${l?l.id:''}','${s.id}')`};
+ if(b)return{t:'Gravação da banda',f:`baGo('${s.id}','${l?l.id:''}')`};
+ if(u&&ytId(u))return{t:'YouTube',f:`ytOpen(${ja(u)},'${s.id}')`};
  return null}
 function sgPlayB(s,l){const x=sgSrc(s,l);return x?`<button class="sgp" title="Tocar · ${x.t}" aria-label="Tocar ${esc(s.title)} (${x.t})" onclick="event.stopPropagation();${x.f}">${PLI}</button>`:`<button class="sgp off" aria-disabled="true" title="Sem áudio" aria-label="Sem áudio para ${esc(s.title)}" onclick="event.stopPropagation();nfo('vs')">${PLI}</button>`}
 function sgMenu(sid,lid){const s=S.songs.find(x=>x.id==sid),l=S.lists.find(x=>x.id==lid);if(!s)return;const b=baFor(s,l),A=stAll(s),u=l?lkFor(s,l):s.link,it=[];
@@ -2585,7 +2586,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='03/11/2026 · 331';
+const VER='03/11/2026 · 332';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
