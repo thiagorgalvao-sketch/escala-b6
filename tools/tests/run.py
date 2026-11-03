@@ -179,7 +179,7 @@ with sync_playwright() as p:
     r = pg.evaluate("""async()=>{let f=0;const of=window.fetch;window.fetch=(...a)=>{f++;return of(...a)};const u='https://hofrthndlstofytlapzk.supabase.co/storage/v1/object/public/midias/teste-grande.mp3';const t0=Date.now();const x=await msrc(u,1);window.fetch=of;return{same:x===u,f,ms:Date.now()-t0}}""")
     ok(r['same'] and r['f'] == 0, 'áudio: toca direto do link, sem baixar o arquivo inteiro antes (celular)', str(r))
     r = pg.evaluate("()=>{S.tab='hoje';R();const h=document.querySelector('.hj');const l=S.lists.find(x=>x.songIds.length);const s=S.songs.find(x=>x.id==l.songIds[0]);sgMenu(s.id,l.id);const n=document.querySelectorAll('#dlg2 .mni').length;d2.close();S.tab='lists';R();return[!!h,n]}")
-    ok(r[0] and r[1] == 7, 'tela Hoje e menu de opções da música (jeito Apple)', str(r))
+    ok(r[0] and r[1] == 6, 'tela Hoje e menu de opções da música (jeito Apple)', str(r))
     r = pg.evaluate("""()=>{const u='https://hofrthndlstofytlapzk.supabase.co/storage/v1/object/public/midias/a.mp3',F={vocal:'x'};const l={id:'L',date:'2099-01-01'};
      const T=s=>(sgSrc(s,l)||{}).t;return[T({id:'a',stems:F,vs:{url:u,stems:F},bas:[{url:u,stems:F}]}),T({id:'b',vs:{url:u,stems:F},bas:[{url:u,stems:F}],stemsSrc:{url:u}}),T({id:'c',bas:[{url:u,stems:F}],stemsSrc:{url:u}}),T({id:'d',stemsSrc:{url:u},vs:{url:u},bas:[{url:u}]}),T({id:'e',vs:{url:u},bas:[{url:u}]}),T({id:'f',bas:[{url:u}],link:'https://youtu.be/dQw4w9WgXcQ'}),T({id:'g',link:'https://youtu.be/dQw4w9WgXcQ'})]}""")
     ok(r == ['Stems do original','Stems do VS','Stems da banda','Versão original','VS','Gravação da banda','YouTube'], 'play: prioridade stems original > stems VS > stems banda > original > VS > banda > YouTube', str(r))
