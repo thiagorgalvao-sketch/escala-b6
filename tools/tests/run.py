@@ -35,7 +35,7 @@ def _nz(x): return ''.join(c for c in unicodedata.normalize('NFD', str(x or '').
 _G = set()
 for _k, _v in PUB.items():
     if _k.startswith('l_'):
-        _j = json.loads(_v['j']); _G.add((_j.get('date'), _nz(_j.get('place')), _nz(_j.get('turno'))) if _j.get('date') else _k)
+        _j = json.loads(_v['j']); _G.add((_j.get('date'), _nz(_j.get('place')), _nz(_j.get('turno')), _nz(_j.get('name'))) if _j.get('date') else _k)
 NL = len(_G)  # cultos duplicados (mesmo dia/local/horário) aparecem como um só
 STUB = open(os.path.join(HERE, 'stub.js'), encoding='utf-8').read()
 CC = open(os.path.join(HERE, 'cifra_exemplo.html'), encoding='utf-8').read()
@@ -171,6 +171,9 @@ with sync_playwright() as p:
     ok(r, 'banda: cultos duplicados no mesmo dia/local/horário viram um só, com as músicas')
     r = pg.evaluate("()=>{const l={id:'t-pd',date:'2099-01-01',name:'X',songIds:[],banda:{}};const a=pendBox(l);return[/pendência/.test(a),/ltG\\('mu'\\)/.test(a),/ltG\\('ev'\\)/.test(a)]}")
     ok(all(r), 'admin: repertório mostra as pendências com atalho para resolver', str(r))
+    r = pg.evaluate("()=>{const n0=S.lists.length;S.lists.push({id:'dupA',date:'2099-02-02',place:'Mauá',turno:'Noite',name:'Culto',songIds:[],banda:{bx:'Fulano'}},{id:'dupB',date:'2099-02-02',place:'Maua',turno:'Noite',name:'Culto',songIds:[S.songs[0].id],banda:{}});S.lv='dupA';const k=lDedup();const b=S.lists.find(l=>l.id=='dupB');return k==1&&S.lists.length==n0+1&&!S.lists.some(l=>l.id=='dupA')&&b.banda.bx=='Fulano'&&S.lv=='dupB'&&DQ.has('l_dupA')}")
+    ok(r, 'admin: culto duplicado é unido ao que tem músicas (card do próximo culto = culto cadastrado)')
+    pg.evaluate("S.lists=S.lists.filter(l=>l.id!='dupB');S.lv=null")
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
