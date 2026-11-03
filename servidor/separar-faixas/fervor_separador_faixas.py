@@ -22,6 +22,7 @@
 #  veja 15_faixas_separadas.sql no projeto para como criá-los, se precisar.)
 
 import os
+import subprocess
 import uuid
 
 import modal
@@ -113,19 +114,30 @@ def separar(url: str, musica_id: str) -> dict:
             audio = fontes[i].cpu().numpy().T  # (amostras, canais)
             sf.write(caminho, audio, modelo.samplerate, subtype="PCM_16")
 
-            destino = f"{musica_id}/{nome_pt}.wav"
-            with open(caminho, "rb") as f:
+            # WAV de música inteira passa de 50 MB (limite do plano gratuito do
+            # Supabase) -> converte para MP3 de alta qualidade (~2,4 MB/min)
+            mp3 = f"{tmp}/{nome_pt}.mp3"
+            subprocess.run(
+                ["ffmpeg", "-y", "-loglevel", "error", "-i", caminho, "-codec:a", "libmp3lame", "-b:a", "320k", mp3],
+                check=True,
+            )
+            os.remove(caminho)
+
+            destino = f"{musica_id}/{nome_pt}.mp3"
+            with open(mp3, "rb") as f:
                 dados = f.read()
             resp = c.post(
                 f"{supabase_url}/storage/v1/object/{bucket}/{destino}",
                 headers={
                     "Authorization": f"Bearer {service_key}",
                     "apikey": service_key,
-                    "Content-Type": "audio/wav",
+                    "Content-Type": "audio/mpeg",
                     "x-upsert": "true",
                 },
                 content=dados,
             )
+            if resp.status_code >= 400:
+                raise RuntimeError(f"Supabase recusou {nome_pt}.mp3 ({len(dados)//1048576} MB): {resp.text[:300]}")
             resp.raise_for_status()
             faixas[nome_pt] = f"{supabase_url}/storage/v1/object/public/{bucket}/{destino}"
 
