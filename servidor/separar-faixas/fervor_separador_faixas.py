@@ -37,6 +37,7 @@ image = (
         "demucs==4.0.1",
         "soundfile==0.12.1",
         "httpx==0.27.2",
+        "fastapi[standard]",
         "numpy<2",
     )
 )
