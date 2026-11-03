@@ -169,6 +169,8 @@ with sync_playwright() as p:
     ok(r[0] == '' and r[1], 'admin: sem botão de publicar; aviso só quando a atualização do time falha')
     r = pg.evaluate("()=>{const a=lMerge([{id:'e_x',date:'2099-01-01',place:'Mauá',turno:'Manhã',songIds:[],banda:{bx:'Thiago',vm:''},passHora:'07:40'},{id:'r1',date:'2099-01-01',place:'Maua',turno:'Manhã',songIds:['a','b'],banda:{vm:'Josué',bx:''}}]);return a.length==1&&a[0].id=='r1'&&a[0].songIds.length==2&&a[0].banda.bx=='Thiago'&&a[0].banda.vm=='Josué'&&a[0].passHora=='07:40'}")
     ok(r, 'banda: cultos duplicados no mesmo dia/local/horário viram um só, com as músicas')
+    r = pg.evaluate("()=>{const l={id:'t-pd',date:'2099-01-01',name:'X',songIds:[],banda:{}};const a=pendBox(l);return[/pendência/.test(a),/ltG\\('mu'\\)/.test(a),/ltG\\('ev'\\)/.test(a)]}")
+    ok(all(r), 'admin: repertório mostra as pendências com atalho para resolver', str(r))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
