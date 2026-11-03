@@ -90,9 +90,9 @@ with sync_playwright() as p:
     ok(pg.evaluate('!!window.__SYNCOK'), 'admin: login e sincronização')
     # 3b) publicar culto futuro: a visão da banda recebe as músicas
     r = pg.evaluate("""async()=>{const l=S.lists.find(x=>x.songIds.length&&x.date);l.date='2099-01-01';delete l.pub;const id=l.id;
-     await pubL(id);const d=await claude.use('db');const q=await d.collection('pub').get();const x=q.docs.find(y=>y.id=='l_'+id);const o=JSON.parse(x.data().j);
-     return{n:o.songIds.length,esp:l.songIds.length,pub:!!l.pub}}""")
-    ok(r['n'] == r['esp'] and r['pub'], 'admin: publicar culto envia as músicas para a banda', str(r))
+     save();await pubSync();const d=await claude.use('db');const q=await d.collection('pub').get();const x=q.docs.find(y=>y.id=='l_'+id);const o=JSON.parse(x.data().j);
+     return{n:o.songIds.length,esp:l.songIds.length,pub:true}}""")
+    ok(r['n'] == r['esp'] and r['pub'], 'admin: salvar culto futuro já envia as músicas para a banda (sem publicar)', str(r))
     pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close())")
     n0 = pg.evaluate('S.songs.length')
     pg.evaluate("editSong()"); pg.fill('#nsq', 'cancao de teste'); pg.click('#dlg button:has-text("Buscar")'); pg.wait_for_timeout(800)
@@ -159,8 +159,8 @@ with sync_playwright() as p:
     ok(r[1], 'player: minimizar fecha a janela, mantém as faixas e mostra a barra pequena')
     ok(r[2], 'player: expandir restaura o player completo')
     ok(r[3], 'player: fechar pela barra pequena para o áudio')
-    r = pg.evaluate("()=>{const l={id:'t-pb',name:'X',songIds:[]};const a=pubBar(l);l.pub=Date.now();const b=pubBar(l);S.band=true;const c=pubBar(l);S.band=false;return[/Publicar para o time/.test(a),/Republicar/.test(b)&&/Publicado para o time/.test(b),c]}")
-    ok(r[0] and r[1] and r[2] == '', 'admin: botão "Publicar para o time" (some para a banda)')
+    r = pg.evaluate("()=>{const l={id:'t-pb',name:'X',songIds:[]};window.__PUBERR='';const a=pubBar(l);window.__PUBERR='falha X';const b=pubBar(l);window.__PUBERR='';return[a,/falha X/.test(b)]}")
+    ok(r[0] == '' and r[1], 'admin: sem botão de publicar; aviso só quando a atualização do time falha')
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
