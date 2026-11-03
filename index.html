@@ -1522,7 +1522,7 @@ const mLong=m=>{const[y,mo]=m.split('-');return['Janeiro','Fevereiro','Março','
 const fdl=d=>{if(!d)return'';const s=new Date(d+'T00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return s.charAt(0).toUpperCase()+s.slice(1)};
 const dd=(d,T)=>Math.round((new Date(d+'T00:00')-new Date(T+'T00:00'))/864e5),cdn=n=>n==0?'Hoje':n==1?'Amanhã':'Em '+n+' dias';
 const ldr=l=>{const b=l.banda||{};return['vm','vf'].map(k=>(b[k]||'').trim()).filter(Boolean)};
-const lopen=id=>`S.lv='${id}';S.lvm=1;R();scrollTo(0,0)`;
+const lopen=id=>`S.tab='lists';S.lv='${id}';S.lvm=1;R();scrollTo(0,0)`;
 const lnm=(l,lg)=>{const n=(l.name||'').trim();if(lg&&l.date){const w=new Date(l.date+'T00:00').toLocaleDateString('pt-BR',{weekday:'long'});if(nz(n)==nz(w)||nz(w).startsWith(nz(n)))return''}return esc(n)};
 const lttl=l=>{const p=(l.place||'').trim(),h=(l.turno||'').trim();return p?`<span class="lpl">${esc(p)}</span>${h?`<span class="ltu"> - ${esc(h)}</span>`:''}`:`<span class="lpl">${esc(l.name)}</span>${h?`<span class="ltu"> - ${esc(h)}</span>`:''}`};
 function lBadges(l){const B=[],a=(l.apv||{}).st;let np=0;try{np=lPend(l).length}catch(e){}if(a=='ok')B.push(['ap','Aprovado']);else if(a=='env')B.push(['ag','Aguardando liderança']);else if(l.songIds&&l.songIds.length)B.push(['rs','Rascunho']);if(np)B.push(['pd',np+(np==1?' pendência':' pendências')]);return B.length?'<span class="lbg">'+B.map(b=>`<i class="lb-${b[0]}">${b[1]}</i>`).join('')+'</span>':''}
@@ -2586,7 +2586,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='03/11/2026 · 334';
+const VER='03/11/2026 · 335';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');

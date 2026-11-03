@@ -183,6 +183,8 @@ with sync_playwright() as p:
     r = pg.evaluate("""()=>{const u='https://hofrthndlstofytlapzk.supabase.co/storage/v1/object/public/midias/a.mp3',F={vocal:'x'};const l={id:'L',date:'2099-01-01'};
      const T=s=>(sgSrc(s,l)||{}).t;return[T({id:'a',stems:F,vs:{url:u,stems:F},bas:[{url:u,stems:F}]}),T({id:'b',vs:{url:u,stems:F},bas:[{url:u,stems:F}],stemsSrc:{url:u}}),T({id:'c',bas:[{url:u,stems:F}],stemsSrc:{url:u}}),T({id:'d',stemsSrc:{url:u},vs:{url:u},bas:[{url:u}]}),T({id:'e',vs:{url:u},bas:[{url:u}]}),T({id:'f',bas:[{url:u}],link:'https://youtu.be/dQw4w9WgXcQ'}),T({id:'g',link:'https://youtu.be/dQw4w9WgXcQ'})]}""")
     ok(r == ['Stems do original','Stems do VS','Stems da banda','Versão original','VS','Gravação da banda','YouTube'], 'play: prioridade stems original > stems VS > stems banda > original > VS > banda > YouTube', str(r))
+    r = pg.evaluate("()=>{S.tab='hoje';R();const b=[...document.querySelectorAll('.hjb button')].find(x=>/Repert/.test(x.textContent));if(!b)return 'sem botão';b.click();return S.tab=='lists'&&S.lvm==1}")
+    ok(r is True, 'Hoje: botão Repertório abre o culto', str(r))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
