@@ -142,6 +142,18 @@ with sync_playwright() as p:
     r = pg.evaluate("()=>{const k=CK;CK='C';const a=dgr('C Dm Em F G Am Bdim Am7 Eb');CK='Am';const b=dgr('Am Dm Em C');CK=k;return[a,b]}")
     ok(r[0].startswith('1 2 3 4 5 6 7dim 6m7'), 'graus: grau naturalmente menor não leva "m" (6, não 6m)', str(r))
     ok(r[1] == '6 2 3 1', 'graus: tom menor também sem "m" nos graus naturais', str(r))
+    # 5c) player de stems: minimizar mantém o áudio e mostra a barra; expandir volta; fechar para tudo
+    r = pg.evaluate("""async()=>{const F={vocal:'https://x/v.mp3',bateria:'https://x/b.mp3',em:'2026-11-03'};
+     const s={id:'t-fxm',title:'Teste FX',artist:'',medleys:[],key:'',parts:[],stems:F};S.songs.push(s);
+     fxmOpen('t-fxm','o');const a=d2.open&&!!$('#fxpp')&&!!$('.fxmin')&&!!$('#fxseek');
+     fxMin();const b=!d2.open&&!!$('#fxmini')&&FXMIN&&FXA.length==2;
+     fxExpand();const c=d2.open&&!!$('#fxpp')&&!$('#fxmini')&&!FXMIN;
+     fxMin();fxMiniClose();const d=!$('#fxmini')&&FXA.length==0&&!FXMIN;
+     if(d2.open)d2.close();S.songs=S.songs.filter(x=>x.id!='t-fxm');return[a,b,c,d]}""")
+    ok(r[0], 'player: tem minimizar, barra de tempo e controles')
+    ok(r[1], 'player: minimizar fecha a janela, mantém as faixas e mostra a barra pequena')
+    ok(r[2], 'player: expandir restaura o player completo')
+    ok(r[3], 'player: fechar pela barra pequena para o áudio')
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
