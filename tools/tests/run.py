@@ -176,6 +176,8 @@ with sync_playwright() as p:
     pg.evaluate("S.lists=S.lists.filter(l=>l.id!='dupB');S.lv=null")
     r = pg.evaluate("()=>{const a=lMerge([{id:'e_y',date:'2099-03-03',place:'A',turno:'M',name:'C',songIds:[],apv:{st:'env',t:1000,by:'manu'}},{id:'r_y',date:'2099-03-03',place:'A',turno:'M',name:'C',songIds:['x'],apv:{st:'env',t:5000,by:'tg'}}]);return a.length==1&&a[0].apv.by=='manu'}")
     ok(r, 'admin: ao unir cultos, mantém o envio original à liderança (quem enviou primeiro)')
+    r = pg.evaluate("""async()=>{let f=0;const of=window.fetch;window.fetch=(...a)=>{f++;return of(...a)};const u='https://hofrthndlstofytlapzk.supabase.co/storage/v1/object/public/midias/teste-grande.mp3';const t0=Date.now();const x=await msrc(u,1);window.fetch=of;return{same:x===u,f,ms:Date.now()-t0}}""")
+    ok(r['same'] and r['f'] == 0, 'áudio: toca direto do link, sem baixar o arquivo inteiro antes (celular)', str(r))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
