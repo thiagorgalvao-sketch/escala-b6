@@ -154,6 +154,8 @@ with sync_playwright() as p:
     ok(r[1], 'player: minimizar fecha a janela, mantém as faixas e mostra a barra pequena')
     ok(r[2], 'player: expandir restaura o player completo')
     ok(r[3], 'player: fechar pela barra pequena para o áudio')
+    r = pg.evaluate("()=>{const l={id:'t-pb',name:'X',songIds:[]};const a=pubBar(l);l.pub=Date.now();const b=pubBar(l);S.band=true;const c=pubBar(l);S.band=false;return[/Publicar para o time/.test(a),/Republicar/.test(b)&&/Publicado para o time/.test(b),c]}")
+    ok(r[0] and r[1] and r[2] == '', 'admin: botão "Publicar para o time" (some para a banda)')
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
