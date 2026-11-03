@@ -2039,7 +2039,7 @@ function vHoje(){const T=td(),my=myNxL(T),l=my||nextL(),dt=new Date();const hd=`
  return`<div class="hj">${hd}
  <div class="hjc hjhero"><div class="hjtag"><b>${my?'SEU PRÓXIMO CULTO':'PRÓXIMO CULTO'}</b><span>· ${esc(cdn(dd0))}</span></div><div class="hjti">${esc(dl.charAt(0).toUpperCase()+dl.slice(1))}</div><div class="mut hjsub">${[l.name,l.place,l.turno].filter(Boolean).map(esc).join(' · ')}</div>
  ${inf.length?`<div class="hjg">${inf.map(x=>`<span><small>${esc(x[0])}</small><b>${esc(x[1])}</b></span>`).join('')}</div>`:''}
- <div class="hjb">${ss.length?`<button class="pri" onclick="hjGo('${l.id}')">${PLI} Ensaiar agora</button>`:''}<button onclick="${lopen(l.id)}">Repertório</button>${ss.length?`<button onclick="stage('${l.id}')">Modo palco</button>`:''}</div></div>
+ <div class="hjb"><button class="pri" onclick="${lopen(l.id)}">Repertório</button>${ss.length?`<button onclick="stage('${l.id}')">Modo palco</button>`:''}</div></div>
  ${ens}
  <div class="hjs"><div class="hjsh"><span class="hjt">Repertório</span>${st}</div>${ss.length?`<ol class="hjc hjl">${rows}</ol>`:'<div class="hjc"><p class="mut" style="margin:0">O repertório deste culto ainda não foi definido.</p></div>'}</div>
  ${prox.length?`<div class="hjs"><span class="hjt">${S.band&&meG()?'Suas próximas escalas':'Próximos cultos'}</span><div class="hjc hjl">${prox.map(x=>`<button class="hjm" onclick="${lopen(x.id)}"><span class="hjq"><b>${esc(fdl(x.date))}</b><small>${[x.name,x.place,x.turno].filter(Boolean).map(esc).join(' · ')}</small></span><span class="hjk2">${esc(cdn(dd(x.date,T)))}</span></button>`).join('')}</div></div>`:''}
@@ -2586,7 +2586,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='03/11/2026 · 332';
+const VER='03/11/2026 · 333';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
