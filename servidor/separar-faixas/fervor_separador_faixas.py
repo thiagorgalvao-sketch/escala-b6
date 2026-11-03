@@ -18,7 +18,7 @@
 # mais estável, sem essa dependência frágil.
 #
 # Deploy: modal deploy fervor_separador_faixas.py
-# (usa os secrets "API_KEY" e "fervor-supabase" que já devem existir no Modal —
+# (usa os secrets "fervor-api-key" e "fervor-supabase" que já devem existir no Modal —
 #  veja 15_faixas_separadas.sql no projeto para como criá-los, se precisar.)
 
 import os
@@ -41,7 +41,7 @@ image = (
     )
 )
 
-SECRETS = [modal.Secret.from_name("API_KEY"), modal.Secret.from_name("fervor-supabase")]
+SECRETS = [modal.Secret.from_name("fervor-api-key"), modal.Secret.from_name("fervor-supabase")]
 
 # nome do stem no Demucs (htdemucs_6s) -> nome em português usado pelo app
 STEM_PT = {
@@ -55,7 +55,11 @@ STEM_PT = {
 
 
 def _checar_chave(chave: str):
-    esperado = os.environ.get("API_KEY", "")
+    esperado = ""
+    for nome in ("API_KEY", "MODAL_API_KEY", "FERVOR_API_KEY", "CHAVE"):
+        esperado = os.environ.get(nome, "")
+        if esperado:
+            break
     if not esperado or chave != esperado:
         raise PermissionError("chave inválida")
 
