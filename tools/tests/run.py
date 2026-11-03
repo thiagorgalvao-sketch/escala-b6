@@ -132,6 +132,13 @@ with sync_playwright() as p:
     ok(pg.evaluate("sepAuto()") is True and pg.evaluate("!!document.querySelector('input[onchange*=sepAutoSet]:checked')"), 'stems: separação automática vem marcada por padrão')
     ok(pg.evaluate("!!document.querySelector('.vsb .earow .vsbt')"), 'stems: cada áudio enviado tem seu botão STEMS')
     pg.evaluate("dlg.close();S.songs=S.songs.filter(x=>x.id!='t-stems2');D=null")
+    r = pg.evaluate("""()=>{const F={vocal:'https://x/v.mp3',em:'2026-11-03'},u='https://hofrthndlstofytlapzk.supabase.co/storage/v1/object/public/midias/a.mp3';
+     const s={id:'t-bt',title:'T',artist:'',medleys:[],key:'',parts:[],link:'https://youtu.be/dQw4w9WgXcQ',stems:F,stemsSrc:{url:u,name:'o.mp3'}};S.songs.push(s);
+     const h=qkB(s),a=lkSlot(s.link);S.songs=S.songs.filter(x=>x.id!='t-bt');
+     return{st:/>STEMS</.test(h),or:/>ORIGINAL</.test(h)&&/>VS</.test(h)&&/>BANDA</.test(h),yt:/lkGo[(]this[)]/.test(a),g:lkGo({getAttribute:()=>'https://youtu.be/dQw4w9WgXcQ'})===false&&!!document.querySelector('#ytp')}}""")
+    ok(not r['st'] and r['or'], 'botões: ORIGINAL, VS e BANDA (sem botão STEMS separado)')
+    ok(r['yt'] and r['g'], 'youtube: link abre o player dentro do app')
+    pg.evaluate("ytClose()")
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
