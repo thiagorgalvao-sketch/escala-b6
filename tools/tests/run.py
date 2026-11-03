@@ -174,6 +174,8 @@ with sync_playwright() as p:
     r = pg.evaluate("()=>{const n0=S.lists.length;S.lists.push({id:'dupA',date:'2099-02-02',place:'Mauá',turno:'Noite',name:'Culto',songIds:[],banda:{bx:'Fulano'}},{id:'dupB',date:'2099-02-02',place:'Maua',turno:'Noite',name:'Culto',songIds:[S.songs[0].id],banda:{}});S.lv='dupA';const k=lDedup();const b=S.lists.find(l=>l.id=='dupB');return k==1&&S.lists.length==n0+1&&!S.lists.some(l=>l.id=='dupA')&&b.banda.bx=='Fulano'&&S.lv=='dupB'&&DQ.has('l_dupA')}")
     ok(r, 'admin: culto duplicado é unido ao que tem músicas (card do próximo culto = culto cadastrado)')
     pg.evaluate("S.lists=S.lists.filter(l=>l.id!='dupB');S.lv=null")
+    r = pg.evaluate("()=>{const a=lMerge([{id:'e_y',date:'2099-03-03',place:'A',turno:'M',name:'C',songIds:[],apv:{st:'env',t:1000,by:'manu'}},{id:'r_y',date:'2099-03-03',place:'A',turno:'M',name:'C',songIds:['x'],apv:{st:'env',t:5000,by:'tg'}}]);return a.length==1&&a[0].apv.by=='manu'}")
+    ok(r, 'admin: ao unir cultos, mantém o envio original à liderança (quem enviou primeiro)')
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
