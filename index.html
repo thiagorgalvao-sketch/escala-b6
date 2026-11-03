@@ -1695,7 +1695,7 @@ function cifraParts(t){let P=lsParse(t);if(P.length==1&&P[0].type=='Cifra'){cons
 let CK='C',aOn=0,snd=1,ac,mOn=0,nT=0,bt=0,mTm,tps=[],aL=0,aA=0,it='pen',ic=0,iOn=0,lv2=null,iu=[];
 const RX=/(?<![A-Za-z])([A-G])([#b♯♭]?)(?=(?:maj|min|dim|aug|sus|add|m|M)?(?![A-Za-z]))/g;
 const DG=['1','♭2','2','♭3','3','4','♯4','5','♭6','6','♭7','7'],sp1=a=>a=='#'||a=='♯'?1:a?-1:0;
-function dgr(t){const b=scale(CK).pcs[0];return t.replace(RX,(m,l,a)=>DG[md(NAT[LT.indexOf(l)]+sp1(a)-b)])}
+function dgr(t){const b=scale(CK).pcs[0],ds='236';return t.replace(RX,(m,l,a)=>DG[md(NAT[LT.indexOf(l)]+sp1(a)-b)]).replace(/(?<![♭♯0-9])([1-7])m(?![A-Za-z0-9])/g,(m,d)=>ds.includes(d)?d:m)}
 const CTK=/^[(\[]?[A-G][#b]?(?:maj|min|dim|aug|sus|add|m|M|º|°|ø|\+|-|\d|[()]|[#b](?=\d))*(?:\/[A-G][#b]?)?[)\]]?[,.*]?$/,IGN=/^(\(?\d+x\)?|x\d+|[|\-–—.~:]+|%)$/i;
 function isCL(l){const t=l.trim().split(/\s+/).filter(Boolean);return t.length>0&&t.some(x=>CTK.test(x))&&t.every(x=>CTK.test(x)||IGN.test(x))}
 const chordLine=isCL;
@@ -2459,7 +2459,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='03/11/2026 · 314';
+const VER='03/11/2026 · 315';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
