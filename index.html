@@ -967,7 +967,8 @@ try{offSt=JSON.parse(localStorage.getItem('rep.off')||'{}')}catch(e){}
 const offSv=()=>{try{localStorage.setItem('rep.off',JSON.stringify(offSt))}catch(e){}};
 async function msrc(u,au){if(!u)return u;if(OU[u])return OU[u];const ck=String(u).startsWith('ck:');try{const r=await idbG(u);if(r&&r.blob){let bl=r.blob;if(au||ck)bl=await sniffB(bl);return OU[u]=URL.createObjectURL(bl)}}catch(e){}if(au||ck){try{const bl=await sniffB(await getBl(u));if(ck||bl.type)return OU[u]=URL.createObjectURL(bl)}catch(e){}}return u}
 const CKS=19*1048576,AMAX=200*1048576;
-async function bigUp(as,b,ty){if(b.size<=19.5*1048576){const r=await as.upload(b,{type:ty||'video/mp4'});return{id:r.id,url:r.url,size:r.sizeBytes||b.size}}
+async function bigUp(as,b,ty){try{if(b.size<=150*1048576)b=new Blob([await b.arrayBuffer()],{type:b.type})}catch(e){}
+ if(b.size<=19.5*1048576){const r=await as.upload(b,{type:ty||'video/mp4'});return{id:r.id,url:r.url,size:r.sizeBytes||b.size}}
  const ids=[],us=[],mk=new Uint8Array([0,69,80,67]),n=Math.ceil(b.size/CKS);try{for(let i=0;i<n;i++){if(window._bupP)_bupP(i+1,n);const r=await as.upload(new Blob([mk,b.slice(i*CKS,(i+1)*CKS)]),{type:'video/mp4'});ids.push(r.id);us.push(r.url)}}
  catch(e){try{for(const i of ids)await as.delete(i)}catch(x){}throw e}return{id:ids.join(','),url:'ck:'+us.join('|'),size:b.size}}
 async function getBl(u){if(String(u).startsWith('ck:')){const ps=[];for(const x of u.slice(3).split('|')){const r=await fetch(x);if(!r.ok)throw new Error('http');ps.push((await r.blob()).slice(4))}return new Blob(ps)}const r=await fetch(u);if(!r.ok)throw new Error('http');return r.blob()}
@@ -2423,7 +2424,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='02/11/2026 · 311';
+const VER='02/11/2026 · 312';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
