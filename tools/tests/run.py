@@ -119,6 +119,19 @@ with sync_playwright() as p:
     ok(pg.evaluate('S.songs.length') == n0s and not pg.evaluate("S.songs.some(s=>s.id=='fake-test-song')"), 'backup: restaurar descarta mudanças feitas depois do backup')
     ok(pg.evaluate('S.lists.length') == n0l, 'backup: restaurar preserva a contagem de repertórios')
     pg.evaluate("dlg.close()")
+    # 5b) stems por áudio: Original, VS e Banda
+    pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close())")
+    r = pg.evaluate("""()=>{const u='https://hofrthndlstofytlapzk.supabase.co/storage/v1/object/public/midias/a.mp3',F={vocal:'https://x/v.mp3',bateria:'https://x/b.mp3',em:'2026-11-03'};
+     const s={id:'t-stems',title:'T',artist:'',medleys:[],key:'',parts:[],stems:F,stemsSrc:{url:u,name:'o.mp3'},vs:{url:u,name:'vs.mp3',stems:F},bas:[{url:u+'?b',name:'b.mp3',date:'2026-10-01',stems:F}]};
+     const a=stAll(s);return{n:a.length,ks:a.map(x=>x[0]).join(','),src:stSrc(s,'v'),lk:stSrc({vs:{url:'https://youtu.be/x'}},'v'),ck:stSrc({vs:{url:'ck:https://x'}},'v'),hk:bh(u+'?b')==a[2][0]}}""")
+    ok(r['n'] == 3 and r['ks'].startswith('o,v,b') and r['hk'], 'stems: Original, VS e Banda aparecem como fontes separadas')
+    ok(r['src'].startswith('https://') and r['lk'] == '' and r['ck'] == '', 'stems: só áudio enviado como arquivo pode ser separado (link e partes não)')
+    pg.evaluate("(()=>{D={id:'t-stems2',title:'T2',artist:'',medleys:[],key:'',parts:[],vs:{url:'https://hofrthndlstofytlapzk.supabase.co/storage/v1/object/public/midias/v.mp3',name:'v.mp3'},bas:[]};S.songs.push(D);S.band=false;DT='midia';dlg.showModal();sfR()})()")
+    pg.wait_for_timeout(300)
+    ok(pg.evaluate("[...document.querySelectorAll('.ebad')].map(e=>e.textContent).join(',')").endswith('ORIGINAL,VS,BANDA'), 'stems: aba Áudios tem Original, VS e Banda')
+    ok(pg.evaluate("sepAuto()") is True and pg.evaluate("!!document.querySelector('input[onchange*=sepAutoSet]:checked')"), 'stems: separação automática vem marcada por padrão')
+    ok(pg.evaluate("!!document.querySelector('.vsb .earow .vsbt')"), 'stems: cada áudio enviado tem seu botão STEMS')
+    pg.evaluate("dlg.close();S.songs=S.songs.filter(x=>x.id!='t-stems2');D=null")
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)
