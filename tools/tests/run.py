@@ -88,6 +88,11 @@ with sync_playwright() as p:
     pg.goto(B + '/admin/'); pg.wait_for_timeout(1500)
     pg.fill('#b6e', 'adm@teste.local'); pg.fill('#b6p', 'senha123'); pg.click('#b6f button[type=submit]'); pg.wait_for_timeout(6000)
     ok(pg.evaluate('!!window.__SYNCOK'), 'admin: login e sincronização')
+    # 3b) publicar culto futuro: a visão da banda recebe as músicas
+    r = pg.evaluate("""async()=>{const l=S.lists.find(x=>x.songIds.length&&x.date);l.date='2099-01-01';delete l.pub;const id=l.id;
+     await pubL(id);const d=await claude.use('db');const q=await d.collection('pub').get();const x=q.docs.find(y=>y.id=='l_'+id);const o=JSON.parse(x.data().j);
+     return{n:o.songIds.length,esp:l.songIds.length,pub:!!l.pub}}""")
+    ok(r['n'] == r['esp'] and r['pub'], 'admin: publicar culto envia as músicas para a banda', str(r))
     pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close())")
     n0 = pg.evaluate('S.songs.length')
     pg.evaluate("editSong()"); pg.fill('#nsq', 'cancao de teste'); pg.click('#dlg button:has-text("Buscar")'); pg.wait_for_timeout(800)
