@@ -1186,7 +1186,7 @@ function fxStopSources(){const ctx=FXCTX,now=ctx?ctx.currentTime:0;
   try{if(ctx&&t.fade){t.fade.gain.cancelScheduledValues(now);t.fade.gain.setValueAtTime(t.fade.gain.value,now);t.fade.gain.linearRampToValueAtTime(0,now+FXFADE);src.stop(now+FXFADE)}else src.stop()}catch(e){try{src.stop()}catch(e2){}}
   t.source=null}})}
 function fxCurrentOffset(){if(!FXPLAYING)return FXSTARTOFFSET;return Math.max(0,Math.min(FXDUR||0,FXCTX.currentTime-FXSTARTCTXT+FXSTARTOFFSET))}
-function fxPlayFrom(offset){if(!FXA.length||FXSHIFTING)return;const ctx=fxEnsureCtx();fxStopSources();
+function fxPlayFrom(offset){if(!FXA.length||FXSHIFTING)return;try{if(Q)vqX();const va=$('#vsa');if(va&&!va.paused)va.pause()}catch(e){}const ctx=fxEnsureCtx();fxStopSources();
  offset=Math.max(0,Math.min(FXDUR||0,offset||0));
  const now=ctx.currentTime;
  FXA.forEach(t=>{const buf=fxBufferFor(t);if(!buf)return;const src=ctx.createBufferSource();src.buffer=buf;src.connect(t.fade||t.gain);
@@ -1418,7 +1418,7 @@ async function faixasSep(hk){hk=hk||'o';const myD=D,url=stSrc(D,hk);if(!url)retu
 async function vsClean(ids,ex){if(!ids||!ids.length)return;try{const as=await claude.use('assets');if(!as)return;for(const i of ids)if(!vsRef(i,ex))for(const j of String(i).split(','))await as.delete(j)}catch(e){}}
 let Q=null;
 function vsPlay(lid,sid){const l=S.lists.find(x=>x.id==lid);if(!l)return;{const s0=sid&&S.songs.find(x=>x.id==sid);if(s0&&s0.vs&&isLk(s0.vs.url))return lkOpen(s0.vs.url)}const q=l.songIds.map(i=>S.songs.find(x=>x.id==i)).filter(s=>s&&s.vs&&!isLk(s.vs.url)).map(s=>({id:s.id,url:s.vs.url,title:s.title}));if(!q.length)return;let i=sid?q.findIndex(x=>x.id==sid):0;Q={q,i:Math.max(0,i)};vqLoad()}
-function vqLoad(){const a=$('#vqa');if(!Q||!a)return;const c=Q.q[Q.i],u=c.url,go=x=>{if(Q&&Q.q[Q.i]===c){a.src=x;a.play().catch(()=>{})}};a.dataset.ou=u;a.dataset.want='1';delete a.dataset.fb;
+function vqLoad(){const a=$('#vqa');if(!Q||!a)return;try{if(FXPLAYING)fxPause();const va=$('#vsa');if(va&&!va.paused)va.pause()}catch(e){}const c=Q.q[Q.i],u=c.url,go=x=>{if(Q&&Q.q[Q.i]===c){a.src=x;a.play().catch(()=>{})}};a.dataset.ou=u;a.dataset.want='1';delete a.dataset.fb;
  if(OU[u])go(OU[u]);else if(String(u).startsWith('ck:')||navigator.onLine===false){a.src=SILW;a.play().catch(()=>{});msrc(u,1).then(go)}else{go(u);idbG(u).then(r=>{if(r&&r.blob&&navigator.onLine===false)msrc(u,1).then(go)}).catch(()=>{})}$('#vqt').textContent=(Q.i+1)+'/'+Q.q.length+' · '+c.title;$('#vsq').hidden=false;vqPos()}
 function vqGo(d){if(!Q)return;const i=Q.i+d;if(i<0||i>=Q.q.length)return;Q.i=i;vqLoad()}
 function vqX(){const a=$('#vqa');a.dataset.want='0';a.pause();a.removeAttribute('src');$('#vsq').hidden=true;Q=null;document.body.style.paddingBottom=''}
@@ -2513,7 +2513,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='03/11/2026 · 327';
+const VER='03/11/2026 · 328';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
