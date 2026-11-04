@@ -85,6 +85,11 @@ with sync_playwright() as p:
       const hm=mais&&mais.hidden;pick(S.songs[0].id);const ed=[...document.querySelectorAll('[onclick^="editSong"],[onclick^="delSong"]')].filter(e=>getComputedStyle(e).display!='none').length;const detail=!!document.querySelector('.hd');
       S.tab='lists';S.hide=false;R();return{cs,qb,btn,add,items,hm,ed,detail}}""")
     ok(r['qb'] != 'none' and r['btn'] and r['add'] == 'none' and r['items'] > 10 and r['hm'] and r['ed'] == 0 and r['detail'], 'banda: menu Músicas lista e abre qualquer música, sem opções de edição', str(r))
+    r = pg.evaluate("""()=>{const T=td(),l=S.lists.filter(x=>x.date&&x.date>=T).sort((a,b)=>a.date.localeCompare(b.date))[0];const o=[l.banda,ME_M,MY_DISP,window.__SBB,localStorage.getItem('rep.me')];l.banda={...(l.banda||{}),vm:'Ana Teste'};ME_M={id:'m1',nome:'Ana Teste'};MY_DISP={};window.__SBB={};try{localStorage.setItem('rep.me','Ana Teste')}catch(e){}
+     S.tab='hoje';R();const a=[],cf=()=>document.querySelector('.hjcf'),mo=()=>document.querySelector('.hjmo');
+     a.push(!!cf(),!mo());MY_DISP[l.id]={status:'sim'};R();a.push(!cf(),!!mo(),/Presença confirmada/.test(document.querySelector('.hjhero').textContent));hjMais(l.id);a.push(d2.open&&d2.dataset.k=='sheet'&&/Vou servir/.test(d2.textContent));d2.close();
+     [l.banda,ME_M,MY_DISP,window.__SBB]=o.slice(0,4);if(o[4]==null)localStorage.removeItem('rep.me');else localStorage.setItem('rep.me',o[4]);S.tab='lists';R();return a}""")
+    ok(r == [True, True, True, True, True, True], 'banda: Confirmar presença no Hoje até confirmar; depois fica em Mais', str(r))
     ok(not E, 'banda: sem erros de JavaScript', '; '.join(E[:3])); c.close()
 
     # 2b) Hoje abre na hora pela cópia salva e atualiza por trás sem mexer na tela
