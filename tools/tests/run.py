@@ -90,6 +90,11 @@ with sync_playwright() as p:
      a.push(!!cf(),!mo());MY_DISP[l.id]={status:'sim'};R();a.push(!cf(),!!mo(),/Presença confirmada/.test(document.querySelector('.hjhero').textContent));hjMais(l.id);a.push(d2.open&&d2.dataset.k=='sheet'&&/Vou servir/.test(d2.textContent));d2.close();
      [l.banda,ME_M,MY_DISP,window.__SBB]=o.slice(0,4);if(o[4]==null)localStorage.removeItem('rep.me');else localStorage.setItem('rep.me',o[4]);S.tab='lists';R();return a}""")
     ok(r == [True, True, True, True, True, True], 'banda: Confirmar presença no Hoje até confirmar; depois fica em Mais', str(r))
+    r = pg.evaluate("""async()=>{const T=td(),l=S.lists.filter(x=>x.date&&x.date>=T).sort((a,b)=>a.date.localeCompare(b.date))[0];const o=[l.banda,ME_M,MY_DISP,window.__SBB,window.__FVME,localStorage.getItem('rep.me')];l.banda={...(l.banda||{}),vm:pubNm('Ana Teste')};ME_M=null;MY_DISP={};try{localStorage.removeItem('rep.me')}catch(e){}
+     const q={select:()=>q,eq:()=>q,then:f=>f({data:[]})};window.__SBB={auth:{getUser:async()=>({data:{user:{id:'u',email:'a@b.c'}}})},from:()=>q};window.__FVME={id:'m1',nome:'Ana Teste'};
+     S.tab='hoje';R();const a=[!document.querySelector('.hjcf')];await fvInit();a.push(!!document.querySelector('.hjcf'));
+     [l.banda,ME_M,MY_DISP,window.__SBB,window.__FVME]=o.slice(0,5);if(o[5]==null)localStorage.removeItem('rep.me');else localStorage.setItem('rep.me',o[5]);S.tab='lists';R();return a}""")
+    ok(r == [True, True], 'banda: ao entrar na conta, o Confirmar presença aparece no Hoje sem precisar sair da tela', str(r))
     ok(not E, 'banda: sem erros de JavaScript', '; '.join(E[:3])); c.close()
 
     # 2b) Hoje abre na hora pela cópia salva e atualiza por trás sem mexer na tela
