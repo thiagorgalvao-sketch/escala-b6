@@ -189,6 +189,11 @@ with sync_playwright() as p:
     ok(len(r) >= 6 and 'Hoje' in r and 'Tocar' in r and 'Mapa vocal' in r and 'Mais opções' in r, 'tour: mostra as funções atuais (Hoje, Tocar, Mapa vocal, Mais opções)', str(r))
     r = pg.evaluate("()=>{const l=S.lists.find(x=>x.songIds.length>1);vmGo(l.songIds[0],l.id);const a=!!document.querySelector('.bkr');nav(1);const b=S.vw;S.tab='lists';S.hide=false;R();return[a,b]}")
     ok(r[0] and r[1] == 'vocal', 'mapa vocal: tem botão de voltar e as próximas músicas abrem no mapa vocal', str(r))
+    r = pg.evaluate("""async()=>{const ctx=new OfflineAudioContext(2,44100,44100),b=ctx.createBuffer(2,44100*20,44100);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<d.length;i++)d[i]=Math.sin(i*2*Math.PI*440/44100)*.5}
+     let ticks=0;const iv=setInterval(()=>ticks++,10);const t0=performance.now();const o=await fxPitchShiftBuffer(b,2,ctx);clearInterval(iv);const d=o.getChannelData(0);let bad=0;for(let i=0;i<d.length;i+=997)if(!isFinite(d[i]))bad++;return{len:o.length==b.length,bad,ticks,ms:Math.round(performance.now()-t0)}}""")
+    ok(r['len'] and r['bad'] == 0 and r['ticks'] > 2, 'stems: troca de tom processa em pedaços sem travar a tela', str(r))
+    r = pg.evaluate("()=>{const l=S.lists.find(x=>x.songIds.length>1);vmGo(l.songIds[1],l.id);stage(l.id);const a=[S.vw,S.sel==l.songIds[1]];nav(-1);a.push(S.vw);fsExit();vw('cifra');stage(l.id);a.push(S.vw);nav(1);a.push(S.vw);fsExit();S.vw='mapa';S.tab='lists';S.hide=false;R();return a}")
+    ok(r == ['vocal', True, 'vocal', 'cifra', 'cifra'], 'modo palco: abre e navega na visão atual (mapa vocal / cifra)', str(r))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='esc';R()"); pg.wait_for_timeout(300)

@@ -1041,7 +1041,7 @@ async function offDlg(id){const l=S.lists.find(x=>x.id==id);if(!l)return;const i
 function swInit(){try{if(!('serviceWorker' in navigator)){swS='indisponível neste navegador';return}navigator.serviceWorker.register(window.__B6SB?'../sw.js':'sw.js').then(()=>{swS='ativo'},()=>{swS='indisponível neste link (abra com internet antes do culto)'})}catch(e){swS='indisponível neste link (abra com internet antes do culto)'}}
 window.addEventListener('offline',()=>{setSt('Offline');toast('Sem internet. O que está salvo no aparelho continua disponível.')});window.addEventListener('online',()=>{setSt('');toast('Internet de volta');try{if(typeof DBX!='undefined'&&DBX)doPush()}catch(e){}});
 var FR=null;const fsSnap=()=>({tab:S.tab,lv:S.lv,lvm:S.lvm,sel:S.sel,hide:S.hide,ctx:S.ctx,y:scrollY});
-function stage(id){if(!FS)FR=fsSnap();const l=S.lists.find(x=>x.id==id);if(!l||!l.songIds.length)return;S.tab='songs';S.vw='mapa';S.vwA='';S.sel=l.songIds[0];S.ctx=id;fsGo();R()}
+function stage(id){if(!FS)FR=fsSnap();const l=S.lists.find(x=>x.id==id);if(!l||!l.songIds.length)return;const keep=S.tab=='songs'&&S.ctx==id&&l.songIds.includes(S.sel);S.tab='songs';S.vw=S.vw||'mapa';S.vwAuto=0;S.sel=keep?S.sel:l.songIds[0];S.vwA=S.sel;S.ctx=id;fsGo();R()}
 function stK(l,s){return(l.keys||{})[s.id]||s.key}
 function stInt(a,b){if(!a||!b)return 0;const d=md(pk(b).pc-pk(a).pc);return d>6?d-12:d}
 function stg(){let e=document.getElementById('stg');const l=S.ctx&&S.lists.find(x=>x.id==S.ctx),on=l&&document.body.classList.contains('fs')&&S.tab=='songs'&&S.sel&&l.songIds.includes(S.sel);document.body.classList.toggle('stg',!!on);if(!on){if(e)e.hidden=true;return}
@@ -1051,7 +1051,7 @@ function stg(){let e=document.getElementById('stg');const l=S.ctx&&S.lists.find(
   const bd=(+cur.bpm&&bp)?bp-(+cur.bpm):0;const w=[];if(Math.abs(d)>=3)w.push('troca de tom '+fk(k0)+' → '+fk(k1)+' ('+(d>0?'+':'')+d+')');if(Math.abs(bd)>=20)w.push('andamento '+(bd>0?'+':'')+bd+' BPM');}
  e.innerHTML=`<button class="stb" onclick="nav(-1)"${i<1?' disabled':''}>◀ Anterior</button><button class="stc" onclick="stL()"><span class="stn">${i+1}/${l.songIds.length} · Tom ${fk(stK(l,cur))}${+cur.bpm?' · '+(+cur.bpm)+' BPM':''}</span><span class="sti">${info}</span>${wn}</button><button class="stb" onclick="nav(1)"${nx?'':' disabled'}>Próxima ▶</button>`}
 function stL(){const l=S.lists.find(x=>x.id==S.ctx);if(!l)return;let o=document.getElementById('stgl');if(o){o.remove();return}o=document.createElement('div');o.id='stgl';o.innerHTML=`<div class="stgh"><b>${esc(l.name)}</b><button class="sm" onclick="this.closest('#stgl').remove()">Fechar</button></div>`+l.songIds.map((id,k)=>{const s=S.songs.find(x=>x.id==id);return s?`<button class="it${id==S.sel?' on':''}" onclick="S.sel='${id}';S.vw='mapa';asc(0);iu=[];scrollTo(0,0);document.getElementById('stgl').remove();R()">${k+1}. ${esc(s.title)} <span class="mut">· Tom ${fk(stK(l,s))}${+s.bpm?' · '+(+s.bpm)+' BPM':''}</span></button>`:''}).join('');document.body.appendChild(o)}
-function nav(d){const o=S.ctx?(S.lists.find(x=>x.id==S.ctx)||{songIds:[]}).songIds:fl().map(s=>s.id),i=o.indexOf(S.sel)+d;if(o[i]){S.vw=S.vw=='vocal'||(S.vw=='cifra'&&FS)?S.vw:'mapa';if(S.vw=='vocal'){S.vwAuto=0;S.vwA=o[i]}S.sel=o[i];asc(0);iu=[];scrollTo(0,0);R();toast((d>0?'→ ':'← ')+S.songs.find(x=>x.id==S.sel).title)}else toast(d>0?'Fim da lista':'Início da lista')}
+function nav(d){const o=S.ctx?(S.lists.find(x=>x.id==S.ctx)||{songIds:[]}).songIds:fl().map(s=>s.id),i=o.indexOf(S.sel)+d;if(o[i]){S.vw=FS||S.vw=='vocal'?(S.vw||'mapa'):'mapa';if(FS||S.vw=='vocal'){S.vwAuto=0;S.vwA=o[i]}S.sel=o[i];asc(0);iu=[];scrollTo(0,0);R();toast((d>0?'→ ':'← ')+S.songs.find(x=>x.id==S.sel).title)}else toast(d>0?'Fim da lista':'Início da lista')}
 function delSong(id){ask('Excluir esta música? Ela também sairá dos repertórios.',()=>delSong2(id),'Excluir')}function delSong2(id){try{dlg.close()}catch(e){}uSnap('Música excluída');toTrash('s',[id]);dq(['s_'+id]);S.songs=S.songs.filter(x=>x.id!=id);S.lists.forEach(l=>l.songIds=l.songIds.filter(x=>x!=id));S.sel=null;save();R()}
 /* cadastro de música */
 let D;
@@ -1281,12 +1281,17 @@ function fxStretchCh(ch,stretch,win){const grain=win.length,hopOut=Math.floor(gr
   outPos+=hopOut;inPosF+=hopIn}
  for(let i=0;i<outLen;i++)if(wsum[i]>1e-6)out[i]/=wsum[i];
  return out}
-function fxPitchShiftBuffer(buf,semitones,ctx){if(!semitones||!buf)return buf;
- const ratio=Math.pow(2,semitones/12),win=fxHann(4096),nCh=buf.numberOfChannels,sr=buf.sampleRate;
- const chans=[];let outLen=0;
- for(let c=0;c<nCh;c++){const stretched=fxStretchCh(fxResampleCh(buf.getChannelData(c),ratio),ratio,win);chans.push(stretched);outLen=Math.max(outLen,stretched.length)}
- const out=ctx.createBuffer(nCh,outLen,sr);
- for(let c=0;c<nCh;c++)out.getChannelData(c).set(chans[c].subarray(0,Math.min(outLen,chans[c].length)));
+const fxYield=()=>new Promise(r=>setTimeout(r,0));
+/* muda o tom sem mudar o andamento, em pedaços (não trava a tela) e escrevendo direto no buffer final (pouca memória) */
+async function fxPitchShiftBuffer(buf,semitones,ctx){if(!semitones||!buf)return buf;
+ const ratio=Math.pow(2,semitones/12),win=fxHann(4096),G=win.length,hopOut=1024,hopIn=hopOut/ratio,nCh=buf.numberOfChannels,len=buf.length,sr=buf.sampleRate;
+ const out=ctx.createBuffer(nCh,len,sr);
+ for(let c=0;c<nCh;c++){const src=buf.getChannelData(c),rl=Math.max(1,Math.round(len/ratio));let rs=new Float32Array(rl);
+  for(let i=0;i<rl;i++){const sp=i*ratio,i0=Math.floor(sp),i1=Math.min(i0+1,len-1),fr=sp-i0;rs[i]=(src[i0]||0)*(1-fr)+(src[i1]||0)*fr;if((i&262143)==262143)await fxYield()}
+  const od=out.getChannelData(c);let ws=new Float32Array(len),op=0,ipf=0,k=0;
+  while(op<len){const ip=Math.floor(ipf),gm=Math.min(G,len-op,rl-ip);for(let g=0;g<gm;g++){const w=win[g];od[op+g]+=rs[ip+g]*w;ws[op+g]+=w}op+=hopOut;ipf+=hopIn;if(ip>=rl)break;if((++k&127)==0)await fxYield()}
+  for(let i=0;i<len;i++){const w=ws[i];if(w>1e-6)od[i]/=w}
+  rs=null;ws=null;await fxYield()}
  return out}
 async function fxApplySemi(n){n=Math.max(-6,Math.min(6,n));if(n==FXSEMI||FXSHIFTING)return;
  const wasPlaying=FXPLAYING,offset=fxCurrentOffset();
@@ -1294,8 +1299,9 @@ async function fxApplySemi(n){n=Math.max(-6,Math.min(6,n));if(n==FXSEMI||FXSHIFT
  FXSEMI=n;fxTomPaint();
  if(n!=0){FXSHIFTING=true;const b=$('#fxpp');if(b)b.disabled=true;const ld=$('#fxload');if(ld){ld.style.display='block';ld.textContent='Processando tom…'}
   try{const ctx=fxEnsureCtx();
-   for(const t of FXA){if(t.buf&&!t.shifted[n]){t.shifted[n]=fxPitchShiftBuffer(t.buf,n,ctx);await new Promise(r=>setTimeout(r,0))}}
-  }catch(e){}
+   FXA.forEach(t=>{for(const k in t.shifted)if(+k!==n)delete t.shifted[k]});
+   let q=0;for(const t of FXA){q++;if(ld)ld.textContent='Processando tom… '+q+'/'+FXA.length;if(t.buf&&!t.shifted[n]){t.shifted[n]=await fxPitchShiftBuffer(t.buf,n,ctx)}if(FXSEMI!=n)break}
+  }catch(e){FXA.forEach(t=>{t.shifted={}});FXSEMI=0;fxTomPaint();toast('Não consegui mudar o tom neste aparelho (memória insuficiente).')}
   FXSHIFTING=false;if(b)b.disabled=false;if(ld){ld.style.display='none';ld.textContent=''}}
  if(wasPlaying){try{fxPlayFrom(offset)}catch(e){}}
  fxSavePrefs()}
@@ -1556,7 +1562,7 @@ const EI={vm:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6
 function rec(l,id){if(!l.date)return'';let r='';S.lists.forEach(o=>{if(o.id==l.id||!o.date||o.date>=l.date||!o.songIds.includes(id))return;const n=(new Date(l.date+'T00:00')-new Date(o.date+'T00:00'))/864e5;if(n<=28&&(!r||o.date>r))r=o.date});return r}
 let P;
 var FS=false,FSN=0;
-function fsApply(on){if(on===FS)return;FS=on;document.body.classList.toggle('fs',on);if(on){S.prev=!!S.hide;S.pnd=!!S.nodk;S.hide=true;S.nodk=true;S.vw='mapa';S.deg=0}else{S.hide=S.fsl?true:!!S.prev;S.fsl=0;S.nodk=!!S.pnd;if(FR&&FR.tab=='lists'){S.tab='lists';S.lv=FR.lv;S.lvm=FR.lvm;S.ctx=null}}const fy=!on&&FR?FR.y:null;if(!on)FR=null;setTimeout(stg,0);R();if(fy!=null)setTimeout(()=>scrollTo(0,fy),0)}
+function fsApply(on){if(on===FS)return;FS=on;document.body.classList.toggle('fs',on);if(on){S.prev=!!S.hide;S.pnd=!!S.nodk;S.hide=true;S.nodk=true;S.vw=S.vw||'mapa';S.vwAuto=0;S.vwA=S.sel||'';S.deg=0}else{S.hide=S.fsl?true:!!S.prev;S.fsl=0;S.nodk=!!S.pnd;if(FR&&FR.tab=='lists'){S.tab='lists';S.lv=FR.lv;S.lvm=FR.lvm;S.ctx=null}}const fy=!on&&FR?FR.y:null;if(!on)FR=null;setTimeout(stg,0);R();if(fy!=null)setTimeout(()=>scrollTo(0,fy),0)}
 function lkScr(on){let o=$('#lko');if(!on){if(o)o.remove();return}if(o)return;o=document.createElement('div');o.id='lko';o.innerHTML='<div class="lkp" role="button" tabindex="0"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> Tela travada · <b>toque e segure</b> para destravar</div>';document.body.appendChild(o);const p=o.firstChild;let t=0;const go=e=>{e.preventDefault();p.classList.add('hold');t=setTimeout(()=>{lkScr(0);toast('Tela destravada')},700)},stop=()=>{clearTimeout(t);p.classList.remove('hold')};p.addEventListener('pointerdown',go);['pointerup','pointerleave','pointercancel'].forEach(v=>p.addEventListener(v,stop));o.addEventListener('click',e=>{if(e.target===o){p.classList.remove('flash');void p.offsetWidth;p.classList.add('flash')}});toast('Tela travada: rolar continua funcionando')}
 function fsEnter(){if(FS)return;try{if(Q)vqX()}catch(e){}fsApply(true);const d=document.documentElement,f=d.requestFullscreen||d.webkitRequestFullscreen;if(f){try{const r=f.call(d);r&&r.then&&r.then(()=>{FSN=1}).catch(()=>{})}catch(e){}}}
 function fsExit(){lkScr(0);FSN=0;try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}fsApply(false)}
@@ -2598,7 +2604,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='03/11/2026 · 337';
+const VER='03/11/2026 · 338';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
