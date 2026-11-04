@@ -8,10 +8,6 @@ self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET')return;c
  if(u.host==='cdn.jsdelivr.net'){e.respondWith(caches.open(C).then(c=>c.match(r).then(m=>m||fetch(r).then(x=>{if(x&&(x.ok||x.type==='opaque'))c.put(r,x.clone());return x}))));return}
  if(u.origin!==location.origin||u.pathname.includes('/media/')||r.headers.has('range'))return;
  const key=u.origin+u.pathname;
- if(r.mode==='navigate'){const net=fetch(r).then(x=>{if(x&&x.status===200&&x.type==='basic'){const c=x.clone();caches.open(C).then(k=>k.put(key,c)).catch(()=>{})}return x});
-  const cached=()=>caches.match(key,{ignoreSearch:true}).then(m=>m||caches.match('index.html',{ignoreSearch:true}).then(x=>x||caches.match('./')));
-  e.waitUntil(net.catch(()=>{}));
-  e.respondWith(new Promise(ok=>{let d=0;const fin=x=>{if(!d&&x){d=1;ok(x)}};setTimeout(()=>cached().then(fin),2500);net.then(fin,()=>cached().then(x=>fin(x||Response.error())))}));return}
  e.respondWith(fetch(r).then(x=>{if(x&&x.status===200&&x.type==='basic'){const c=x.clone();caches.open(C).then(k=>k.put(key,c)).catch(()=>{})}return x})
   .catch(()=>caches.match(key,{ignoreSearch:true}).then(m=>m||(r.mode==='navigate'?caches.match('index.html',{ignoreSearch:true}).then(x=>x||caches.match('./')):undefined)||Response.error())))});
 
