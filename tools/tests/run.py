@@ -95,7 +95,7 @@ with sync_playwright() as p:
     pg.fill('#b6e', 'adm@teste.local'); pg.fill('#b6p', 'senha123'); pg.click('#b6f button[type=submit]'); pg.wait_for_timeout(6000)
     ok(pg.evaluate('!!window.__SYNCOK'), 'admin: login e sincronização')
     # 3b) publicar culto futuro: a visão da banda recebe as músicas
-    r = pg.evaluate("""async()=>{const l=S.lists.find(x=>x.songIds.length&&x.date);l.date='2099-01-01';delete l.pub;const id=l.id;
+    r = pg.evaluate("""async()=>{const l=S.lists.filter(x=>x.songIds.length&&x.date).sort((p,q)=>p.date.localeCompare(q.date))[0];l.date='2099-01-01';delete l.pub;const id=l.id;
      save();await pubSync();const d=await claude.use('db');const q=await d.collection('pub').get();const x=q.docs.find(y=>y.id=='l_'+id);const o=JSON.parse(x.data().j);
      return{n:o.songIds.length,esp:l.songIds.length,pub:true}}""")
     ok(r['n'] == r['esp'] and r['pub'], 'admin: salvar culto futuro já envia as músicas para a banda (sem publicar)', str(r))
@@ -109,7 +109,7 @@ with sync_playwright() as p:
     sid = pg.evaluate("S.songs[0].id"); pg.evaluate(f"editSong('{sid}')"); pg.fill('.etit', 'Alterado'); pg.click('#dlg button:has-text("Cancelar")'); pg.wait_for_timeout(200)
     ok(pg.evaluate("dlg.open&&d2.open"), 'admin: avisa antes de sair sem salvar'); pg.evaluate("d2.close();D0='';dlg.close()")
     # 4) disponibilidade da equipe: borda colorida + motivo da recusa, sem caixa duplicada
-    lid2 = pg.evaluate("(S.lists.find(l=>l.songIds.length&&l.date)||{}).id")
+    lid2 = pg.evaluate("(S.lists.filter(l=>l.songIds.length&&l.date).sort((p,q)=>p.date.localeCompare(q.date))[0]||{}).id")
     if lid2:
         pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close())")
         pg.evaluate("(id=>{const l=S.lists.find(x=>x.id==id);l.date='2099-01-01';l.banda=Object.assign({},l.banda,{vm:'Teste Confirma',bt:'Teste Recusa'});DISP_ALL={[id]:[{nome:'Teste Confirma',status:'sim',obs:''},{nome:'Teste Recusa',status:'nao',obs:'Motivo X'}]};S.tab='lists';S.lv=id;S.lvm=1;R()})(%r)" % lid2)
@@ -185,7 +185,7 @@ with sync_playwright() as p:
     ok(r == ['Stems do original','Stems do VS','Stems da banda','Versão original','VS','Gravação da banda','YouTube'], 'play: prioridade stems original > stems VS > stems banda > original > VS > banda > YouTube', str(r))
     r = pg.evaluate("()=>{S.tab='hoje';R();const b=[...document.querySelectorAll('.hjb button')].find(x=>/Repert/.test(x.textContent));if(!b)return 'sem botão';b.click();return S.tab=='lists'&&S.lvm==1}")
     ok(r is True, 'Hoje: botão Repertório abre o culto', str(r))
-    r = pg.evaluate("""async()=>{tourStart(1);const seen=[];for(let i=0;i<20&&$('#tour');i++){await new Promise(r=>setTimeout(r,120));const b=$('#tour .tcd b');seen.push(b?b.textContent:'');tourGo(1)}return seen}""")
+    r = pg.evaluate("""async()=>{const nx=nextL();if(nx&&!nx.songIds.length)nx.songIds=S.songs.slice(0,2).map(x=>x.id);tourStart(1);const seen=[];for(let i=0;i<20&&$('#tour');i++){await new Promise(r=>setTimeout(r,120));const b=$('#tour .tcd b');seen.push(b?b.textContent:'');tourGo(1)}return seen}""")
     ok(len(r) >= 6 and 'Hoje' in r and 'Tocar' in r and 'Mapa vocal' in r and 'Mais opções' in r, 'tour: mostra as funções atuais (Hoje, Tocar, Mapa vocal, Mais opções)', str(r))
     r = pg.evaluate("()=>{const l=S.lists.find(x=>x.songIds.length>1);vmGo(l.songIds[0],l.id);const a=!!document.querySelector('.bkr');nav(1);const b=S.vw;S.tab='lists';S.hide=false;R();return[a,b]}")
     ok(r[0] and r[1] == 'vocal', 'mapa vocal: tem botão de voltar e as próximas músicas abrem no mapa vocal', str(r))
@@ -207,7 +207,7 @@ with sync_playwright() as p:
     r = pg.evaluate("""()=>{const a=document.createElement('audio');a.id='vqa';a.dataset.ou='https://x.test/m.mp3';document.body.appendChild(a);Object.defineProperty(a,'duration',{value:240,configurable:true});Object.defineProperty(a,'currentTime',{value:75,writable:true,configurable:true});a.dispatchEvent(new Event('timeupdate'));
      const sv=JSON.parse(localStorage.getItem('rep.pos'))['https://x.test/m.mp3'];a.currentTime=0;a.dispatchEvent(new Event('loadedmetadata'));const r=a.currentTime;a.remove();localStorage.removeItem('rep.pos');return[sv&&sv.s,r]}""")
     ok(r == [75, 75], 'player: retoma a música de onde parou', str(r))
-    r = pg.evaluate("()=>{const l=S.lists.find(x=>x.songIds.length);const s=S.songs.find(x=>x.id==l.songIds[0]);const old=s.vs;s.vs={url:'https://x.test/vs.mp3',name:'vs'};S.tab='hoje';R();const b=document.querySelector('.hjb .offb2');const t=b&&b.textContent;s.vs=old;S.tab='lists';R();return t}")
+    r = pg.evaluate("()=>{const l=nextL();if(!l.songIds.length)l.songIds=[S.songs[0].id];const s=S.songs.find(x=>x.id==l.songIds[0]);const old=s.vs;s.vs={url:'https://x.test/vs.mp3',name:'vs'};S.tab='hoje';R();const b=document.querySelector('.hjb .offb2');const t=b&&b.textContent;s.vs=old;S.tab='lists';R();return t}")
     ok(r == 'Baixar para offline', 'Hoje: botão Baixar para offline aparece quando há áudio', str(r))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
