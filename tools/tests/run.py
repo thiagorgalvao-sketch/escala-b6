@@ -79,8 +79,38 @@ with sync_playwright() as p:
         ok(pg.evaluate("$('#fxpp').disabled===true"), 'stems: desabilita o play quando todas as faixas falham')
         pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
         ok(pg.evaluate("d2.open===false&&FXA.length===0&&!FXCTX"), 'stems: fechar com Esc libera o áudio (sem vazamento)')
+    r = pg.evaluate("""()=>{document.querySelectorAll('dialog[open]').forEach(d=>d.close());tab('songs');S.hide=false;R();
+      const q=document.getElementById('q'),cs=getComputedStyle(q).display,btn=[...document.querySelectorAll('#tbb [data-t="songs"]')].some(e=>getComputedStyle(e).display!='none'),
+      qb=getComputedStyle(document.getElementById('qb')).display,add=getComputedStyle(document.getElementById('add')).display,items=document.querySelectorAll('#ls .it').length,mais=document.querySelector('.lt [title="Mais opções"]');
+      const hm=mais&&mais.hidden;pick(S.songs[0].id);const ed=[...document.querySelectorAll('[onclick^="editSong"],[onclick^="delSong"]')].filter(e=>getComputedStyle(e).display!='none').length;const detail=!!document.querySelector('.hd');
+      S.tab='lists';S.hide=false;R();return{cs,qb,btn,add,items,hm,ed,detail}}""")
+    ok(r['qb'] != 'none' and r['btn'] and r['add'] == 'none' and r['items'] > 10 and r['hm'] and r['ed'] == 0 and r['detail'], 'banda: menu Músicas lista e abre qualquer música, sem opções de edição', str(r))
     ok(not E, 'banda: sem erros de JavaScript', '; '.join(E[:3])); c.close()
 
+    # 2b) Hoje abre na hora pela cópia salva e atualiza por trás sem mexer na tela
+    SGc = [json.loads(v['j']) for k, v in PUB.items() if k.startswith('s_')]; LSc = [json.loads(v['j']) for k, v in PUB.items() if k.startswith('l_')]
+    c = ctx_of(b); held = []
+    c.route('**/*.supabase.co/**', lambda r: held.append(r)); c.route('**/pub.json**', lambda r: held.append(r))
+    c.add_init_script("try{localStorage.setItem('rep.tour','1');localStorage.setItem('rep.meask','1');localStorage.setItem('rep.role','band');localStorage.setItem('rep.band',%s)}catch(e){}" % json.dumps(json.dumps({'SG': SGc, 'LS': LSc, 'E': None, 't': 1})))
+    pg2 = c.new_page(); E2 = []; pg2.on('pageerror', lambda x: E2.append(str(x)[:200]))
+    pg2.goto(B + '/'); pg2.wait_for_timeout(1200)
+    r = pg2.evaluate("({tab:S.tab,n:S.lists.length,hoje:!!document.querySelector('.hjhero'),off:S.bOff,held:0})")
+    ok(r['tab'] == 'hoje' and r['n'] > 0 and r['hoje'] and not r['off'] and len(held) > 0, 'Hoje abre na hora com a cópia salva (sem esperar a internet)', str(r) + ' pendentes=' + str(len(held)))
+    pg2.evaluate("S.tab='lists';S.lvm=0;R()")
+    for rt in list(held):
+        try:
+            if 'pub.json' in rt.request.url: rt.fulfill(status=200, content_type='application/json', path=os.path.join(ROOT, 'pub.json'))
+            else: rt.fulfill(status=200, content_type='application/json', body='[]')
+        except Exception: pass
+    pg2.wait_for_timeout(2500)
+    r = pg2.evaluate("({tab:S.tab,n:S.lists.length,off:S.bOff})")
+    ok(r['tab'] == 'lists' and r['n'] > 0 and not E2, 'atualização pela internet não tira o usuário da tela em que está', str(r) + str(E2))
+    for rt in list(held):
+        try: rt.abort()
+        except Exception: pass
+    try: pg2.close()
+    except Exception: pass
+    c.close()
     # 3) painel dos administradores (Supabase simulado)
     lists = [{'id': k, 'j': v['j']} for k, v in PUB.items()]
     DB = {'users': [{'id': 'u1', 'email': 'adm@teste.local', 'password': 'senha123', 'meta': {'pw_ok': True}}], 'admins': [{'user_id': 'u1', 'email': 'adm@teste.local'}],
@@ -99,6 +129,8 @@ with sync_playwright() as p:
      save();await pubSync();const d=await claude.use('db');const q=await d.collection('pub').get();const x=q.docs.find(y=>y.id=='l_'+id);const o=JSON.parse(x.data().j);
      return{n:o.songIds.length,esp:l.songIds.length,pub:true}}""")
     ok(r['n'] == r['esp'] and r['pub'], 'admin: salvar culto futuro já envia as músicas para a banda (sem publicar)', str(r))
+    r = pg.evaluate("""async()=>{await pubSync();const q=await(await claude.use('db')).collection('pub').get();const ids=new Set(q.docs.map(y=>y.id));return[q.docs.filter(y=>y.id[0]=='s').length,new Set(S.songs.map(s=>s.id)).size,S.songs.filter(s=>!ids.has('s_'+s.id)).map(s=>s.id+':'+s.title).slice(0,3),JSON.stringify((window.__PUBST||{}).err)]}""")
+    ok(r[0] == r[1] and r[1] > 0, 'admin: todas as músicas vão para a visão da banda (para buscar na hora)', str(r))
     pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close())")
     n0 = pg.evaluate('S.songs.length')
     pg.evaluate("editSong()"); pg.fill('#nsq', 'cancao de teste'); pg.click('#dlg button:has-text("Buscar")'); pg.wait_for_timeout(800)

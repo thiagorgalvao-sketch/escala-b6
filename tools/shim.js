@@ -40,11 +40,14 @@ function pwFirst(){ui(`<form id="fvf">${head}<p><b style="color:#fff">Bem-vindo(
 async function check(){let s=null;try{s=(await sb.auth.getSession()).data.session}catch(e){}
  if(!s){loginForm();return}
  if(!(s.user.user_metadata||{}).pw_ok&&navigator.onLine){pwFirst();return}
+ {let c0=null;try{const x=JSON.parse(lg('fv-me')||'null');if(x&&x.user_id==s.user.id&&x.ativo!==false)c0=x}catch(e){}
+  if(c0&&navigator.onLine){window.__FVME=c0;window.__SBB=sb;hide();okRes(true);
+   sb.from('membros').select('*').eq('user_id',s.user.id).maybeSingle().then(async r=>{if(r.error||!r.data)return;ls('fv-me',JSON.stringify(r.data));window.__FVME=r.data;if(r.data.ativo===false){let adm=false;try{adm=(await sb.rpc('is_admin')).data===true}catch(e){}if(!adm){try{await sb.auth.signOut()}catch(e){}ls('fv-me',null);try{localStorage.removeItem('rep.band')}catch(e){}location.reload()}}},()=>{});return}}
  let m=null;try{const r=await sb.from('membros').select('*').eq('user_id',s.user.id).maybeSingle();if(r.error)throw r.error;m=r.data;if(m)ls('fv-me',JSON.stringify(m))}catch(e){try{const c=JSON.parse(lg('fv-me')||'null');if(c&&c.user_id==s.user.id)m=c}catch(x){}}
  if(!m||m.ativo===false){if(navigator.onLine){let adm=false;try{adm=(await sb.rpc('is_admin')).data===true}catch(e){}if(!adm){await sb.auth.signOut();loginForm('Seu acesso não está ativo. Fale com a liderança.');return}}}
  window.__FVME=m;window.__SBB=sb;hide();okRes(true)}
 window.fvSair=async()=>{try{await sb.auth.signOut()}catch(e){}ls('fv-me',null);try{localStorage.removeItem('rep.band')}catch(e){}location.reload()};
-async function start(){await cfgLoad();if(CFG.login_banda!==true){okRes(false);return}
+async function start(){if(Object.keys(CFG).length)cfgLoad();else await cfgLoad();if(CFG.login_banda!==true){okRes(false);return}
  try{await loadJs()}catch(e){ui(`<form>${head}<p>Sem conexão para entrar. Verifique a internet e recarregue a página.</p></form>`);return}
  sb=window.supabase.createClient(SBU,KEY,{auth:{persistSession:true,autoRefreshToken:true,storage:store,storageKey:'fv-band-auth'}});
  const go=()=>check().catch(()=>loginForm('Sem conexão com o servidor. Tente de novo.'));if(document.body)go();else document.addEventListener('DOMContentLoaded',go)}
