@@ -244,9 +244,9 @@ with sync_playwright() as p:
     r = pg.evaluate("""async()=>{const l=nextL(),o=[l.hBanda,l.hGain,l.passHora,l.passFim,l.date];l.hBanda='07:00';l.hGain='07:30';l.passHora='07:45';l.passFim='08:10';l.date='2099-05-10';
      const w=document.createElement('div');w.innerHTML=tlV(l,td());const a=[w.querySelectorAll('.tll li').length,w.querySelector('.tlt').textContent,w.querySelectorAll('li.pas').length,w.querySelector('.tls').textContent];
      a.push(tlSt({k:'pas',s:465,e:490},0,400),tlSt({k:'pas',s:465,e:490},0,470),tlSt({k:'pas',s:465,e:490},0,500),tlSt({k:'pas',s:465},5,0),tlSt({k:'pas',s:465},-1,0));
-     let ics='';URL.createObjectURL=b=>{window.__b=b;return'blob:x'};tlIcs(l.id);ics=await window.__b.text();a.push(/DTSTART:20990510T074500/.test(ics),/TRIGGER:-PT30M/.test(ics),/DTEND:20990510T081000/.test(ics));
+     a.push(typeof tlIcs=='undefined',!/Agenda/.test(w.innerHTML));
      [l.hBanda,l.hGain,l.passHora,l.passFim,l.date]=o;return a}""")
-    ok(r == [3, '07:45 – 08:10', 1, 'Em 2099 dias'.replace('2099', str(r[3]).split(' ')[1]) if isinstance(r[3], str) and r[3].startswith('Em ') else r[3], 'up', 'now', 'done', 'up', 'done', True, True, True], 'horários do culto: linha do tempo, passagem em destaque, estados e evento da Agenda', str(r))
+    ok(r == [3, '07:45 – 08:10', 1, 'Em 2099 dias'.replace('2099', str(r[3]).split(' ')[1]) if isinstance(r[3], str) and r[3].startswith('Em ') else r[3], 'up', 'now', 'done', 'up', 'done', True, True], 'horários do culto: linha do tempo, passagem em destaque e estados (sem botão de Agenda)', str(r))
     r = pg.evaluate("()=>{S.tab='esc';R();const a=[S.tab,document.querySelectorAll('[data-t=\"esc\"]').length,typeof vEsc];S.tab='lists';R();return a}")
     ok(r == ['hoje', 0, 'undefined'], 'menu Escala removido (sem botão, sem tela)', str(r))
     # 6) proteção contra código malicioso nos textos
