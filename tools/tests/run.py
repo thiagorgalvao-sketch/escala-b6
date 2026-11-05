@@ -198,9 +198,9 @@ with sync_playwright() as p:
      a.push(typeof ytHi=='function',!YTP.got);send({playerState:1,duration:200,currentTime:100});a.push(!!YTP.got,YTP.state==1,/\\d+:\\d\\d \\/ 3:20/.test(document.querySelector('#ytst').textContent));ytClose();S.tab='lists';R();return a}""")
     ok(r == [True, True, True, True, True], 'youtube: o player responde ao app (aperto de mão correto) e passa a acompanhar a cifra', str(r))
     r = pg.evaluate("""()=>{const a=[];const s=S.songs.find(x=>x.parts&&x.parts.length>2)||S.songs[0];s.link='https://youtu.be/dQw4w9WgXcQ';S.tab='songs';S.sel=s.id;S.hide=true;S.vw='cifra';R();
-     const b=document.querySelector('.asfx .pbm');a.push(!!b,/▶/.test(b.textContent));ytOpen('https://youtu.be/dQw4w9WgXcQ',s.id);
+     const b=document.querySelector('.asfx .pbm');a.push(!!b,!b.classList.contains('on'));ytOpen('https://youtu.be/dQw4w9WgXcQ',s.id);
      window.dispatchEvent(new MessageEvent('message',{origin:'https://www.youtube-nocookie.com',data:JSON.stringify({event:'infoDelivery',info:{playerState:1,duration:200,currentTime:50}})}));
-     a.push(/❚❚/.test(document.querySelector('.pbm').textContent),/0:50 \\/ 3:20/.test(document.querySelector('#pbl').textContent));ytClose();a.push(/▶/.test(document.querySelector('.pbm').textContent));S.tab='lists';R();return a}""")
+     a.push(document.querySelector('.pbm').classList.contains('on'),/0:50 \\/ 3:20/.test(document.querySelector('#pbl').textContent));ytClose();a.push(!document.querySelector('.pbm').classList.contains('on'));S.tab='lists';R();return a}""")
     ok(r == [True, True, True, True, True], 'barra única: play/pausa, tempo e rolagem seguem o vídeo', str(r))
     pg.evaluate("ytClose()")
     r = pg.evaluate("()=>{const k=CK;CK='C';const a=dgr('C Dm Em F G Am Bdim Am7 Eb');CK='Am';const b=dgr('Am Dm Em C');CK=k;return[a,b]}")
