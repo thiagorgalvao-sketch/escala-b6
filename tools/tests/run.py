@@ -285,6 +285,12 @@ with sync_playwright() as p:
     ok(r == 'Minha gratidão e contigo', 'grafia dos mapas corrigida automaticamente ao abrir', str(r))
     r = pg.evaluate("""()=>{const a=[];const l=S.lists.find(x=>x.songIds.length)||S.lists[0];const was=l.apv;S.band=false;ME='Teste';apvSend(l.id);dlg.close&&0;d2.close&&d2.close();apvSet(l.id,'ok');apvD();const h=l.apv.h.map(x=>x.e).join();const txt=dlg.textContent;a.push(h=='env,ok',/Histórico de aprovações/.test(txt),/Aprovado/.test(txt),/Teste/.test(txt));dlg.close();l.apv=was;if(!was)delete l.apv;return a}""")
     ok(r == [True, True, True, True], 'histórico de aprovações da liderança registra envio e resposta', str(r))
+    r = pg.evaluate("""()=>{const a=[];a.push(/skl/.test(skl()));const s0=S.songs[0];S.band=false;spotD();$('#spq').value=s0.title.split(' ')[0];spR();a.push(/class="it"/.test($('#spr').innerHTML));$('#spq').value='zzzxqq';spR();a.push(/Nada encontrado/.test($('#spr').innerHTML));dlg.close();
+     spM(s0.id);a.push(/Abrir/.test(dlg.innerHTML)&&/Adicionar ao repertório/.test(dlg.innerHTML));dlg.close();
+     const l=S.lists.find(x=>x.date&&x.date>=td());if(l){const n=l.songIds.length,had=l.songIds.includes('__x');S.songs.push({id:'__x',title:'X',parts:[],key:'C'});lAddS(l.id,'__x');a.push(l.songIds.length==n+1);l.songIds.pop();S.songs.pop();R()}else a.push(true);
+     themeSet('light');a.push(document.documentElement.classList.contains('lt'));themeSet('dark');a.push(!document.documentElement.classList.contains('lt'));
+     a.push(!!document.getElementById('offb'));return a}""")
+    ok(r == [True]*8, 'camada Apple: skeleton, busca única, menu de segurar, adicionar ao repertório, tema, offline', str(r))
     r = pg.evaluate("""()=>{const a=[];const n0=fixCount();a.push(Array.isArray(n0));const s=S.songs.find(x=>x.id=='s91');const had=s?[...(s.tags||[])]:null;
      if(s){s.tags=(s.tags||[]).filter(x=>!/^(Vertical|Horizontal)$/i.test(x))}const n1=fixCount();a.push(!s||n1[0]>=1);fixGo();a.push(!s||hasT(s,'Vertical'));const n2=fixCount();a.push(n2[0]==0&&n2[1]==0);uDo();const s2=S.songs.find(x=>x.id=='s91');a.push(!s2||!hasT(s2,'Vertical'));
      if(s2)s2.tags=had;return a}""")
