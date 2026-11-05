@@ -281,6 +281,8 @@ with sync_playwright() as p:
     ok(r == [True, True, True, True], 'rascunho automático: guarda a edição e oferece restaurar', str(r))
     r = pg.evaluate("""()=>{const s=S.songs.find(x=>(x.vmap||[]).length)||S.songs[0];s.vmap=s.vmap||[];s.vmap.push({t:'Que eu passo con8go',h:0,v:'f'},{t:'Mais    de Ti',h:0,v:''});const n=fixCount()[2];fixGo();const t=s.vmap.map(r=>r.t);return [n>=2,t.includes('Que eu passo contigo'),t.includes('Mais de Ti'),fixCount()[2]==0]}""")
     ok(r == [True, True, True, True], 'correção de grafia dos mapas vocais (con8go → contigo)', str(r))
+    r = pg.evaluate("""()=>{const s=S.songs.find(x=>(x.vmap||[]).length)||S.songs[0];s.vmap.push({t:'Minha gra@dão e con8go',h:0,v:''});R();const t=s.vmap[s.vmap.length-1].t;s.vmap.pop();return t}""")
+    ok(r == 'Minha gratidão e contigo', 'grafia dos mapas corrigida automaticamente ao abrir', str(r))
     r = pg.evaluate("""()=>{const a=[];const n0=fixCount();a.push(Array.isArray(n0));const s=S.songs.find(x=>x.id=='s91');const had=s?[...(s.tags||[])]:null;
      if(s){s.tags=(s.tags||[]).filter(x=>!/^(Vertical|Horizontal)$/i.test(x))}const n1=fixCount();a.push(!s||n1[0]>=1);fixGo();a.push(!s||hasT(s,'Vertical'));const n2=fixCount();a.push(n2[0]==0&&n2[1]==0);uDo();const s2=S.songs.find(x=>x.id=='s91');a.push(!s2||!hasT(s2,'Vertical'));
      if(s2)s2.tags=had;return a}""")
