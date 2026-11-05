@@ -95,7 +95,7 @@ with sync_playwright() as p:
      S.tab='hoje';R();const a=[!document.querySelector('.hjcf')];await fvInit();a.push(!!document.querySelector('.hjcf'));
      [l.banda,ME_M,MY_DISP,window.__SBB,window.__FVME]=o.slice(0,5);if(o[5]==null)localStorage.removeItem('rep.me');else localStorage.setItem('rep.me',o[5]);S.tab='lists';R();return a}""")
     ok(r == [True, True], 'banda: ao entrar na conta, o Confirmar presença aparece no Hoje sem precisar sair da tela', str(r))
-    r = pg.evaluate("""()=>{const o=[ME_M,window.__SBB];ME_M={id:'m1',nome:'Ana Teste'};window.__SBB={};S.tab='hoje';R();const a=[!!document.querySelector('.hj > .hjbar'),!document.querySelector('.hjhero .hjb')];S.tab='perf';R();const d=document.querySelector('details.dmo2');a.push(!!d&&!d.open,!!d&&/Mais/.test(d.textContent));[ME_M,window.__SBB]=o;S.tab='lists';R();return a}""")
+    r = pg.evaluate("""()=>{const o=[ME_M,window.__SBB];ME_M={id:'m1',nome:'Ana Teste'};window.__SBB={};S.tab='hoje';R();const a=[!!document.querySelector('.hjcol > .hjbar'),!document.querySelector('.hjhero .hjb')];S.tab='perf';R();const d=document.querySelector('details.dmo2');a.push(!!d&&!d.open,!!d&&/Mais/.test(d.textContent));[ME_M,window.__SBB]=o;S.tab='lists';R();return a}""")
     ok(r == [True, True, True, True], 'um jeito só: barra de ações do Hoje fora do cartão e disponibilidade do Perfil em "Mais"', str(r))
     ok(not E, 'banda: sem erros de JavaScript', '; '.join(E[:3])); c.close()
 
@@ -264,6 +264,12 @@ with sync_playwright() as p:
     r = pg.evaluate("""()=>{const T=td(),l=S.lists.filter(x=>x.date&&x.date>=T).sort((a,b)=>a.date.localeCompare(b.date))[0];const ob=l.banda,od=DISP_ALL;l.banda={...(l.banda||{}),vm:'Ana Teste',vf:'Bia Teste',so:'Cris Teste'};DISP_ALL={[l.id]:[{nome:'Ana Teste',status:'sim',obs:''},{nome:'Bia Teste',status:'nao',obs:'viagem'}]};S.tab='dash';R();
      const e=document.querySelector('.dsm'),t=document.querySelector('.dtm'),c=[...document.querySelectorAll('.dtc b')].map(x=>x.textContent),a=[!!e,!!e&&/pendência|Tudo pronto/.test(e.querySelector('.dsq').textContent),c.join(','),!!t&&/viagem/.test(t.textContent),!!t&&/Cris Teste/.test(t.textContent),!/músicas diferentes no período/.test(document.body.textContent),document.querySelectorAll('.dk[onclick]').length>=1];DISP_ALL=od;l.banda=ob;S.tab='lists';R();return a}""")
     ok(r[:2] == [True, True] and r[2].startswith('1,1,') and r[3:] == [True, True, True, True], 'painel: resumo do próximo culto, pendências e confirmação da equipe', str(r))
+    r = pg.evaluate("""()=>{const a=[];let w=0;toastA('x','Desfazer',()=>w=1);const b=document.querySelector('#tt.act button');a.push(!!b);if(b)b.click();a.push(w==1,!document.querySelector('#tt').classList.contains('act'));
+     const l=cl(S.lists[0]);l.id='tst-del';l.date='2099-01-01';S.lists.push(l);delList('tst-del');a.push(!S.lists.some(x=>x.id=='tst-del'),!d2.open);uDo();a.push(S.lists.some(x=>x.id=='tst-del'));S.lists=S.lists.filter(x=>x.id!='tst-del');return a}""")
+    ok(r == [True, True, True, True, True, True], 'desfazer em vez de confirmar: excluir repertório não pergunta e volta com Desfazer', str(r))
+    r = pg.evaluate("""()=>{const a=[],id=S.songs[0].id;try{localStorage.removeItem('rep.dr')}catch(e){}editSong(id);D.title+=' RASC';drfNow();const dr=JSON.parse(localStorage.getItem('rep.dr')||'null');a.push(!!dr&&dr.k=='s'&&dr.id==id,!!dlg.querySelector('.drfi'));D0='';dlg.close();
+     editSong(id);const b=document.querySelector('#tt.act button');a.push(!!b&&/Restaurar/.test(b.textContent));if(b)b.click();a.push(/ RASC$/.test(D.title));D0='';dlg.close();drfClr();return a}""")
+    ok(r == [True, True, True, True], 'rascunho automático: guarda a edição e oferece restaurar', str(r))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='dash';R()"); pg.wait_for_timeout(300)
