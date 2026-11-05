@@ -193,6 +193,10 @@ with sync_playwright() as p:
      return{st:/>STEMS</.test(h),or:/>ORIGINAL</.test(h)&&/>VS</.test(h)&&/>BANDA</.test(h),yt:/lkGo[(]this[)]/.test(a),g:lkGo({getAttribute:()=>'https://youtu.be/dQw4w9WgXcQ'})===false&&!!document.querySelector('#ytp')}}""")
     ok(not r['st'] and r['or'], 'botões: ORIGINAL, VS e BANDA (sem botão STEMS separado)')
     ok(r['yt'] and r['g'], 'youtube: link abre o player dentro do app')
+    r = pg.evaluate("""()=>{const a=[];const s=S.songs.find(x=>x.parts&&x.parts.length>2)||S.songs[0];S.tab='songs';S.sel=s.id;S.hide=true;S.vw='cifra';R();ytOpen('https://youtu.be/dQw4w9WgXcQ',s.id);
+     const send=i=>window.dispatchEvent(new MessageEvent('message',{origin:'https://www.youtube-nocookie.com',data:JSON.stringify({event:'infoDelivery',info:i})}));
+     a.push(typeof ytHi=='function',!YTP.got);send({playerState:1,duration:200,currentTime:100});a.push(!!YTP.got,YTP.state==1,/\\d+:\\d\\d \\/ 3:20/.test(document.querySelector('#ytst').textContent));ytClose();S.tab='lists';R();return a}""")
+    ok(r == [True, True, True, True, True], 'youtube: o player responde ao app (aperto de mão correto) e passa a acompanhar a cifra', str(r))
     pg.evaluate("ytClose()")
     r = pg.evaluate("()=>{const k=CK;CK='C';const a=dgr('C Dm Em F G Am Bdim Am7 Eb');CK='Am';const b=dgr('Am Dm Em C');CK=k;return[a,b]}")
     ok(r[0].startswith('1 2 3 4 5 6 7dim 6m7'), 'graus: grau naturalmente menor não leva "m" (6, não 6m)', str(r))
