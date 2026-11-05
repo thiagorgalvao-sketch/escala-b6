@@ -758,6 +758,30 @@ body:not(.fs) .ctx2 .cxa{background:transparent}
 body:not(.fs) .row.r1{display:flex;align-items:flex-end;gap:12px 16px;flex-wrap:wrap;margin:8px 0}
 body:not(.fs) .row.r1 .field{flex:1 1 220px}body:not(.fs) .row.r1 .tkc b{color:#fff!important}
 body:not(.fs) .ctlw{margin:2px 0 10px}
+/* ===== Sistema de design único (VER 358): 5 tamanhos de letra, 3 raios, alvos de 40–44 px ===== */
+:root{--r-s:10px;--r-m:16px}
+.hb,.pri,.wi,.rcb,.nxc,.chip,.hjk,.lsel,.nxb{border-radius:var(--r-s)}
+.hjc,.hjhero,.tlh,.hjb,.dbc,.hjl{border-radius:var(--r-m)}
+.vct,.nxb,.tlk,.vfp{font-size:12px!important}
+footer p,footer b,footer cite,.ft p,.ft b,.ft cite,#m>p:last-child,#m cite{font-size:12px!important}
+.tabs button,.tabs a,.etabs button,.etabs a{min-height:40px}
+header .sm,header>button{min-height:40px}
+.lft .sm,.lft button,.lft a{min-height:40px}
+.hje,.hjk2,.mh2,.esl,.dmb,.esp small,.espw{font-size:12px!important}
+.sm,.bkl,.bkr,.lsel,select.lsel{min-height:40px}
+footer a,.ft a,#m>p a,#m a[href*=privac]{display:inline-flex;align-items:center;min-height:40px}
+.az{width:32px}
+.ind i:not(.y){display:none}.ind{min-height:0}
+.az{top:calc(var(--hh,56px) + 76px)!important;max-height:calc(100vh - var(--hh,56px) - 170px)!important}
+.chip{min-height:36px;display:inline-flex;align-items:center}
+.fvs,.fv{min-width:40px;min-height:40px}
+.az a,.az button,.az span{min-width:30px;min-height:20px;display:flex;align-items:center;justify-content:center}
+.acts .vsbt:not(.on){display:none!important}
+.acts .vsbt.on{opacity:1;filter:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+:focus-visible{outline:2px solid #00CDD3;outline-offset:2px}
+@media(hover:none){button:active,.sm:active,.it:active{transform:scale(.97);transition:transform .08s}}
+
 </style></head><body>
 <header><svg class="lg" height="30" viewBox="0 0 720 160" preserveAspectRatio="xMinYMid slice" role="img" aria-label="Escala B6"><g transform="scale(.3125)"><circle cx="256" cy="256" r="256" fill="#000"/><circle cx="256" cy="256" r="226" fill="none" stroke="#fff" stroke-width="14"/><text x="256" y="338" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="232" font-weight="800" letter-spacing="-6" fill="#fff">B6</text></g><text x="190" y="112" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif" font-size="92" font-weight="700" letter-spacing="-2" fill="currentColor">Escala</text></svg><span id="hti" aria-hidden="true"></span><div class="tabs"><button data-t="hoje" onclick="tab('hoje')">Hoje</button> <button data-t="lists" onclick="tab('lists')">Repertórios</button> <button data-t="songs" onclick="tab('songs')">Músicas</button> <button data-t="dash" onclick="tab('dash')">Painel</button> <button data-t="esp" onclick="tab('esp')">Espiritual</button></div>
 <input id="q" placeholder="Buscar por artista ou nome da música" oninput="qin(this.value)">
@@ -1041,7 +1065,12 @@ ${FS||vv?'':R1}<details class="ctlw"${!FS&&!S.ctlo?'':' open'} ontoggle="if(!FS)
 <div class="cg zg"><span class="cap">Tamanho</span><span class="seg"><button class="ic" title="Diminuir letra" aria-label="Diminuir letra" onclick="S.z=Math.max(.6,+(S.z-.15).toFixed(2));zSv();R()">A−</button><span class="zv">${Math.round(S.z*100)}%</span><button class="ic" title="Aumentar letra" aria-label="Aumentar letra" onclick="S.z=Math.min(2.4,+(S.z+.15).toFixed(2));zSv();R()">A+</button></span></div><button class="sm mpb" onclick="FS?fsExit():fsEnter()" title="Abrir em tela cheia"><svg class="gi" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Modo Palco</button></div></div></details>${cv||vv?`<div class="asfx">${asgH(s)}</div>`:''}
 ${s.nota?`<div class="nota">${esc(s.nota)}</div>`:''}
 ${!cv&&!vv&&s.parts.length>2&&(MOB()||FS)?`<div class="row pj">${s.parts.map((q,i)=>`<button class="sm" style="border-color:${col(q)};color:${col(q)}" onclick="goP(${i})">${esc(q.type)}${q.rep?' '+esc(q.rep):''}</button>`).join('')}</div>`:''}${cv&&!(s.cifra||'').trim()&&(s.cc||'').trim()?ccB(s):''}${cv?cf(x):''}${vv?vmv(s):''}${!s.parts.length&&!s.cifra&&!vv?`<div class="emp"><p class="mut">Esta música ainda não tem blocos nem cifra.</p>${(s.cc||'').trim()?ccB(s):''}${S.band?'':`<div class="ac"><button class="sm" onclick="edT('${s.id}','cifra')">Colar cifra</button><button class="sm" onclick="edT('${s.id}','blocos','bpdf')">Importar blocos</button></div>`}</div>`:''}<div class="parts"${cv||vv?' hidden':''}>${x.parts.map((q,i)=>`<section class="p" id="p${i}" style="--c:${col(q)}"><h3>${esc(q.type)}${q.rep?`<em>${esc(q.rep)}</em>`:''}</h3>${q.lyric?`<p class="ly">${esc(q.lyric)}</p>`:''}<pre>${ch(PF.bass?simpC(q.chords):q.chords)}</pre>${q.note?`<p class="nt">${ch(q.note)}</p>`:''}</section>`).join('')}</div></div>`}
-function trs(d){const s=cs();if(!s)return;const l=S.ctx&&S.lists.find(x=>x.id==S.ctx),k=(l&&(l.keys||{})[s.id])||s.key;trp(['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'][(pk(k).pc+d+12)%12])}
+
+/* acessibilidade e retorno tátil */
+function hap(n){try{if(navigator.vibrate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)navigator.vibrate(n||8)}catch(e){}}
+function ariaFix(){document.querySelectorAll('button:not([aria-label]),a[role=button]:not([aria-label]),summary:not([aria-label])').forEach(b=>{if(!(b.textContent||'').trim()){const l=b.getAttribute('title');if(l)b.setAttribute('aria-label',l)}})}
+try{new MutationObserver(()=>{clearTimeout(ariaFix.t);ariaFix.t=setTimeout(ariaFix,250)}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+function trs(d){hap(6);const s=cs();if(!s)return;const l=S.ctx&&S.lists.find(x=>x.id==S.ctx),k=(l&&(l.keys||{})[s.id])||s.key;trp(['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'][(pk(k).pc+d+12)%12])}
 function trp(v){if(S.ctx&&lockG(S.ctx,()=>trp(v)))return;uSnap('Tom alterado');if(S.ctx){const l=S.lists.find(x=>x.id==S.ctx);if(l){const s=cs(),nk=v+(pk((l.keys||{})[s.id]||s.key).min?'m':'');l.keys=l.keys||{};if(nk==s.key)delete l.keys[s.id];else l.keys[s.id]=nk;save();R();return}}
 const s=S.songs.find(x=>x.id==S.sel);snap(s);const a=pk(s.key),nk=v+(a.min?'m':''),d=md(pk(nk).pc-a.pc);s.parts.forEach(q=>{q.chords=tr(q.chords,d,nk);q.note=tr(q.note,d,nk)});s.cifra=trc(s.cifra,d,nk);s.orig=s.orig||s.key;s.key=nk;if(s.orig==nk)delete s.orig;save();R()}
 const fl=()=>{const n=nz(S.q).split(' ').filter(Boolean);const F={__sa:s=>!s.artist,__sm:s=>!s.parts.length&&!s.cifra,__vm:s=>(s.vmap||[]).length,__nv:s=>!(s.vmap||[]).length,__vs:s=>s.vs&&s.vs.url,__nc:s=>!s.cifra},T=(a,b)=>a.title.localeCompare(b.title,'pt');return S.songs.filter(s=>(!S.fv||s.fav)&&(!S.tg||(F[S.tg]?F[S.tg](s):(s.tags||[]).includes(S.tg)))&&n.every(w=>hay(s).includes(w))).sort(S.so=='a'?(a,b)=>(a.artist||'~').localeCompare(b.artist||'~','pt')||T(a,b):S.so=='k'?(a,b)=>pk(a.key).pc-pk(b.key).pc||T(a,b):T)};
@@ -1683,7 +1712,7 @@ function myNx(l,T){const me=meG(),ro=meRoles(l,me),ss=l.songIds.map(id=>S.songs.
  return`<div class="myx" style="--pc:${plc(l.place)}"><div class="nxt"><span class="nxb">SEU PRÓXIMO CULTO</span><span class="nxd">${cdn(dd(l.date,T))}</span></div><b class="myt">${lttl(l)}${chgD(l)?' <span class="upd">Atualizado</span>':''}</b><div class="mut">${[lnm(l,1),fdl(l.date)].filter(Boolean).join(' · ')}</div><div class="myg">${ro.length?`<span><small>Sua função</small><b>${esc(ro.join(', '))}</b></span>`:''}${l.semEns?'':e?`<span><small>Ensaio</small><b>${esc(e)}</b></span>`:''}${ps?`<span><small>Passagem de som</small><b>${esc(ps)}</b></span>`:''}</div>${ss.length?`<ol class="myl">${ss.map(s=>`<li><button onclick="S.tab='songs';S.vw='mapa';S.vwA='';S.sel='${s.id}';S.ctx='${l.id}';S.hide=true;R();scrollTo(0,0)"><span class="mys">${esc(s.title)}${iSing(l,s)?' <span class="myr">você canta</span>':''}</span><span class="myk2">${lKey(l,s)}</span></button></li>`).join('')}</ol>`:'<p class="mut" style="margin:8px 0 0">O repertório deste culto ainda não foi definido.</p>'}<div class="ac"><button class="sm" onclick="${lopen(l.id)}">Abrir repertório</button>${ss.length?`<button class="sm pri" onclick="stage('${l.id}')">Modo palco</button>`:''}</div></div>`}
 function nxc(l,T){const n=dd(l.date,T),e=ensGone(l)?'':[l.ensData&&fd(l.ensData),l.ensHora,l.ensLocal].filter(Boolean).join(' · ');return`<div class="nxc${l.id==S.lv?' on':''}" style="--pc:${plc(l.place)}" onclick="${lopen(l.id)}"><div class="nxt"><span class="nxb">PRÓXIMO</span><span class="nxd">${cdn(n)}</span></div><b>${lttl(l)}${S.band&&chgD(l)?' <span class="upd">Atualizado</span>':''}</b><div class="mut">${[lnm(l,1),fdl(l.date)].filter(Boolean).join(' · ')}</div>${l.semEns?'<div class="mut">Ensaio: —</div>':e?`<div class="mut">Ensaio: ${esc(e)}</div>`:''}${l.songIds.length?`<button class="sm pri" onclick="event.stopPropagation();stage('${l.id}')"><svg class="gi" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Modo palco</button>`:''}</div>`}
 function qin(v){if(S.tab=='songs'){S.q=v;if(MOB()&&S.hide&&!S.ctx){S.hide=false;R();setTimeout(()=>{const q=$('#q');q.focus()},0);return}rl()}else{S.ql=v;const e=$('#ll');if(e)e.innerHTML=llh()}}
-function vLists(){const c=S.lists.find(x=>x.id==S.lv);if(MOB()){if(c&&S.lvm)return`<div class="wrap" style="grid-template-columns:1fr"><div><button class="sm bkl" data-ic="1" onclick="S.lvm=0;R();scrollTo(0,0)">‹ Repertórios</button>${lv(c)}</div></div>`;return`<div class="wrap mobl"><div class="lst" id="ll">${llh()}</div></div>`}return`<div class="wrap"><div class="lst" id="ll">${llh()}</div><div>${c?lv(c):'<p class="mut">Escolha um repertório na lista ao lado para ver as músicas, a equipe e o ensaio.</p>'}</div></div>`}
+function vLists(){const c=S.lists.find(x=>x.id==S.lv)||(MOB()?null:(()=>{const T=td(),a=S.lists.filter(x=>x.date&&x.date>=T).sort((p,q)=>p.date.localeCompare(q.date));return a[0]||S.lists.filter(x=>x.date).sort((p,q)=>q.date.localeCompare(p.date))[0]||null})());if(MOB()){if(c&&S.lvm)return`<div class="wrap" style="grid-template-columns:1fr"><div><button class="sm bkl" data-ic="1" onclick="S.lvm=0;R();scrollTo(0,0)">‹ Repertórios</button>${lv(c)}</div></div>`;return`<div class="wrap mobl"><div class="lst" id="ll">${llh()}</div></div>`}return`<div class="wrap"><div class="lst" id="ll">${llh()}</div><div>${c?lv(c):'<p class="mut">Escolha um repertório na lista ao lado para ver as músicas, a equipe e o ensaio.</p>'}</div></div>`}
 function lv(l){const ss=l.songIds.map(id=>S.songs.find(x=>x.id==id)).filter(Boolean),b=l.banda||{},T=td(),own=!S.band;
  const ens=l.semEns?'—':[l.ensData&&fd(l.ensData),l.ensHora,l.ensLocal].filter(Boolean).join(' · ');
  const AD='A definir',sm=[['Pregador(a)',l.pregador||AD],['Ensaio',ens||AD],['Passagem de som',pasR(l)||AD]].filter(x=>!(x[0]=='Ensaio'&&ensGone(l))&&!(x[0]=='Passagem de som'&&tlHas(l)));
@@ -2318,7 +2347,7 @@ async function fvFoto(inp){const f=inp.files&&inp.files[0],c=FVC();if(!f||!c||!M
 function fvSenha(){const c=FVC();if(!c)return;dlg.innerHTML=`<h2>Trocar senha</h2><div class="esf"><label>Nova senha<input id="fs_a" type="password" autocomplete="new-password" minlength="8"></label><label>Repita a nova senha<input id="fs_b" type="password" autocomplete="new-password" minlength="8"></label></div><div class="ac"><button class="pri" onclick="fvSenhaSv()">Salvar</button><button onclick="dlg.close()">Cancelar</button></div>`;dlg.showModal()}
 async function fvSenhaSv(){const a=$('#fs_a').value,b=$('#fs_b').value;if(a.length<8)return say('Use pelo menos 8 caracteres.');if(a!==b)return say('As senhas não conferem.');const r=await FVC().auth.updateUser({password:a,data:{pw_ok:true}});if(r.error)return say(/same|different/i.test(r.error.message)?'A nova senha precisa ser diferente da atual.':'Não consegui salvar: '+r.error.message);dlg.close();toast('Senha alterada')}
 /* disponibilidade */
-async function dispSet(lid,st){const c=FVC();if(!c||!ME_M)return;const cur=(MY_DISP[lid]||{}).status;
+async function dispSet(lid,st){hap(10);const c=FVC();if(!c||!ME_M)return;const cur=(MY_DISP[lid]||{}).status;
  if(cur==st){const r=await c.from('disponibilidade').delete().eq('membro_id',ME_M.id).eq('culto_id',lid);if(r.error)return say('Não consegui salvar: '+r.error.message);delete MY_DISP[lid];R();return}
  const o={membro_id:ME_M.id,culto_id:lid,status:st,obs:st=='nao'?((MY_DISP[lid]||{}).obs||''):'',atualizado_em:new Date().toISOString()};const r=await c.from('disponibilidade').upsert(o);if(r.error)return say('Não consegui salvar: '+r.error.message);
  MY_DISP[lid]=o;R();if(st=='sim'){toastA('Presença confirmada','Desfazer',()=>dispSet(lid,'sim'));return}dispAviso(lid)}
@@ -2779,7 +2808,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='05/11/2026 · 357';
+const VER='05/11/2026 · 358';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
