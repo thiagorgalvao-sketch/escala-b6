@@ -2741,7 +2741,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='05/11/2026 · 349';
+const VER='05/11/2026 · 350';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2749,22 +2749,52 @@ const pdfClip=(d,t,w)=>{const L=d.splitTextToSize(t,w);return L.length>1?L[0]+'�
 function logoPDF(d,x,y,s,tx){const k=s/512;d.setFillColor(0,0,0);d.circle(x+256*k,y+256*k,256*k,'F');d.setDrawColor(255,255,255);d.setLineWidth(14*k);d.circle(x+256*k,y+256*k,226*k,'S');d.setTextColor(255,255,255);d.setFont('helvetica','bold');d.setFontSize(232*k*2.83);d.text('B6',x+256*k,y+338*k,{align:'center'});
  if(tx){const fs=s*2.2;d.setFont('helvetica','bold');d.setFontSize(fs);d.setTextColor(0);d.text('Escala',x+s*1.25,y+s*.72);d.setTextColor(0)}}
 async function pdfL(id){const l=S.lists.find(x=>x.id==id);if(!l)return;if(!window.jspdf){toast('Preparando PDF…');await ljsV('jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js').catch(()=>{})}if(!window.jspdf)return say('O gerador de PDF não carregou. Verifique a internet e tente de novo.');
- const d=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,M=14;let y=M+16;d.setFont('helvetica','bold');d.setFontSize(11);d.setTextColor(0);d.text('B6 - Lugar do Encontro',M,M+4);
- const need=n=>{if(y+n>284){d.addPage();y=M}};
- const T=(t,sz,st,col,fam,ind)=>{d.setFont(fam||'helvetica',st||'normal');d.setFontSize(sz);d.setTextColor(col||0);const q=sz*.43;d.splitTextToSize(asc2(t),W-2*M-(ind||0)).forEach(s=>{need(q);d.text(s,M+(ind||0),y);y+=q})};
- T(l.name,20,'bold');y+=2;const m=shM(l);m.H.forEach(x=>T(x,12,'normal',40));T('....///',12,'bold',150);y+=1;m.Tm.forEach(x=>T(x,12,'normal',20));y+=3;
- const ss=l.songIds.map(i=>S.songs.find(x=>x.id==i)).filter(Boolean).map(s=>{const k=(l.keys||{})[s.id];return k&&k!=s.key?evS(s,k):s});
- m.mains.forEach(s=>{need(24+s.L.length*5);T('\u2022  '+s.t,12,'bold');T('TOM ('+s.k+')',10,'normal',60,'helvetica',8);s.L.forEach(x=>{need(5);d.setFont('helvetica','normal');d.setFontSize(9);d.setTextColor(30,90,200);d.textWithLink(asc2(x[0]+': '+x[1]),M+8,y,{url:x[1]});y+=4.2});y+=3});
- m.extras.forEach(x=>T('-  '+x,11,'normal',20));
- ss.forEach(s=>{d.addPage();y=M;{const q=16*.43,tt=asc2(s.title),ex=asc2([s.artist,'Tom '+fk(s.key)].filter(Boolean).join(' - '));d.setFont('helvetica','bold');d.setFontSize(16);const tw=d.getTextWidth(tt);d.setFont('helvetica','normal');d.setFontSize(11);const ew=d.getTextWidth('   '+ex);if(tw+ew<=W-2*M){need(q);d.setFont('helvetica','bold');d.setFontSize(16);d.setTextColor(0);d.text(tt,M,y);d.setFont('helvetica','normal');d.setFontSize(11);d.setTextColor(90);d.text('   '+ex,M+tw,y);y+=q}else{T(s.title,16,'bold');T(ex,11,'normal',90)}}if((s.medleys||[]).length)T('+ '+s.medleys.join(' + '),11,'normal',60);if(s.nota)T(s.nota,9,'italic',90);y+=3;
-  if((s.vmap||[]).length){const mp=s.vmap,CL={u:[22,163,74],a:[220,38,38],f:[219,39,119],m:[37,99,235],s:[202,138,4]},lw=W-2*M,top=y+7,H=284-top;let fs=14,rows;
+ /* visual estilo Apple: muito espaço, uma cor de destaque, cartões suaves, tipografia em poucos tamanhos */
+ const d=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,H=297,M=18,AC=[0,142,150],IN=[28,28,30],GR=[142,142,147],BG=[242,242,247],LN=[220,220,226],BOT=H-16;let y=M;
+ const fc=c=>d.setFillColor(c[0],c[1],c[2]),tc=c=>d.setTextColor(c[0],c[1],c[2]),dc=c=>d.setDrawColor(c[0],c[1],c[2]);
+ const tx=(t,x,yy,sz,st,col,o)=>{d.setFont('helvetica',st||'normal');d.setFontSize(sz);tc(col||IN);d.text(asc2(t),x,yy,o)};
+ const cap=(t,x,yy,col)=>{d.setFont('helvetica','bold');d.setFontSize(7.5);tc(col||GR);d.text(asc2(t).toUpperCase(),x,yy,{charSpace:.45})};
+ const wrap=(t,w,sz,st)=>{d.setFont('helvetica',st||'normal');d.setFontSize(sz);return d.splitTextToSize(asc2(t),w)};
+ const pill=(t,x,yy,fill,col,sz)=>{d.setFont('helvetica','bold');d.setFontSize(sz||8.5);const w=d.getTextWidth(asc2(t))+7;fc(fill);d.roundedRect(x,yy-4.6,w,6.6,3.3,3.3,'F');tc(col);d.text(asc2(t),x+3.5,yy,{baseline:'alphabetic'});return w};
+ const need=n=>{if(y+n>BOT){d.addPage();y=M}};
+ const dt=l.date?new Date(l.date+'T00:00'):null,dia=dt?dt.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}):'',dia2=dia?dia.charAt(0).toUpperCase()+dia.slice(1):(l.name||'Repertório');
+ const m=shM(l),ss=l.songIds.map(i=>S.songs.find(x=>x.id==i)).filter(Boolean).map(s=>{const k=(l.keys||{})[s.id];return k&&k!=s.key?evS(s,k):s});
+ /* capa: resumo do culto */
+ fc(AC);d.roundedRect(M,y,14,1.6,.8,.8,'F');y+=9;cap('B6 · Lugar do Encontro',M,y);y+=11;
+ wrap(dia2,W-2*M,28,'bold').forEach(s=>{tx(s,M,y,28,'bold');y+=11.5});y+=0.5;
+ tx([l.name,l.place,l.turno].filter(Boolean).join('  ·  '),M,y,12.5,'normal',GR);y+=11;
+ {const it=[['Banda pronta',l.hBanda],['Gain / check',l.hGain],['Passagem de som',pasR(l)]].filter(x=>x[1]);if(it.length){const g=4,cw=(W-2*M-(it.length-1)*g)/it.length;it.forEach((x,i)=>{const px=M+i*(cw+g),hl=/Passagem/.test(x[0]);fc(hl?AC:BG);d.roundedRect(px,y,cw,22,4,4,'F');cap(x[0],px+5,y+7.5,hl?[210,244,245]:GR);tx(x[1],px+5,y+16.5,hl?17:15,'bold',hl?[255,255,255]:IN)});y+=29}}
+ {const pl=drTxt(l)?asc2(drTxt(l)).replace(/^\s*Paleta\s*/i,'').trim():'';if(pl){const L=wrap(pl,W-2*M-10,10);const h=9+L.length*4.6+3;fc(BG);d.roundedRect(M,y,W-2*M,h,4,4,'F');cap('Paleta de roupas',M+5,y+7);L.forEach((s,i)=>tx(s,M+5,y+13+i*4.6,10,'normal',IN));y+=h+7}}
+ if(m.Tm.length){cap('Equipe',M,y);y+=3;dc(LN);d.setLineWidth(.2);d.line(M,y,W-M,y);y+=6;const cw=(W-2*M)/2;m.Tm.forEach((x,i)=>{const p=x.split(': '),lab=p.shift(),val=p.join(': '),cx=M+(i%2)*cw,cy=y+Math.floor(i/2)*12;tx(lab,cx,cy,8,'normal',GR);const V=wrap(val,cw-6,11,'bold');tx(V[0]||'',cx,cy+5,11,'bold',IN)});y+=Math.ceil(m.Tm.length/2)*12+4}
+ /* repertório */
+ const mains=[],extras=[];ss.forEach(s=>{const o=oo(l,s.id);(o&&!/^\d+$/.test(o)?extras:mains).push({s,o})});
+ const linksOf=s=>{const L=[];if(s.link)L.push([s.linkV?'Instrumental':'Versão',s.link]);if(s.linkV)L.push(['Português',s.linkV]);(s.mlinks||[]).forEach(u=>{if(u&&u.trim())L.push(['Medley',u.trim()])});return L};
+ const row=(x,num)=>{const s=x.s,cant=((l.cant||{})[s.id]||'').trim(),art=s.artist?String(s.artist).split(';').map(a=>a.trim()).filter(Boolean).join(', '):'',k=fk((l.keys||{})[s.id]||s.key),ti=UPT(s.title)+((s.medleys||[]).length?'  +  '+s.medleys.map(UPT).join('  +  '):''),T=wrap(ti,W-2*M-36,13,'bold'),L=linksOf(s),h=T.length*5.6+(art?5:0)+(cant?5:0)+(L.length?5.5:0)+6;
+  need(h+2);const top=y;
+  if(num){fc(AC);d.circle(M+5,top+5,5,'F');tx(String(num),M+5,top+6.4,11,'bold',[255,255,255],{align:'center'})}else{fc(BG);d.circle(M+5,top+5,5,'F');tc(GR);d.setFont('helvetica','bold');d.setFontSize(9);d.text('+',M+5,top+6.2,{align:'center'})}
+  let yy=top+3.4;if(x.o&&!num){cap(x.o,M+15,yy,AC);yy+=5}T.forEach(s2=>{tx(s2,M+15,yy+1.6,13,'bold',IN);yy+=5.6});if(art){tx(art,M+15,yy+.8,9.5,'normal',GR);yy+=5}if(cant){tx('Quem canta: '+cant,M+15,yy+.8,9.5,'normal',AC);yy+=5}
+  if(L.length){let lx=M+15;yy+=1;L.forEach(q=>{d.setFont('helvetica','normal');d.setFontSize(8.5);tc(AC);const w=d.getTextWidth(asc2(q[0]));d.textWithLink(asc2(q[0]),lx,yy+.6,{url:q[1]});d.setDrawColor(AC[0],AC[1],AC[2]);d.setLineWidth(.15);d.line(lx,yy+1.3,lx+w,yy+1.3);lx+=w+6});yy+=4.5}
+  if(k)pill('Tom '+k,W-M-d.getTextWidth('Tom '+asc2(k))-9,top+6.2,BG,IN,9);
+  y=Math.max(yy,top+11)+3;dc(LN);d.setLineWidth(.15);d.line(M+15,y,W-M,y);y+=5};
+ need(30);cap('Repertório',M,y);y+=7;mains.forEach((x,i)=>row(x,i+1));
+ if(extras.length||!hasPP(l)){y+=3;need(22);cap('Momentos especiais',M,y);y+=7;extras.forEach(x=>row(x,0));if(!hasPP(l)){need(12);fc(BG);d.circle(M+5,y+4,5,'F');tc(GR);d.setFont('helvetica','bold');d.setFontSize(9);d.text('+',M+5,y+5.2,{align:'center'});cap('Pós-Palavra',M+15,y+2.6,AC);tx('A definir',M+15,y+7.4,12,'italic',GR);y+=13}}
+ /* uma página por música, com o mapa vocal */
+ ss.forEach((s,si)=>{d.addPage();y=M;
+  fc(AC);d.roundedRect(M,y,14,1.6,.8,.8,'F');y+=9;cap('Música '+(si+1)+' de '+ss.length+(oo(l,s.id)&&!/^\d+$/.test(oo(l,s.id))?'  ·  '+oo(l,s.id):''),M,y);y+=10;
+  wrap(s.title,W-2*M,22,'bold').forEach(q=>{tx(q,M,y,22,'bold');y+=9.2});if((s.medleys||[]).length){wrap('+ '+s.medleys.join(' + '),W-2*M,12).forEach(q=>{tx(q,M,y,12,'normal',GR);y+=5.4})}
+  if(s.artist){tx(String(s.artist).split(';').map(a=>a.trim()).filter(Boolean).join(', '),M,y+.4,11,'normal',GR);y+=7}
+  {let px=M;y+=3;const k=fk(s.key);if(k)px+=pill('Tom '+k,px,y,AC,[255,255,255],9)+3;if(s.bpm)px+=pill(s.bpm+' BPM',px,y,BG,IN,9)+3;const cq=((l.cant||{})[s.id]||'').trim();if(cq)tx('Quem canta: '+cq,px+1,y,9.5,'normal',GR);y+=9}
+  if(s.nota){wrap(s.nota,W-2*M,9.5,'italic').forEach(q=>{tx(q,M,y,9.5,'italic',GR);y+=4.4});y+=2}
+  dc(LN);d.setLineWidth(.2);d.line(M,y,W-M,y);y+=7;
+  if((s.vmap||[]).length){const mp=s.vmap,CL={u:[22,163,74],a:[220,38,38],f:[219,39,119],m:[37,99,235],s:[202,138,4]},lw=W-2*M,top=y+9,HH=BOT-top;let fs=16,rows;
    const lay=z=>{d.setFontSize(z);const o=[];mp.forEach(x=>{if(!x.t){o.push({g:1});return}d.setFont('helvetica',x.h?'bold':'normal');d.splitTextToSize(asc2(x.t),lw).forEach(r=>o.push({r,h:x.h,v:x.v}))});return o},ht=(o,z)=>o.reduce((a,r)=>a+(r.g?z*.3:z*.45)+(r.h?z*.12:0),0);
-   for(;fs>=5;fs-=.5){rows=lay(fs);if(ht(rows,fs)<=H)break}
-   let xx=M;[['u','Unissono'],['a','Aberto'],['f','Solo Feminino'],['m','Solo Masculino'],['s','Solo']].forEach(c=>{d.setFontSize(8);d.setFont('helvetica','normal');const c3=CL[c[0]];d.setTextColor(c3[0],c3[1],c3[2]);d.text('\u2022 '+c[1],xx,y+2);xx+=d.getTextWidth('\u2022 '+c[1])+6});
-   y=top;d.setFontSize(fs);rows.forEach(r=>{const q=r.g?fs*.3:fs*.45+(r.h?fs*.12:0);if(y+q>284){d.addPage();y=M+4}if(r.g){y+=q;return}d.setFont('helvetica',r.h?'bold':'normal');const c3=CL[r.v]||[20,20,20];d.setTextColor(c3[0],c3[1],c3[2]);d.text(r.r,M,y+(r.h?fs*.12:0));y+=q});d.setTextColor(0)}
-  else if(s.parts.length)s.parts.forEach(q=>{need(14);T(q.type+(q.rep?'  ('+q.rep+')':''),11,'bold',0);if(q.lyric)T(q.lyric,9,'italic',110,'helvetica',4);if(q.chords)T(q.chords.replace(/_/g,' '),12,'bold',0,'courier',4);if(q.note)T(q.note,9,'normal',110,'helvetica',4);y+=3});
-  else if(s.cifra)s.cifra.split('\n').forEach(x=>T(x||' ',10,'normal',0,'courier'))});
- const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.setFont('helvetica','normal');d.setTextColor(130);d.text(p+' / '+n,W-M,293,{align:'right'});}
+   for(;fs>=5;fs-=.5){rows=lay(fs);if(ht(rows,fs)<=HH)break}
+   let xx=M;[['u','Uníssono'],['a','Aberto'],['f','Solo feminino'],['m','Solo masculino'],['s','Solo']].forEach(c=>{const c3=CL[c[0]];fc(c3);d.circle(xx+1.2,y+.2,1.2,'F');tx(c[1],xx+3.8,y+1.2,8,'normal',GR);d.setFontSize(8);xx+=d.getTextWidth(asc2(c[1]))+10});
+   y=top;d.setFontSize(fs);rows.forEach(r=>{const q=r.g?fs*.3:fs*.45+(r.h?fs*.12:0);if(y+q>BOT){d.addPage();y=M+4}if(r.g){y+=q;return}d.setFont('helvetica',r.h?'bold':'normal');const c3=CL[r.v]||IN;d.setFontSize(fs);d.setTextColor(c3[0],c3[1],c3[2]);d.text(r.r,M,y+(r.h?fs*.12:0));y+=q})}
+  else if(s.parts.length)s.parts.forEach(q=>{need(16);cap(q.type+(q.rep?'  ·  '+q.rep:''),M,y,AC);y+=5;if(q.lyric)wrap(q.lyric,W-2*M-4,10,'italic').forEach(z=>{tx(z,M+4,y,10,'italic',GR);y+=4.4});if(q.chords)(q.chords.replace(/_/g,' ')).split('\n').forEach(z=>{d.setFont('courier','bold');d.setFontSize(12);tc(IN);d.text(asc2(z),M+4,y);y+=5.2});if(q.note)wrap(q.note,W-2*M-4,9).forEach(z=>{tx(z,M+4,y,9,'normal',GR);y+=4});y+=4})
+  else if(s.cifra)s.cifra.split('\n').forEach(x=>{need(5);d.setFont('courier','normal');d.setFontSize(10);tc(IN);d.text(asc2(x||' '),M,y);y+=4.4})});
+ /* rodapé em todas as páginas */
+ const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);dc(LN);d.setLineWidth(.15);d.line(M,H-14,W-M,H-14);tx('Fervor'+(l.place?'  ·  '+l.place:'')+(dt?'  ·  '+l.date.split('-').reverse().join('/'):''),M,H-9,8,'normal',GR);tx(p+' / '+n,W-M,H-9,8,'normal',GR,{align:'right'})}
  const fn=([l.place,l.turno,l.date&&l.date.split('-').reverse().join('-')].map(x=>String(x||'').replace(/[\\/:*?"<>|]/g,'').trim()).filter(Boolean).join(' - ')||'Repertório')+'.pdf';
  try{const dl=await claude.use('downloads');await dl.save({filename:fn,data:d.output('arraybuffer')})}catch(e){try{d.save(fn)}catch(e2){say('Não foi possível gerar o PDF.')}}}
 function hideL(){S.hide=!S.hide;R()}

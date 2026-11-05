@@ -274,6 +274,9 @@ with sync_playwright() as p:
      if(s){s.tags=(s.tags||[]).filter(x=>!/^(Vertical|Horizontal)$/i.test(x))}const n1=fixCount();a.push(!s||n1[0]>=1);fixGo();a.push(!s||hasT(s,'Vertical'));const n2=fixCount();a.push(n2[0]==0&&n2[1]==0);uDo();const s2=S.songs.find(x=>x.id=='s91');a.push(!s2||!hasT(s2,'Vertical'));
      if(s2)s2.tags=had;return a}""")
     ok(r == [True, True, True, True, True], 'correções de dados: conta, aplica só o que está vazio e deixa desfazer', str(r))
+    r = pg.evaluate("""async()=>{const l=S.lists.find(x=>x.songIds.length);window.__pb=null;const o=window.claude&&window.claude.use;window.claude=window.claude||{};window.claude.use=async k=>k=='downloads'?{save:async a=>{window.__pb=new Uint8Array(a.data)}}:(o?o.call(window.claude,k):{});
+     await pdfL(l.id);const b=window.__pb;if(o)window.claude.use=o;return b?[String.fromCharCode(...b.slice(0,5)),b.length>5000,(new TextDecoder('latin1').decode(b).match(/\\/Type\\s*\\/Page[^s]/g)||[]).length>=2]:null}""")
+    ok(r == ['%PDF-', True, True], 'PDF do repertório: gera um arquivo válido com capa e uma página por música', str(r))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='dash';R()"); pg.wait_for_timeout(300)
