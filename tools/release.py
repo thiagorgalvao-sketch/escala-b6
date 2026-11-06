@@ -49,7 +49,7 @@ def main():
         if r.returncode: sys.exit('✘ testes falharam — nada foi enviado')
     if '--so-montar' in flags: return
     ver = json.load(open('versao.json'))['v']
-    sh('git', 'add', '-A', 'tools', 'index.html', 'admin', 'versao.json', '.github', 'sw.js', 'servidor')
+    sh('git', 'add', '-A', 'tools', 'index.html', 'app.js', 'admin', 'versao.json', '.github', 'sw.js', 'servidor')
     if sh('git', 'diff', '--cached', '--quiet', check=False).returncode == 0:
         sys.exit('nada para publicar')
     corpo = f'{msg} (VER {ver.split(" · ")[-1]})' if '--sem-numero' not in flags else msg

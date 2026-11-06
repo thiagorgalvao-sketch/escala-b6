@@ -18,8 +18,13 @@ def build(s):
     s=s[:i]+'<script>'+sh+'</script>\n'+s[i:]
     return s.replace('</head>',HEAD+'</head>',1)
 if __name__=='__main__':
-    a,o=sys.argv[1:3]
-    open(o,'w',encoding='utf-8').write(build(open(a,encoding='utf-8').read()))
+    a,o=[x for x in sys.argv[1:] if not x.startswith('--')][:2]
+    src=open(a,encoding='utf-8').read();html=build(src)
+    if '--inline' not in sys.argv:
+        sys.path.insert(0,here);from extjs import externalize
+        mv=re.search(r"const VER='([^']+)'",src);html,js=externalize(html,'app.js',mv.group(1) if mv else '')
+        open(os.path.join(os.path.dirname(os.path.abspath(o)),'app.js'),'w',encoding='utf-8').write(js)
+    open(o,'w',encoding='utf-8').write(html)
     print('index',os.path.getsize(o))
     m=re.search(r"const VER='([^']+)'",open(a,encoding='utf-8').read())
     if m: json.dump({'v':m.group(1)},open(os.path.join(os.path.dirname(os.path.abspath(o)),'versao.json'),'w'),ensure_ascii=False);print('versao',m.group(1))

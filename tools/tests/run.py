@@ -15,6 +15,16 @@ def ok(cond, name, info=''):
 r = subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'montar.py'), '--check'], capture_output=True, text=True)
 ok(r.returncode == 0, 'módulos de tools/src conferem com tools/app.html', r.stdout[-200:])
 
+# 0b) CSS: não deixa crescer a pilha de regras sobrepostas (limites = situação de hoje; só podem diminuir)
+import glob, collections
+_css = ''.join(open(f, encoding='utf-8').read() for f in sorted(glob.glob(os.path.join(ROOT, 'tools', 'src', '0[0-4]_*.html'))))
+_css = re.sub(r'/\*.*?\*/', '', _css, flags=re.S)
+_imp = _css.count('!important')
+_sel = collections.Counter(x.strip() for x, _ in re.findall(r'(?m)^([^{}@\n][^{}\n]*)\{([^{}]*)\}', _css))
+_dup = sum(1 for k, n in _sel.items() if n > 1)
+ok(_imp <= 251, f'CSS: no máximo 251 usos de !important (hoje {_imp})')
+ok(_dup <= 43, f'CSS: no máximo 43 seletores repetidos (hoje {_dup})')
+
 # 1) sintaxe do JavaScript das páginas
 for f in ['index.html', 'admin/index.html']:
     s = open(os.path.join(ROOT, f), encoding='utf-8').read()
@@ -22,7 +32,7 @@ for f in ['index.html', 'admin/index.html']:
         t = tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8'); t.write(sc); t.close()
         r = subprocess.run(['node', '--check', t.name], capture_output=True, text=True); os.unlink(t.name)
         ok(r.returncode == 0, f'sintaxe {f} bloco {i+1}', r.stderr[-300:])
-for f in ['sw.js', 'tools/shim.js', 'tools/sbshim.js']:
+for f in ['app.js', 'admin/app.js', 'sw.js', 'tools/shim.js', 'tools/sbshim.js']:
     p = os.path.join(ROOT, f)
     if os.path.exists(p):
         r = subprocess.run(['node', '--check', p], capture_output=True, text=True); ok(r.returncode == 0, f'sintaxe {f}', r.stderr[-300:])
@@ -313,6 +323,42 @@ with sync_playwright() as p:
     ok(r == ['%PDF-', True, True], 'PDF do repertório: gera um arquivo válido com capa e uma página por música', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const v=verN();a.push(v.fix.length==4&&v.info.length==4);const l=S.lists.find(x=>x.songIds.length>1);l.cant=l.cant||{};l.cant['__fantasma']='X';a.push(verN().fix[3][1]>=1);verD();a.push(/Verificar dados/.test(dlg.innerHTML)&&/Corrigir tudo/.test(dlg.innerHTML));verGo();a.push(!('__fantasma' in l.cant));a.push(verN().fix[3][1]==0);dlg.close();d2.close&&d2.close();return a}""")
     ok(r == [True]*5, 'Verificar dados: lista pendências e corrige tudo com um toque', str(r))
+    # 5a) resumo de erros dos aparelhos (item 10)
+    r = pg.evaluate("""async()=>{const a=[];const now=new Date().toISOString(),old=new Date(Date.now()-30*864e5).toISOString();
+     const w=errSum([{msg:'A',vezes:7,ultima:now},{msg:'B',vezes:1,ultima:now},{msg:'C',vezes:9,ultima:old}],7);a.push(w.n==2,w.rep.length==1,w.v==8);
+     const o=window.__SB;S.band=false;S.role='dono';localStorage.removeItem('rep.errday');localStorage.removeItem('rep.errwk');
+     window.__SB={from:()=>({select:()=>({order:()=>({limit:async()=>({data:[{msg:'Falha X',vezes:6,ultima:now}],error:null})})})})};
+     const d=await errResumo();a.push(!!d&&/Erro repetido 6/.test(document.querySelector('#tt').textContent));
+     localStorage.setItem('rep.errday',String(Date.now()));localStorage.removeItem('rep.errwk');
+     window.__SB={from:()=>({select:()=>({order:()=>({limit:async()=>({data:[{msg:'Y',vezes:1,ultima:now}],error:null})})})})};
+     await errResumo(1);a.push(/Resumo da semana/.test(document.querySelector('#tt').textContent));
+     window.__SB=o;return a}""")
+    ok(r == [True]*5, 'resumo de erros: soma da semana e alerta de erro repetido', str(r))
+    # 5a2) gestos: segurar numa música abre o menu; mexer o dedo cancela
+    r = pg.evaluate("""async()=>{const a=[];S.band=false;S.tab='songs';S.sel=null;R();await new Promise(r=>setTimeout(r,200));const el=document.querySelector('#ls .it');if(!el)return['sem lista'];
+     const ev=(t,x,y)=>el.dispatchEvent(new PointerEvent(t,{pointerType:'touch',clientX:x,clientY:y,bubbles:true,cancelable:true}));
+     ev('pointerdown',100,100);await new Promise(r=>setTimeout(r,700));a.push(dlg.open&&/Adicionar ao repertório|Abrir/.test(dlg.innerHTML));ev('pointerup',100,100);dlg.close();
+     ev('pointerdown',100,100);ev('pointermove',100,160);await new Promise(r=>setTimeout(r,700));a.push(!dlg.open);ev('pointerup',100,160);
+     ev('pointerdown',100,100);await new Promise(r=>setTimeout(r,200));ev('pointerup',100,100);await new Promise(r=>setTimeout(r,500));a.push(!dlg.open);
+     el.dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true}));a.push(dlg.open);dlg.close();return a}""")
+    ok(r == [True]*4, 'gestos: segurar abre o menu; arrastar ou toque curto não abrem', str(r))
+    # 5a3) visual: sem rolagem lateral nem elementos para fora da tela; compara capturas com a referência (aviso, não derruba)
+    VD = os.path.join(HERE, 'visual'); os.makedirs(os.path.join(VD, 'base'), exist_ok=True); os.makedirs(os.path.join(VD, 'atual'), exist_ok=True)
+    telas = {'musica': "S.tab='songs';S.sel=S.songs.find(x=>(x.vmap||[]).length)?.id||S.songs[0].id;S.vw='mapa'", 'lista': "S.tab='songs';S.sel=null", 'repertorio': "S.tab='lists';S.lv=(S.lists.find(x=>x.songIds.length)||S.lists[0]).id;S.lvm=1", 'ajustes': "S.tab='songs';S.sel=null"}
+    for nome, js in telas.items():
+        pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close());S.band=false;" + js + (";R();cfgD()" if nome == 'ajustes' else ";R()")); pg.wait_for_timeout(500)
+        g = pg.evaluate("""()=>{const W=innerWidth,bad=[];document.querySelectorAll('body *').forEach(e=>{if(!e.offsetParent&&getComputedStyle(e).position!='fixed')return;const r=e.getBoundingClientRect();if(r.width&&r.right>W+2&&!e.closest('[class*=scr],.tabs,#tbb,pre,table,.hscroll,svg,canvas,dialog,[style*=overflow]')&&getComputedStyle(e).position!='fixed')bad.push((e.tagName+'.'+(e.className&&e.className.baseVal===undefined?e.className:'')).slice(0,40))});return{sw:document.documentElement.scrollWidth-W,bad:bad.slice(0,4)}}""")
+        ok(g['sw'] <= 1, f'visual {nome}: sem rolagem lateral (390 px)', str(g))
+        arq = nome + '.png'; pg.screenshot(path=os.path.join(VD, 'atual', arq))
+        bp = os.path.join(VD, 'base', arq)
+        try:
+            from PIL import Image, ImageChops
+            if os.path.exists(bp):
+                A = Image.open(bp).convert('RGB'); Bm = Image.open(os.path.join(VD, 'atual', arq)).convert('RGB')
+                if A.size != Bm.size: print(f'⚠ visual {nome}: tamanho da captura mudou {A.size} → {Bm.size}'); continue
+                dif = ImageChops.difference(A, Bm).convert('L').point(lambda v: 255 if v > 24 else 0); pct = sum(1 for v in dif.getdata() if v) / (A.size[0] * A.size[1]) * 100
+                if pct > 2: print(f'⚠ visual {nome}: {pct:.1f}% da tela mudou em relação à referência'); (FAIL.append('visual ' + nome) if os.environ.get('VISUAL_ESTRITO') else None)
+        except ImportError: pass
     # 5b) varredura: percorre todas as telas e diálogos principais; qualquer erro de JavaScript derruba o teste
     E0 = len(E); pg.on('console', lambda m: E.append('console: ' + m.text[:160]) if m.type == 'error' and 'supabase' not in m.text.lower() and 'Failed to load resource' not in m.text else None)
     steps = pg.evaluate("""async()=>{const fails=[];let n=0;const T=async(name,f)=>{n++;try{await f()}catch(e){fails.push(name+': '+String(e).slice(0,100))}

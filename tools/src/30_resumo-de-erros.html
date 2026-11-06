@@ -1,0 +1,10 @@
+/* ===== resumo automático dos erros dos aparelhos (VER 368) ===== */
+function errSum(a,dias){const lim=Date.now()-dias*864e5,r=(a||[]).filter(x=>{const t=new Date(x.ultima).getTime();return t>=lim}),rep=r.filter(x=>(x.vezes||1)>=5);return{n:r.length,v:r.reduce((s,x)=>s+(x.vezes||1),0),rep,top:rep.concat(r.filter(x=>(x.vezes||1)<5))[0]||null}}
+async function errResumo(force){if(S.band||!window.__SB||S.role=='editor'&&!force)return;const g=k=>{try{return +localStorage.getItem(k)||0}catch(e){return 0}},s=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},now=Date.now();
+ const dia=force||now-g('rep.errday')>864e5,sem=force||now-g('rep.errwk')>7*864e5;if(!dia&&!sem)return;
+ let a=null;try{const r=await __SB.from('erros').select('*').order('ultima',{ascending:false}).limit(100);if(r.error)return;a=r.data||[]}catch(e){return}
+ s('rep.errday',now);
+ const d=errSum(a,1),w=errSum(a,7);
+ if(d.rep.length){const x=d.rep[0];toastA('⚠ Erro repetido '+(x.vezes||1)+'×: '+String(x.msg).slice(0,60),'Ver',errD,9000);return d}
+ if(sem){s('rep.errwk',now);if(w.n)toastA('Resumo da semana: '+w.v+' erro'+(w.v==1?'':'s')+' em '+w.n+' tipo'+(w.n==1?'':'s')+' nos aparelhos','Ver',errD,9000);else if(force)toast('Resumo da semana: nenhum erro nos aparelhos ✓')}
+ return w}

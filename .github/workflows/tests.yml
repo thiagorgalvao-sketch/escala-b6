@@ -2,7 +2,7 @@ name: Testes automáticos
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'admin/**', 'sw.js', 'pub.json', 'tools/app.html', 'tools/src/**', 'tools/montar.py', 'tools/shim.js', 'tools/sbshim.js', 'tools/tests/**', '.github/workflows/tests.yml']
+    paths: ['index.html', 'app.js', 'admin/**', 'sw.js', 'pub.json', 'tools/app.html', 'tools/src/**', 'tools/montar.py', 'tools/shim.js', 'tools/sbshim.js', 'tools/tests/**', '.github/workflows/tests.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
           node-version: '22'
       - name: Prepara o navegador de testes
         run: |
-          pip install -q playwright==1.48.0
+          pip install -q playwright==1.48.0 pillow
           python -m playwright install --with-deps chromium > /dev/null
       - name: Roda os testes
         run: |
@@ -34,6 +34,14 @@ jobs:
         if: always()
         run: |
           { echo '### Testes do Fervor'; echo '```'; cat /tmp/r.txt 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Guarda as capturas de tela
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-de-tela
+          path: tools/tests/visual/atual/
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Avisa se algo falhou
         if: failure()
         env:
