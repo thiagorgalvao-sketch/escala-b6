@@ -293,6 +293,11 @@ with sync_playwright() as p:
     ok(r == [True]*8, 'camada Apple: skeleton, busca única, menu de segurar, adicionar ao repertório, tema, offline', str(r))
     r = pg.evaluate("""()=>{const l=S.lists.find(x=>x.songIds.length>2);S.band=false;vmGo(l.songIds[1],l.id);const a=S.sel,el=document.querySelector('.hd')||document.querySelector('#m');const send=(t,x,y)=>{const T=new Touch({identifier:1,target:el,clientX:x,clientY:y});el.dispatchEvent(new TouchEvent(t,{touches:t=='touchend'?[]:[T],changedTouches:[T],bubbles:true,cancelable:true}))};send('touchstart',300,300);send('touchend',120,310);const b=S.sel;S.tab='lists';R();return [a==l.songIds[1],b==l.songIds[2]]}""")
     ok(r == [True, True], 'deslizar troca exatamente uma música por gesto', str(r))
+    r = pg.evaluate("""()=>{const a=[];S.band=false;cfgD();const R=document.querySelector('#cfgRoot');const hs=[...R.querySelectorAll('.cfh')].map(x=>x.textContent);a.push(['Leitura','Aparência','Liderança','Dados e segurança','Conta','Ajuda','Este aparelho'].every(x=>hs.includes(x)));
+      cfQ('tema');a.push([...R.querySelectorAll('.cfr:not([hidden])')].some(x=>/Aparência/.test(x.textContent)));
+      cfQ('lideran');a.push(R.querySelectorAll('.cfr:not([hidden])').length>=3);
+      cfQ('zzzxxqq');a.push(!document.querySelector('#cfno').hidden);cfQ('');a.push(R.querySelectorAll('.cfr[hidden]').length==0);dlg.close();return a}""")
+    ok(r == [True]*5, 'Ajustes: seções claras e busca com sinônimos', str(r))
     r = pg.evaluate("""()=>{const a=[];const n0=fixCount();a.push(Array.isArray(n0));const s=S.songs.find(x=>x.id=='s91');const had=s?[...(s.tags||[])]:null;
      if(s){s.tags=(s.tags||[]).filter(x=>!/^(Vertical|Horizontal)$/i.test(x))}const n1=fixCount();a.push(!s||n1[0]>=1);fixGo();a.push(!s||hasT(s,'Vertical'));const n2=fixCount();a.push(n2[0]==0&&n2[1]==0);uDo();const s2=S.songs.find(x=>x.id=='s91');a.push(!s2||!hasT(s2,'Vertical'));
      if(s2)s2.tags=had;return a}""")
