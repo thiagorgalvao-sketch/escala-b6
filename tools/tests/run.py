@@ -298,6 +298,8 @@ with sync_playwright() as p:
       cfQ('lideran');a.push(R.querySelectorAll('.cfr:not([hidden])').length>=3);
       cfQ('zzzxxqq');a.push(!document.querySelector('#cfno').hidden);cfQ('');a.push(R.querySelectorAll('.cfr[hidden]').length==0);dlg.close();return a}""")
     ok(r == [True]*5, 'Ajustes: seções claras e busca com sinônimos', str(r))
+    r = pg.evaluate("""()=>{const a=[];const l=S.lists.find(x=>x.songIds.length>1);const keep=l.songIds[0];l.cant=l.cant||{};l.ord=l.ord||{};l.cant['__fantasma']='X';l.ord['__fantasma']='9';l.cant[keep]=l.cant[keep]||'Fulano';a.push(orphN()>=2);R();a.push(!('__fantasma' in l.cant)&&!('__fantasma' in l.ord));a.push(!!l.cant[keep]);return a}""")
+    ok(r == [True, True, True], 'limpeza automática de sobras (quem canta/ordem/tom de músicas que saíram do repertório)', str(r))
     r = pg.evaluate("""()=>{const a=[];const n0=fixCount();a.push(Array.isArray(n0));const s=S.songs.find(x=>x.id=='s91');const had=s?[...(s.tags||[])]:null;
      if(s){s.tags=(s.tags||[]).filter(x=>!/^(Vertical|Horizontal)$/i.test(x))}const n1=fixCount();a.push(!s||n1[0]>=1);fixGo();a.push(!s||hasT(s,'Vertical'));const n2=fixCount();a.push(n2[0]==0&&n2[1]==0);uDo();const s2=S.songs.find(x=>x.id=='s91');a.push(!s2||!hasT(s2,'Vertical'));
      if(s2)s2.tags=had;return a}""")
