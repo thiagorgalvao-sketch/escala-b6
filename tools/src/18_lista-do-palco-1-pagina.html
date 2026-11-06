@@ -1,0 +1,20 @@
+/* ===== lista do palco (1 página) */
+async function pdfP(id){const l=S.lists.find(x=>x.id==id);if(!l)return;if(!window.jspdf){toast('Preparando PDF…');await ljsV('jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js').catch(()=>{})}if(!window.jspdf)return say('O gerador de PDF não carregou. Verifique a internet e tente de novo.');
+ const q=rotSeq(l),SM=Object.fromEntries(S.songs.map(s=>[s.id,s])),W=210,H=297,M=12,b=l.banda||{};
+ const rows=[];q.forEach((x,j)=>{if(x.k=='m'){rows.push({t:'m',a:x.m.m,n:x.m.n});return}const s=SM[x.id];const o=oo(l,s.id);rows.push({t:'s',o:/^\d+$/.test(o)?o:(o?(SLN[o]||o):'-'),a:s.title,md:(s.medleys||[]).join(' + '),k:String(stK(l,s)||''),bp:s.bpm||'',sg:((l.cant||{})[s.id]||'').trim(),n:((l.rn||{})[s.id]||'').trim()});});
+ const hh=r=>r.t=='m'?(r.n?13:9):r.t=='t'?6:(13+(r.md?4:0)+(r.n?5:0));let z=1;const tot=rows.reduce((a,r)=>a+hh(r)+2,0),av=H-M-46;if(tot>av)z=Math.max(.55,av/tot);
+ const d=new window.jspdf.jsPDF({unit:'mm',format:'a4'});let y=M+4;d.setFont('helvetica','bold');d.setFontSize(9);d.setTextColor(120);d.text('B6 - LUGAR DO ENCONTRO  ·  LISTA DO PALCO',M,y);y+=8;
+ d.setTextColor(0);d.setFontSize(20);d.text(asc2([l.place,l.turno].filter(Boolean).join(' - ')||l.name||'Culto'),M,y);y+=6;d.setFont('helvetica','normal');d.setFontSize(11);d.setTextColor(70);
+ const dl=l.date?new Date(l.date+'T00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'}):'';d.text(asc2([l.name,dl].filter(Boolean).join(' · ')),M,y);y+=5;
+ const inf=[l.passHora&&'Passagem de som '+l.passHora,l.dm&&b[l.dm]&&'DM: '+b[l.dm],ldr(l).length&&'Ministram: '+ldr(l).join(' e ')].filter(Boolean).join('   ·   ');if(inf){d.text(asc2(inf),M,y);y+=4}y+=4;d.setDrawColor(200);d.line(M,y,W-M,y);y+=6;
+ rows.forEach(r=>{const g=hh(r)*z;if(r.t=='m'){d.setFillColor(236,236,236);d.roundedRect(M,y-4.5*z,W-2*M,g-1,2,2,'F');d.setFont('helvetica','bold');d.setFontSize(11*z+1);d.setTextColor(60);d.text(asc2(r.a.toUpperCase()),M+4,y+.5);if(r.n){d.setFont('helvetica','normal');d.setFontSize(10*z+.5);d.setTextColor(90);d.text(d.splitTextToSize(asc2(r.n),W-2*M-10)[0],M+4,y+5*z)}y+=g+2*z;return}
+  if(r.t=='t'){d.setFont('helvetica','italic');d.setFontSize(9*z+.5);d.setTextColor(30,110,200);d.text(asc2('  > passagem: '+r.a),M+14,y-1);y+=g+2*z;return}
+  d.setFillColor(20,20,20);d.roundedRect(M,y-5*z,11,9*z,2,2,'F');d.setTextColor(255);d.setFont('helvetica','bold');d.setFontSize(r.o.length>2?6.5:12*z+1);d.text(asc2(r.o.length>2?r.o.slice(0,9):r.o),M+5.5,y+.8*z,{align:'center'});
+  d.setTextColor(0);d.setFontSize(15*z+1);d.text(pdfClip(d,asc2(r.a),W-2*M-60),M+15,y+.5);let yy=y+5*z;if(r.md){d.setFont('helvetica','normal');d.setFontSize(10*z+.5);d.setTextColor(80);d.text(d.splitTextToSize(asc2('+ '+r.md),W-2*M-60)[0],M+15,yy);yy+=4*z}
+  d.setFont('helvetica','normal');d.setFontSize(10*z+.5);d.setTextColor(90);const sub=[r.bp&&r.bp+' BPM',r.sg].filter(Boolean).join('  ·  ');if(sub){d.text(asc2(sub),M+15,yy);yy+=4.5*z}
+  if(r.n){d.setFont('helvetica','bold');d.setTextColor(190,120,0);d.text(d.splitTextToSize(asc2('Obs.: '+r.n),W-2*M-60)[0],M+15,yy)}
+  d.setTextColor(0);d.setFont('helvetica','bold');d.setFontSize(22*z+2);d.text(asc2(r.k.replace(/♯/g,'#').replace(/♭/g,'b')),W-M-2,y+2*z,{align:'right'});d.setFont('helvetica','normal');d.setFontSize(7);d.setTextColor(130);d.text('TOM',W-M-2,y-5.5*z,{align:'right'});
+  y+=g+2*z;d.setDrawColor(225);d.line(M+15,y-3*z,W-M,y-3*z)});
+ d.setFontSize(8);d.setTextColor(150);d.text(asc2('Gerado pelo Escala B6 · '+new Date().toLocaleDateString('pt-BR')),M,H-8);
+ const fn='Lista do palco - '+([l.place,l.turno,l.date&&l.date.split('-').reverse().join('-')].map(x=>String(x||'').replace(/[\\/:*?"<>|]/g,'').trim()).filter(Boolean).join(' - ')||'culto')+'.pdf';
+ try{const dl2=await claude.use('downloads');await dl2.save({filename:fn,data:d.output('arraybuffer')})}catch(e){try{d.save(fn)}catch(e2){say('Não foi possível gerar o PDF.')}}}

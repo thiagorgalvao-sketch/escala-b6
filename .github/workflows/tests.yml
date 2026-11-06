@@ -2,7 +2,7 @@ name: Testes automáticos
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'admin/**', 'sw.js', 'pub.json', 'tools/app.html', 'tools/shim.js', 'tools/sbshim.js', 'tools/tests/**', '.github/workflows/tests.yml']
+    paths: ['index.html', 'admin/**', 'sw.js', 'pub.json', 'tools/app.html', 'tools/src/**', 'tools/montar.py', 'tools/shim.js', 'tools/sbshim.js', 'tools/tests/**', '.github/workflows/tests.yml']
   workflow_dispatch:
 permissions:
   contents: read

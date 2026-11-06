@@ -1,0 +1,11 @@
+/* ===== roteiro do culto + passagens */
+const RK=o=>!o||/^\d+$/.test(o)?0:o=='Ceia do Senhor'?1:o=='Pós-Break'?2:o=='Pós-Palavra'?3:4;
+const RTM=['Oração','Avisos','Oferta','Palavra','Ceia do Senhor','Break','Apelo','Batismo','Momento livre','Encerramento'];
+function rotSongs(l){return l.songIds.filter(i=>S.songs.some(s=>s.id==i)).map((id,i)=>[id,i]).sort((a,b)=>RK(oo(l,a[0]))-RK(oo(l,b[0]))||a[1]-b[1]).map(x=>x[0])}
+function rotDef(l,ss){const M=[],last=f=>{let a='';ss.forEach(i=>{if(f(RK(oo(l,i))))a=i});return a};if(isCeia(l))M.push({m:'Ceia do Senhor',n:'',a:last(r=>r<1)});if(ss.some(i=>RK(oo(l,i))==2))M.push({m:'Break',n:'',a:last(r=>r<2)});if(ss.length)M.push({m:'Palavra',n:'',a:last(r=>r<3)});return M}
+function rotSeq(l){const ss=rotSongs(l),M=Array.isArray(l.rot)?l.rot:rotDef(l,ss),set=new Set(ss),q=[];const ms=a=>M.forEach((m,i)=>{if(m.a==a)q.push({k:'m',i,m})});
+ ms('');ss.forEach(id=>{q.push({k:'s',id});ms(id)});M.forEach((m,i)=>{if(m.a&&!set.has(m.a))q.push({k:'m',i,m})});return q}
+function trI(l,a,b){const A=S.songs.find(x=>x.id==a),B=S.songs.find(x=>x.id==b);if(!A||!B)return null;const ka=stK(l,A),kb=stK(l,B),d=stInt(ka,kb),ba=+A.bpm||0,bb=+B.bpm||0,n=((l.tr||{})[a]||'').trim();
+ const t=d?`${fk(ka)} → ${fk(kb)} (${d>0?'sobe':'desce'} ${String(Math.abs(d)/2).replace('.',',')} tom${Math.abs(d)>2?'s':''})`:'',bp=ba&&bb&&ba!=bb?`${ba} → ${bb} BPM`:'';return{t,bp,n,same:!d&&!bp}}
+const RMI='<svg viewBox="0 0 24 24"><path d="M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/></svg>';
+

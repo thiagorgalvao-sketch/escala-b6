@@ -1,0 +1,107 @@
+/* ===== 4 importar texto WhatsApp */
+function wSpl(s){return s.split(/\s*(?:,|;|\s+e\s+|&)\s*/i).map(x=>x.trim()).filter(Boolean)}
+function wParse(t){const o={b:{},songs:[]};let cur=null;t.split('\n').map(x=>x.replace(/[*_~]/g,'').replace(/\s+/g,' ').trim()).forEach(x=>{if(!x)return;let m;
+ if(m=/^data\s*:?\s*(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-](\d{2,4}))?/i.exec(x)){o.date=[m[1],m[2],m[3]];return}
+ if(m=/^hor[aá]rio\s*:\s*(.+)$/i.exec(x)){o.turno=m[1];return}
+ if(m=/^local\s*:\s*(.+)$/i.exec(x)){o.place=m[1];return}
+ if(m=/^(evento|culto|tipo)\s*:\s*(.+)$/i.exec(x)){o.name=m[2];return}
+ if(m=/^(?:pregador|pregadora|pregador\(a\)|preletor|preletora|ministra[çc][aã]o)\s*:\s*(.+)$/i.exec(x)){o.preg=m[1];return}
+ if(m=/^(bateria|baixo|guitarra|teclado|teclados|viol[aã]o)\s*:\s*(.+)$/i.exec(x)){const k={bateria:'bt',baixo:'bx',guitarra:'gt',teclado:'tc',teclados:'tc'}[nz(m[1])]||'vi';let v=m[2];if(/\(\s*dm\s*\)/i.test(v)){o.dm=k;v=v.replace(/\s*\(\s*dm\s*\)/i,'')}o.b[k]=v.trim();return}
+ if(m=/^(?:l[ií]der(?:es)?|vocal principal|voz principal)\s*:\s*(.+)$/i.exec(x)){o.ld=wSpl(m[1]);return}
+ if(m=/^(?:backs?|back vocal|backing)\s*:\s*(.+)$/i.exec(x)){o.bk=wSpl(m[1]);return}
+ if(m=/^tom\s*:?\s*\(?\s*([A-G][#b♯♭]?m?)\s*\)?\s*$/i.exec(x)){if(cur)cur.key=m[1].replace('♯','#').replace('♭','b');return}
+ if(/^(vers[aã]o|medley|link|youtube|spotify)\s*:/i.test(x)||/^https?:\/\//.test(x)||/^[….\/\s]+$/.test(x))return;
+ if(m=/^(?:✅|☑️|✔️|✔|🎵|🎶)\s*(.+)$/u.exec(x)||/^(\d{1,2})\s*[.)\-–]\s*(.+)$/.exec(x)&&[0,x.replace(/^\d{1,2}\s*[.)\-–]\s*/,'')]){cur={raw:m[1],ord:''};o.songs.push(cur);return}
+ if(m=/^(?:▪️|▪|◾|🔸|🔹|•|-)\s*([^:]{2,30}):\s*(.+)$/u.exec(x)){cur={raw:m[2],ord:m[1].trim()};o.songs.push(cur);return}});
+ o.songs.forEach(s=>{let r=s.raw;let m=/\s[-–]\s*tom\s*:?\s*([A-G][#b]?m?)\s*$/i.exec(r);if(m){s.key=s.key||m[1];r=r.slice(0,m.index)}m=/^\(([^)]*)\)\s*/.exec(r);if(m){s.artist=m[1];r=r.slice(m[0].length)}m=/\s*\(([^)]*)\)\s*$/.exec(r);if(m){s.sing=m[1];r=r.slice(0,m.index)}const P2=r.split(/\s+\+\s+/).map(x=>x.trim()).filter(Boolean);s.title=P2[0]||'';s.med=P2.slice(1)});return o}
+function wMatch(s){const t=nz(s.title),md=(s.med||[]).map(nz).join('+');let c=S.songs.filter(x=>nz(x.title)==t);if(!c.length)c=S.songs.filter(x=>nz(x.title).startsWith(t)||t.startsWith(nz(x.title)));if(!c.length)return null;return c.find(x=>(x.medleys||[]).map(nz).join('+')==md)||c.find(x=>!(x.medleys||[]).length&&!md)||c.sort((a,b)=>Math.abs((a.medleys||[]).length-(s.med||[]).length)-Math.abs((b.medleys||[]).length-(s.med||[]).length))[0]}
+async function impW(){const tx=($('#wtx')||{}).value||'';if(!tx.trim())return say('Cole o texto do repertório.');let o=wParse(tx);
+ if(!o.songs.length){let sm=null;try{sm=window.claude&&await claude.use('sample')}catch(e){}if(sm){const st=$('#wst');if(st)st.textContent='Claude está lendo o texto…';try{const j=await sm.json('Extraia os dados deste repertório de culto (texto de WhatsApp) e responda SOMENTE JSON: {"data":"dd/mm/aaaa ou vazio","horario":"","local":"","evento":"","pregador":"","banda":{"bateria":"","baixo":"","guitarra":"","teclado":"","violao":""},"lideres":[],"backs":[],"musicas":[{"titulo":"","medleys":[],"tom":"","cantor":"","ordem":"número ou nome da seção, ex.: Pós-Palavra"}]}. Não invente nada que não esteja no texto.\n\nTEXTO:\n'+tx.slice(0,20000));if(st)st.textContent='';if(j){const d=/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/.exec(j.data||'');o={date:d?[d[1],d[2],d[3]]:null,turno:j.horario,place:j.local,name:j.evento,preg:j.pregador,b:{bt:(j.banda||{}).bateria,bx:(j.banda||{}).baixo,gt:(j.banda||{}).guitarra,tc:(j.banda||{}).teclado,vi:(j.banda||{}).violao},ld:j.lideres||[],bk:j.backs||[],songs:(j.musicas||[]).map(m=>({title:m.titulo||'',med:m.medleys||[],key:m.tom||'',sing:m.cantor||'',ord:/^\d+$/.test(String(m.ordem||''))?'':String(m.ordem||'')}))}}}catch(e){if(st)st.textContent=''}}}
+ if(o.date){let[d,m,y]=o.date;y=y?(y.length==2?'20'+y:y):'';if(!y){const T=new Date(),c=new Date(T.getFullYear(),+m-1,+d);y=String(c<new Date(T.getTime()-60*864e5)?T.getFullYear()+1:T.getFullYear())}P.date=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
+ const fx=(k,v)=>{v=(v||'').trim();if(!v)return;const c=cbo(k).find(x=>nz(x)==nz(v));P[k]=c||v};fx('turno',o.turno);fx('place',o.place);fx('name',o.name);fx('pregador',o.preg);
+ P.banda=P.banda||{};Object.entries(o.b||{}).forEach(([k,v])=>{v=(v||'').trim();if(v){const c=cbb(k).find(x=>nz(x)==nz(v));P.banda[k]=c||v}});if(o.dm)P.dm=o.dm;
+ const put=(names,ks)=>{(names||[]).forEach(n=>{let k=ks.find(k=>!P.banda[k]&&cbb(k).some(x=>nz(x)==nz(n)))||ks.find(k=>!P.banda[k]);if(k){const c=cbb(k).find(x=>nz(x)==nz(n));P.banda[k]=c||n}})};put(o.ld,['vm','vf']);put(o.bk,['so','co','te']);
+ const miss=[];let n=0;P.songIds=[];P.keys={};P.cant={};P.ord={};o.songs.forEach(s=>{const x=wMatch(s);if(!x){miss.push(s.title+((s.med||[]).length?' + '+s.med.join(' + '):''));return}if(P.songIds.includes(x.id))return;P.songIds.push(x.id);if(s.key){const p=pk(s.key);if(p.pc!=pk(x.key).pc||p.min!=pk(x.key).min)P.keys[x.id]=p.r+(p.min?'m':'')}if(s.sing)P.cant[x.id]=wSpl(s.sing).join(' + ');P.ord[x.id]=s.ord||String(++n)});
+ lfR();toast(P.songIds.length+' música(s) importada(s)');if(miss.length)say('Não encontrei no cadastro: '+miss.join('; ')+'. Cadastre essas músicas e adicione na aba Músicas.')}
+
+
+async function baUp(inp){const fs=[...inp.files||[]];inp.value='';if(!fs.length)return;const set=t=>{const e=$('#bas');if(e)e.textContent=t};
+ let as=null;try{as=window.claude&&await claude.use('assets')}catch(e){}if(!as)return say('O envio de áudio precisa de internet e login de administrador.');
+ const bad=[],nb=[];D.bas=baAll(D).slice();for(const f of fs){if(!/\.(wav|mp3|m4a)$/i.test(f.name)&&!/^audio\//i.test(f.type)){bad.push(f.name+' (use wav, mp3 ou m4a)');continue}
+  try{set('Preparando '+f.name+'…');let b=await vsPrep(f),nm=f.name;if(b!==f)nm=nm.replace(/\.[^.]+$/,'')+'.wav';window._bupP=(i,n)=>set('Enviando '+f.name+' (parte '+i+'/'+n+')…');set('Enviando '+f.name+'…');const r=await bigUp(as,b);D.bas.push({id:r.id,url:r.url,name:nm,size:r.size,date:baDt(f.name)});nb.push(r.url)}
+  catch(e){bad.push(f.name+' ('+(e&&e.message||e&&e.code||'erro')+')')}}
+ baSync(D);sfR();if(bad.length)say('Não enviados: '+bad.join('; ')+'.');if(sepAuto())for(const u of nb)if(/^https:\/\//i.test(u))await faixasSep(bh(u))}
+function baDel(i){const b=baAll(D)[i];if(!b)return;ask('Remover a gravação "'+(b.name||'')+'"?',()=>{D._del=D._del||[];if(b.id)D._del.push(b.id);D.bas=baAll(D).filter(x=>x!==b);baSync(D);sfR()},'Remover')}
+function baDate(i,v){D.bas=baAll(D).slice();const b=D.bas[i];if(!b)return;D.bas[i]=Object.assign({},b,{date:v});baSync(D);sfR()}
+function baPlay(sid,lid){const s=S.songs.find(x=>x.id==sid),l=S.lists.find(x=>x.id==lid);if(!s)return;const f=baFor(s,l);if(!f)return;if(isLk(f.url))return lkOpen(f.url);const a=[f,...baAll(s).filter(x=>x!==f&&!isLk(x.url))];Q={q:a.map(b=>({id:s.id,url:b.url,title:'Banda · '+s.title+(b.date?' ('+baDF(b.date)+')':'')})),i:0};vqLoad()}
+const B6I='<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#000" stroke="#fff" stroke-width="4"/><text x="50" y="65" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="44" fill="#fff">B6</text></svg>';
+
+function toastA(t,l,fn,ms){const e=$('#tt');e.textContent='';const a=document.createElement('span');a.textContent=t;const b=document.createElement('button');b.type='button';b.textContent=l;b.onclick=()=>{e.classList.remove('on','act');clearTimeout(tt0);fn()};e.append(a,b);e.classList.add('on','act');clearTimeout(tt0);tt0=setTimeout(()=>e.classList.remove('on','act'),ms||6000)}
+function toast(t){const e=$('#tt');e.classList.remove('act');e.textContent=t;e.classList.add('on');clearTimeout(tt0);tt0=setTimeout(()=>e.classList.remove('on'),Math.min(4500,Math.max(1400,String(t).length*45)))}
+function fav(id){const s=S.songs.find(x=>x.id==id);uSnap(s.fav?'Removida das favoritas':'Adicionada às favoritas');s.fav=!s.fav;save();R()}
+function snap(s){const c=cl(s);delete c.hist;delete c.ink;s.hist=[{t:Date.now(),d:c,by:ME||''},...(s.hist||[])].slice(0,5)}
+function hs(id){const s=S.songs.find(x=>x.id==id);setTimeout(nmFill,0);dlg.innerHTML=`<h2>Histórico de versões</h2>${(s.hist||[]).map((v,i)=>`<div class="ac" style="align-items:center"><span>${new Date(v.t).toLocaleString('pt-BR')} · Tom ${fk(v.d.key)} · ${v.d.parts.length} blocos${v.cf?' · <b>conflito</b>':''}${whoH(v.by)}</span><button class="sm" onclick="rv('${id}',${i})">Restaurar</button></div>`).join('')||'<p class="mut">Ainda não há versões anteriores. Elas são guardadas a cada edição ou troca de tom.</p>'}<div class="ac"><button onclick="sfR()">Voltar à edição</button></div>`;dlg.showModal()}
+function rv(id,i){uSnap('Versão restaurada');const s=S.songs.find(x=>x.id==id),v=cl(s.hist[i].d);snap(s);const hh=s.hist,k=s.ink;Object.keys(s).forEach(x=>delete s[x]);Object.assign(s,v,{hist:hh});if(k)s.ink=k;save();dlg.close();R()}
+function ex(id){const s=S.songs.find(x=>x.id==id),L=[`{title: ${s.title}}`];if(s.artist)L.push(`{artist: ${s.artist}}`);L.push(`{key: ${s.key}}`);if(s.bpm)L.push(`{tempo: ${s.bpm}}`);(s.medleys||[]).forEach(m=>L.push(`{comment: Medley: ${m}}`));L.push('');
+ s.parts.forEach(q=>{L.push(`{comment: ${q.type}${q.rep?' ('+q.rep+')':''}}`);if(q.chords)L.push(q.chords.replace(/_/g,' '));if(q.lyric)L.push(q.lyric);if(q.note)L.push(q.note);L.push('')});
+ dlg.innerHTML=`<h2>Texto da música</h2><textarea id="sht" readonly style="width:100%;height:50vh;font-family:ui-monospace,Menlo,Consolas,monospace">${esc(L.join('\n'))}</textarea><div class="ac"><button class="pri" onclick="cpS(this)">COPIAR</button></div>`;dlg.showModal()}
+async function off(){let dl=null;try{dl=window.claude&&await claude.use('downloads')}catch(e){}if(!dl){dlg.innerHTML=`<h2>Usar sem internet</h2><div class="nota" style="line-height:1.6"><svg class="ico" viewBox="0 0 24 24"><path d="M5 13l5 5L19 7"/></svg> Depois de aberto uma vez com internet, o Escala B6 abre sem sinal neste aparelho, com repertórios, cifras, mapas e anotações.<br><svg class="ico" viewBox="0 0 24 24"><path d="M12 4v10M7.5 9.5 12 14l4.5-4.5M5 19h14"/></svg> Para os <b>VS e áudios da banda</b>, abra o culto e use <b>Mais → Baixar para usar offline</b>.<br>Dica: instale na tela inicial (menu do navegador → <b>Adicionar à tela de início</b>).</div><div class="ac"><button class="pri" onclick="dlg.close()">Entendi</button></div>`;if(!dlg.open)dlg.showModal();return}
+ const c=document.documentElement.cloneNode(true);['#m','#ink','#ib','#st','#au'].forEach(q=>{const e=c.querySelector(q);if(e)e.innerHTML=''});const d=c.querySelector('#dlg');d.innerHTML='';d.removeAttribute('open');
+ let t='<!doctype html>'+c.outerHTML;t=t.replace(/const SEED=[\s\S]*?;\nconst \$=/,()=>'const SEED='+JSON.stringify(S.songs)+';const LISTS0='+JSON.stringify(S.lists)+';\nconst $=');
+ try{await dl.save({filename:'escalapro.html',data:t})}catch(e){say('Não foi possível baixar ('+(e.code||e.message||'erro')+'). Use o Backup para levar seus dados.')}}
+
+const nzs=t=>{const a=String(t||'').replace(/jeovah/gi,'jeova');return new Set([nz(a),...a.split('/').map(nz)].filter(Boolean))};
+const gen=m=>!m||!m.length||m.every(x=>/^medley$/i.test(x));
+function pdfInit(){if(S.mig.pdf)return;let add=0,art=0,med=0;
+ PD.forEach(p=>{const ps=nzs(p.t),m=S.songs.filter(s=>[...nzs(s.title)].some(x=>ps.has(x)));
+  if(!m.length){const k=p.mk.find(x=>x[0]==p.k);S.songs.push({id:'p_'+nz(p.t).replace(/\W+/g,'_'),title:p.t,artist:p.a,key:p.k,medleys:k?k[1].slice():[],mlinks:[],tags:['sem mapa'],parts:[]});add++;return}
+  m.forEach(s=>{if(!s.artist&&p.a){s.artist=p.a;art++}const a=pk(s.key),x=p.mk.find(y=>pk(y[0]).pc==a.pc&&pk(y[0]).min==a.min);
+   if(x){const n=s.medleys&&s.medleys.length&&s.medleys.every(q=>/^medley$/i.test(q))?x[2]:(!s.medleys||!s.medleys.length?x[1]:[]);if(n.length){s.medleys=n.slice();s.mlinks=[];med++}}})});
+ S.mig.pdf=1;save()}
+
+/* ícones automáticos nos botões com texto */
+const GI=[
+[/^(editar)$/i,'M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4'],
+[/^(duplicar( \(\d+\))?|copiar)$/i,'M9 9h11v11H9zM5 15V5a1 1 0 0 1 1-1h10'],
+[/^copiado/i,'M5 12.5l5 5L20 7'],
+[/^(excluir|apagar|remover)/i,'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3'],
+[/^(fechar|cancelar)$/i,'M6 6l12 12M18 6 6 18'],
+[/^(salvar|ok$|confirmar|aplicar letra)/i,'M5 12.5l5 5L20 7'],
+[/^restaurar/i,'M4 12a8 8 0 1 0 3-6.2M4 4v5h5'],
+[/^voltar/i,'M19 12H5M11 6l-6 6 6 6'],
+[/^ocultar lista/i,'M4 5h16v14H4zM9 5v14M16 10l-2 2 2 2'],
+[/^mostrar lista/i,'M4 5h16v14H4zM9 5v14M14 10l2 2-2 2'],
+[/^(atualizar|reaplicar)/i,'M20 11a8 8 0 0 0-14-4M4 5v4h4M4 13a8 8 0 0 0 14 4M20 19v-4h-4'],
+[/^(trazer letra|baixar versão)/i,'M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14'],
+[/^(importar vs|trocar vs|importar mapa|importar blocos)/i,'M12 15V4M7.5 8.5 12 4l4.5 4.5M5 19h14'],
+[/^lote$/i,'M4 6l2 2 3-3M12 7h8M4 13l2 2 3-3M12 14h8M4 20h5M12 20h8'],
+[/^(todas|limpar)$/i,'M4 5h16v14H4zM8 12.5l3 3 5-6'],
+[/^modo palco$/i,'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'],
+[/^tap$/i,'M9 11V6a2 2 0 1 1 4 0v5M13 11a2 2 0 1 1 4 0v3a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-3l-2-4a2 2 0 0 1 3-2l1 1'],
+[/^som$/i,'M4 10v4h4l5 4V6L8 10H4zM16 9a4 4 0 0 1 0 6'],
+[/^rolar$/i,'M12 4v14M6 14l6 6 6-6'],
+[/^pausar$/i,'M8 5v14M16 5v14'],
+[/^metrônomo$/i,'M8 21h8l-2-16h-4zM12 14l5-6'],
+[/^anotar$/i,'M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3'],
+[/^backup$/i,'M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 7v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7M4 12v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5'],
+[/^repertórios$/i,'M4 6h12M4 11h12M4 16h7M18 14v5M18 14a2 2 0 1 0 0 5'],
+[/^escala$/i,'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4'],
+[/^painel$/i,'M4 20h16M7 16v-5M12 16V5M17 16v-8'],
+[/^espiritual$/i,'M12 3c.8 3.2 5 5.4 5 10.4A5 5 0 0 1 7 13.4c0-2.5 1.3-4.3 2.6-5.4.2 1.8 1 3 2.3 3.6-.6-3 .1-5.9.1-8.6zM12 21a2 2 0 0 1-2-2c0-1.3 1-2.2 2-3.2 1 1 2 1.9 2 3.2a2 2 0 0 1-2 2z'],
+[/^músicas$/i,'M9 18V5l11-2v13M6.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17.5 19a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z'],
+[/^mapa( vocal|\s*\(vocal\))/i,'M9 3h6v11H9zM5 11a7 7 0 0 0 14 0M12 18v3'],
+[/^dados e cifra$/i,'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6'],
+[/^blocos$/i,'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z'],
+[/^(vs|tocar vs)/i,'M7 5l12 7-12 7z'],
+[/^anterior$/i,'M15 6l-6 6 6 6'],
+[/^próxima$/i,'M9 6l6 6-6 6',1],
+[/^adicionar/i,'M12 5v14M5 12h14'],
+[/^histórico$/i,'M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z'],
+[/^limpar cor$/i,'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9 9l6 6M15 9l-6 6']];
+function icn(){document.querySelectorAll('button').forEach(b=>{if(b.dataset.ic||b.querySelector('svg')||b.matches('.ic,.ic2,.chip,.vbr,.dh,.it,[onclick^="goP"],.cl,.mni,.hjm,.sgp,.sgm'))return;const raw=b.textContent.trim();if(!raw||raw.length>40)return;const lab=raw.replace(/^[◀▶‹›+●⏮⏭]\s*/,'').replace(/\s*[›]$/,'').trim(),g=GI.find(x=>x[0].test(lab));if(!g){b.dataset.ic='1';return}
+ const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('viewBox','0 0 24 24');s.setAttribute('class','gi');s.setAttribute('aria-hidden','true');const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',g[1]);s.appendChild(p);b.classList.add('wi');b.textContent='';const sp=document.createElement('span');sp.className='gl';sp.textContent=lab;if(g[2]){b.append(sp,s)}else{b.append(s,sp)}})}
+{let _t;new MutationObserver(()=>{clearTimeout(_t);_t=setTimeout(icn,20)}).observe(document.body,{childList:true,subtree:true})}
+const _imp=/^#importar=/.test(location.hash)?location.hash:'';if(_imp)history.replaceState(null,'',location.pathname+location.search);load();runMig();lsInit();setTimeout(()=>{lsInit();LSON=1},2500);if(!hashGo()&&!uiRest())homeGo();R();if(_imp&&!window.__B6SITE)setTimeout(()=>cbHash(_imp),700);swInit();document.querySelectorAll('#tbb button,header .tabs button').forEach(b=>{const t=b.textContent.trim();if(t){b.title=t;b.setAttribute('aria-label',t)}});setTimeout(()=>tourStart(),2200);setTimeout(()=>{try{if(!S.band&&window.__SB){fvInit();setInterval(()=>{dispAllLoad().then(()=>{if(S.tab=='lists'&&!dlg.open)R()})},300000)}}catch(e){}},3500);setTimeout(bkRem,2500);bandBoot();icn();
+</script></body></html>
+
+</body></html>

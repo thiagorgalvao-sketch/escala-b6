@@ -1,0 +1,40 @@
+name: Conferir se a versão nova está no ar
+on:
+  push:
+    branches: [main]
+    paths: ['versao.json']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  issues: write
+concurrency:
+  group: no-ar
+  cancel-in-progress: true
+jobs:
+  conferir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Espera a versão nova aparecer no site (e pede novo deploy se travar)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          ESPERADA=$(python3 -c "import json;print(json.load(open('versao.json'))['v'])")
+          echo "Versão esperada: $ESPERADA"
+          no_ar() { python3 -c "import json,sys,urllib.request as u;print(json.load(u.urlopen('https://fervor.website/versao.json?x=$RANDOM',timeout=20))['v'])" 2>/dev/null || echo "?"; }
+          for tentativa in 1 2 3; do
+            for i in $(seq 1 12); do
+              NO_AR=$(no_ar)
+              echo "[$tentativa/$i] no ar: $NO_AR"
+              if [ "$NO_AR" = "$ESPERADA" ]; then echo "✔ Versão $ESPERADA está no ar."; echo "### ✔ Versão $ESPERADA está no ar" >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
+              sleep 25
+            done
+            echo "Não apareceu em 5 min. Pedindo novo deploy do GitHub Pages (tentativa $tentativa)…"
+            gh api -X POST "repos/${{ github.repository }}/pages/builds" >/dev/null 2>&1 || echo "(não consegui pedir novo deploy)"
+          done
+          echo "### ✘ Versão $ESPERADA NÃO apareceu no site" >> "$GITHUB_STEP_SUMMARY"
+          gh issue create --repo "${{ github.repository }}" --title "⚠ Versão $ESPERADA não apareceu no site" --body "O site ainda mostra $(no_ar) depois de 3 tentativas de novo deploy. Veja ${{ github.server_url }}/${{ github.repository }}/actions e a aba Pages. Se travou em 'updating_pages', cancele e faça um commit vazio."
+          exit 1

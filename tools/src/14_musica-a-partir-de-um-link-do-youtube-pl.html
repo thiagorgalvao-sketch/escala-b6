@@ -1,0 +1,155 @@
+/* ===== música a partir de um link do YouTube + player que acompanha a cifra ===== */
+const YTRX=/(?:youtube\.com|youtu\.be|music\.youtube\.com)/i;
+function ytClean(t){return String(t||'').replace(/\[[^\]]*\]/g,' ').replace(/\((?:[^)]*?(?:ao vivo|live|clipe|clip|oficial|official|vídeo|video|lyric|letra|áudio|audio|acústic|acoustic|cover|playback|remaster)[^)]*)\)/gi,' ').replace(/\b(?:clipe|vídeo|video)\s+oficial\b|\bofficial\s+(?:music\s+)?video\b|\bao vivo\b|\blyric video\b|\bcom letra\b/gi,' ').replace(/#\S+/g,' ').replace(/\s{2,}/g,' ').replace(/^[\s\-|–—:]+|[\s\-|–—:]+$/g,'').trim()}
+function ytParse(title,author){const t=ytClean(title),au=String(author||'').replace(/\s*-\s*Topic$/i,'').replace(/\b(?:oficial|official|music|vevo)\b/gi,'').replace(/\s{2,}/g,' ').trim();
+ const parts=t.split(/\s+[|–—-]\s+|\s*\|\s*/).map(x=>ytClean(x)).filter(Boolean);let title2=t,artist=au;
+ if(parts.length>=2){const a=nz(au),i=parts.findIndex(p=>a&&(nz(p).includes(a)||a.includes(nz(p))));if(i>=0){artist=parts[i];title2=parts.filter((_,k)=>k!=i).join(' / ')}else{artist=parts[0];title2=parts.slice(1).join(' / ')}}
+ title2=title2.replace(/\s*\((?:part|feat|ft)\.?[^)]*\)/i,'').trim();return{title:TC(title2.toUpperCase()),artist:artist}}
+async function ytMeta(u){const q=encodeURIComponent(u);for(const src of ['https://www.youtube.com/oembed?format=json&url='+q,'https://noembed.com/embed?url='+q]){try{const r=await fetch(src);if(!r.ok)continue;const j=await r.json();if(j&&j.title)return j}catch(e){}}return null}
+function ytCard(u){return`<div class="ytc"><div class="ytt"><img src="https://i.ytimg.com/vi/${ytId(u)}/mqdefault.jpg" alt=""><div><b>Link do YouTube</b><small>Criar uma música a partir deste vídeo: o Fervor identifica a música, guarda o link, busca a cifra e monta os blocos.</small></div></div><button class="pri sm" onclick="ytNew(${ja(u)})">▶ Criar música deste vídeo</button></div>`}
+{const _lh=lh;lh=function(){const q=(S.q||'').trim();return!S.band&&YTRX.test(q)&&ytId(q)?ytCard(q):_lh()}}
+function ytNew(u){nsStart(u,1)}
+/* player do YouTube que rola a cifra junto */
+let YTP=null;
+function ytBtn(s){const u=lkAll(s).map(x=>x[1]).find(x=>YTRX.test(x)&&ytId(x));return u?`<button class="vsbt on ytb" title="Tocar o vídeo e rolar a cifra junto" aria-label="Tocar o vídeo do YouTube" onclick="ytOpen(${ja(u)},${ja(s.id)})"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M10.5 9.5v5l4-2.5z" fill="currentColor"/></svg><span>VÍDEO</span></button>`:''}
+{const _q=qkB;qkB=function(s0){const s=S.songs.find(x=>x.id==s0.id)||s0;return _q(s0).replace(/<\/span>$/,ytBtn(s)+'</span>')}}
+function ytOpen(u,sid){const id=ytId(u);if(!id)return;ytClose();const w=document.createElement('div');w.id='ytp';
+ w.innerHTML=`<div class="ytf"><iframe id="ytif" src="https://www.youtube-nocookie.com/embed/${id}?enablejsapi=1&autoplay=1&playsinline=1&rel=0&modestbranding=1&origin=${encodeURIComponent(location.origin)}" title="Vídeo da música" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><div class="ytk"><label class="ytg"><input type="checkbox" id="ytsg" checked onchange="if(YTP)YTP.follow=this.checked"> Rolar a cifra junto</label><span class="mut" id="ytst">Toque ▶ no vídeo</span>${!S.band&&sid?'<button class="sm" onclick="ymStart()" title="Marcar as partes da música no tempo do vídeo">⏱ Partes</button>':''}<button class="sm" onclick="ytMin()" aria-label="Minimizar vídeo" title="Minimizar">▁</button><button class="sm" onclick="ytClose()" aria-label="Fechar vídeo" title="Fechar"><svg class="ico" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></svg></button></div>`;
+ document.body.appendChild(w);document.body.classList.add('ytopen');YTP={id,sid,follow:true,cur:0,dur:0,state:-1,y0:null,lastUser:0,at:0,mk:null};w.insertAdjacentHTML('beforeend','<div id="ytmk" hidden></div>');{const k=ytMarks();const g=w.querySelector('.ytg');if(k&&g)g.lastChild.textContent=' Rolar pelas partes'}const f=$('#ytif');f.addEventListener('load',ytHi);clearInterval(YTH);YTH=setInterval(()=>{if(!YTP||YTP.got){clearInterval(YTH);return}ytHi()},1500);setTimeout(()=>{const st=$('#ytst');if(YTP&&!YTP.got&&st)st.textContent='Sincronizando…'},800)}
+var YTH=0;function ytHi(){const f=$('#ytif');if(!f||!f.contentWindow)return;const T=o=>{try{f.contentWindow.postMessage(JSON.stringify(Object.assign({id:'fv',channel:'widget'},o)),'*')}catch(e){}};T({event:'listening'});['onStateChange','onReady'].forEach(n=>T({event:'command',func:'addEventListener',args:[n]}))}
+function ytMin(){const w=$('#ytp');if(w)w.classList.toggle('min')}
+function ytClose(){const w=$('#ytp');if(w)w.remove();clearInterval(YTH);YTP=null;document.body.classList.remove('ytopen');pbSync()}
+addEventListener('message',e=>{if(!YTP||!/youtube(-nocookie)?\.com$/.test(new URL(e.origin||'http://x').hostname))return;let d;try{d=typeof e.data=='string'?JSON.parse(e.data):e.data}catch(x){return}if(!d||!d.info)return;const i=d.info;YTP.got=1;
+ if(typeof i.currentTime=='number'){YTP.cur=i.currentTime;YTP.at=Date.now()}if(typeof i.duration=='number'&&i.duration>0)YTP.dur=i.duration;if(typeof i.playerState=='number'&&i.playerState!==YTP.state){YTP.state=i.playerState;YTP.at=Date.now();if(YTP.mk)ymR()}
+ const st=$('#ytst');if(st&&YTP.dur){const f=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');st.textContent=f(YTP.cur)+' / '+f(YTP.dur)}
+ pbSync();ytFollow()});
+['wheel','touchmove','keydown'].forEach(ev=>addEventListener(ev,()=>{if(YTP)YTP.lastUser=Date.now()},{passive:true}));
+const ytNow=()=>YTP?YTP.cur+(YTP.state===1&&YTP.at?Math.min(2,(Date.now()-YTP.at)/1000):0):0;
+function ytMarks(){if(!YTP||!YTP.sid)return null;const s=S.songs.find(x=>x.id==YTP.sid);if(!s||!s.ytm||s.ytm.v!=YTP.id||!Array.isArray(s.ytm.m))return null;const M=s.ytm.m.map(a=>({i:s.parts.findIndex(q=>q.id==a[0]),t:+a[1]})).filter(o=>o.i>=0&&o.t>=0).sort((a,b)=>a.t-b.t);return M.length?{s,M}:null}
+const ymN=x=>{let b=String(x||'').replace(/[\[\]]/g,'').replace(/\(?\d+\s*x\)?/gi,'').toLowerCase().replace(/\s+/g,' ').trim();b=CPN[b]||b;return nz(b).replace(/\s*\d+$/,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim()};
+function ytAnch(s){const vis=e=>e&&!e.hidden&&e.offsetParent!==null,P=document.querySelector('#m .parts');if(vis(P))return{A:s.parts.map((q,i)=>document.getElementById('p'+i)),c:P};
+ const C=document.querySelector('#m .cf');if(vis(C)){const hs=[...C.querySelectorAll('.cs')];let j=0;return{A:s.parts.map(q=>{const t=ymN(q.type);for(let x=j;x<hs.length;x++)if(ymN(hs[x].textContent)==t){j=x+1;return hs[x]}return null}),c:C}}return null}
+function ytFollow(){if(!YTP||!YTP.follow||YTP.mk||YTP.state!==1||!YTP.dur||Date.now()-YTP.lastUser<4000)return;const hh=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh'))||56)+8,Y=e=>e.getBoundingClientRect().top+scrollY-hh;
+ const K=ytMarks(),X=K&&ytAnch(K.s);if(X){const M=K.M.filter(o=>X.A[o.i]);if(M.length){const cur=ytNow()+0.8;let k=-1;for(let x=0;x<M.length;x++)if(M[x].t<=cur)k=x;let y;
+  if(k<0)y=Y(X.A[M[0].i]);else{const a=Y(X.A[M[k].i]),n=M[k+1],b=n?Y(X.A[n.i]):X.c.getBoundingClientRect().bottom+scrollY-hh,t1=n?n.t:YTP.dur,fr=Math.min(1,Math.max(0,(cur-M[k].t)/Math.max(1,t1-M[k].t)));y=a-24+(b-a)*fr-innerHeight*0.15*fr}
+  y=Math.max(0,y);if(Math.abs(scrollY-y)>3)scrollTo({top:y,behavior:'smooth'});return}}
+ const c=document.querySelector('#m .parts')||document.querySelector('#m .cf')||document.querySelector('#m #vmv');if(!c)return;
+ const r=c.getBoundingClientRect(),top=r.top+scrollY-hh,len=Math.max(0,c.scrollHeight-innerHeight*0.55),p=Math.min(1,Math.max(0,YTP.cur/YTP.dur)),y=top+len*p;
+ if(Math.abs(scrollY-y)>3)scrollTo({top:y,behavior:'smooth'})}
+/* marcar as partes no tempo do vídeo (administradores) */
+function ymStart(){if(!YTP||!YTP.sid)return;const s=S.songs.find(x=>x.id==YTP.sid);if(!s||!s.parts.length)return say('Esta música ainda não tem blocos. Gere os blocos a partir da cifra primeiro.');YTP.mk={sid:s.id,i:0,m:[]};const w=$('#ytp');if(w)w.classList.remove('min');ymR()}
+function ymR(){const b=$('#ytmk');if(!b||!YTP)return;const k=YTP.mk;if(!k){b.hidden=true;b.innerHTML='';return}const s=S.songs.find(x=>x.id==k.sid);if(!s){YTP.mk=null;return ymR()}b.hidden=false;const P=s.parts,f=t=>Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'),nx=P[k.i];
+ b.innerHTML=`<div class="ymh">${YTP.state===1?'Toque no botão no momento em que cada parte <b>começa</b>.':'Dê <b>play</b> no vídeo e toque no botão quando cada parte começar.'}</div>${nx?`<button class="ymb" onclick="ymTap()" style="--c:${col(nx)}"><small>Começou agora:</small>${esc(nx.type||'Parte '+(k.i+1))}${nx.rep?' <em>'+esc(nx.rep)+'x</em>':''}</button>`:'<div class="ymd">✓ Todas as partes marcadas. Toque em Salvar.</div>'}${k.m.length?`<div class="yml">${k.m.map(a=>{const q=P.find(x=>x.id==a[0]);return`<span>${esc(q?q.type:'?')} <b>${f(a[1])}</b></span>`}).join('')}</div>`:''}<div class="ymc"><button class="sm" onclick="ymUndo()"${k.m.length?'':' disabled'}>↶ Desfazer</button>${nx?'<button class="sm" onclick="ymSkip()">Pular parte</button>':''}<button class="sm pri" onclick="ymSave()"${k.m.length?'':' disabled'}>Salvar</button><button class="sm" onclick="YTP.mk=null;ymR()">Cancelar</button></div>`}
+function ymTap(){const k=YTP&&YTP.mk;if(!k)return;const s=S.songs.find(x=>x.id==k.sid),nx=s&&s.parts[k.i];if(!nx)return;if(YTP.state!==1&&YTP.cur<=0)return toast('Dê play no vídeo primeiro');const t=Math.max(0,Math.round((ytNow()-(YTP.state===1?0.25:0))*10)/10);
+ if(k.m.length&&t<=k.m[k.m.length-1][1])return toast('Este tempo é antes da parte anterior. Use Desfazer.');k.m.push([nx.id,t]);k.i++;ymR()}
+function ymSkip(){const k=YTP&&YTP.mk;if(k){k.i++;ymR()}}
+function ymUndo(){const k=YTP&&YTP.mk;if(!k||!k.m.length)return;const a=k.m.pop(),s=S.songs.find(x=>x.id==k.sid);k.i=Math.max(0,s?s.parts.findIndex(q=>q.id==a[0]):k.i-1);ymR()}
+function ymSave(){const k=YTP&&YTP.mk;if(!k||!k.m.length)return;const s=S.songs.find(x=>x.id==k.sid);if(!s)return;uSnap('Partes marcadas no vídeo');s.ytm={v:YTP.id,m:k.m.slice()};save();YTP.mk=null;YTP.follow=true;const c=$('#ytsg');if(c){c.checked=true;c.parentNode.lastChild.textContent=' Rolar pelas partes'}ymR();toast('✓ '+s.ytm.m.length+' partes marcadas. A cifra agora rola pelas partes.')}
+function ymClr(){if(!D)return;delete D.ytm;sfR();toast('Marcações apagadas (vale ao salvar)')}
+/* painel */
+function dsGo(id){S.tab='songs';S.q='';S.ctx=null;pick(id)}
+function dsL(id){S.tab='lists';S.lv=id;S.lvm=1;S.fut=0;R();scrollTo(0,0)}
+function vDash(){const SM=Object.fromEntries(S.songs.map(s=>[s.id,s])),T=td(),dp=S.dp||'12',pl=S.dl||'';
+ const cut=dp=='all'?'':(()=>{const d=new Date(T+'T00:00');d.setMonth(d.getMonth()-(+dp));return d.toISOString().slice(0,10)})();
+ const ALL=S.lists.filter(l=>l.date&&l.date<=T&&l.songIds.some(i=>SM[i])),PL=[...new Set(ALL.map(l=>(l.place||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));
+ const L=ALL.filter(l=>(!cut||l.date>=cut)&&(!pl||(l.place||'').trim()==pl)).sort((a,b)=>b.date.localeCompare(a.date)),st=tStat(L,SM),sAll=tStat(ALL,SM),cat=new Map();S.songs.forEach(s=>{const k=tk(s);if(k&&!cat.has(k))cat.set(k,s)});
+ const V=Object.values(st),top=V.slice().sort((a,b)=>b.n-a.n||b.l.localeCompare(a.l)).slice(0,10),mx=top[0]?top[0].n:1,ab=V.filter(o=>o.ab).sort((a,b)=>b.ab-a.ab||b.l.localeCompare(a.l)).slice(0,8),mxa=ab[0]?ab[0].ab:1;
+ const old=Object.values(sAll).filter(o=>cat.has(o.k)).sort((a,b)=>a.l.localeCompare(b.l)).slice(0,10),nev=[...cat.entries()].filter(([k])=>!sAll[k]).map(x=>x[1]).sort((a,b)=>a.title.localeCompare(b.title,'pt'));
+ let slots=0;const cnt={V:0,H:0,'':0},pos=[1,2,3,4].map(()=>({V:0,H:0,'':0,n:0}));L.forEach(l=>{let k=0;l.songIds.forEach(id=>{const s=SM[id];if(!s)return;const t=fty(s);cnt[t]++;slots++;if(flG(l,id)){if(k<4){pos[k][t]++;pos[k].n++}k++}})});
+ const pc=(a,b)=>b?Math.round(a*100/b):0,bar=c=>{const t=c.V+c.H+c['']||1;return`<div class="dvh">${['H','V',''].filter(x=>c[x]).map(x=>`<i class="f${x||'_'}" style="width:${c[x]*100/t}%" title="${FTN[x]}: ${c[x]}"></i>`).join('')}</div>`};
+ const row=(o,i,v,m,sub)=>`<button class="dbr" onclick="dsGo('${o.id}')"><i>${i+1}</i><span>${esc(o.t)}</span><em>${v}</em><u><b style="width:${Math.max(4,v*100/m)}%"></b></u>${sub?`<small>${sub}</small>`:''}</button>`;
+ const ago=d=>{const n=dAgo(d,T);return n<45?`há ${n} dias`:n<730?`há ${Math.round(n/30.4)} meses`:`há ${(n/365).toFixed(1).replace('.',',')} anos`};
+ const ch=(v,lb)=>`<button class="chip${dp==v?' on':''}" onclick="S.dp='${v}';R()">${lb}</button>`,per=dp=='all'?'todo o histórico':dp=='3'?'últimos 3 meses':'últimos 12 meses';
+ const cu=L.slice(0,10).map(l=>{const f=l1st(l,SM),ss=l.songIds.filter(i=>SM[i]);return`<button class="dcu" onclick="dsL('${l.id}')"><span>${fd(l.date).slice(0,5)}<small>${esc((l.place||'').trim()||l.name||'')}</small></span><div class="dvh">${ss.map(i=>{const t=fty(SM[i]);return`<i class="f${t||'_'}${i==f?' ab':''}" style="flex:1" title="${esc(SM[i].title)} · ${FTN[t]}${i==f?' · abertura':''}"></i>`}).join('')}</div></button>`}).join('');
+ return`<div class="dbw"><div class="dbh"><div><h1>Painel</h1><p class="mut">Atenção agora e histórico dos cultos</p></div><div class="dbf">${ch('3','3 meses')}${ch('12','12 meses')}${ch('all','Tudo')}<select aria-label="Local" onchange="S.dl=this.value;R()"><option value="">Todos os locais</option>${PL.map(x=>`<option${x==pl?' selected':''}>${esc(x)}</option>`).join('')}</select></div></div>
+ ${dashSum(T)}
+ ${dashKpi({SM,T,ALL,L,V,cnt})}
+ ${dashDec({SM,T,ALL,L,st,sAll,cnt,pos,slots,cat})}
+ ${dashEsp({SM,T,ALL})}
+ <h2 class="dsh">Histórico <small>${per}${pl?' · '+esc(pl):''}</small></h2>
+ ${L.length?`<div class="dbg">
+ <div class="dbc"><h3>Mais tocadas<small>vezes</small></h3>${top.map((o,i)=>row(o,i,o.n,mx,'última em '+fd(o.l))).join('')}</div>
+ <div class="dbc" id="dvh"><h3>Vertical × Horizontal</h3><div style="display:flex;gap:18px;flex-wrap:wrap"><div class="dvn" style="color:#64b5f6">${pc(cnt.H,cnt.H+cnt.V)}% <small>horizontais</small></div><div class="dvn" style="color:#00CDD3">${pc(cnt.V,cnt.H+cnt.V)}% <small>verticais</small></div></div>${cnt['']?`<p class="mut" style="margin:2px 0 6px;font-size:.8rem">Percentual sobre as músicas etiquetadas · ${cnt['']} execuç${cnt['']>1?'ões':'ão'} sem etiqueta</p>`:''}${bar(cnt)}
+ <p class="mut">Por posição no culto</p><div class="dps">${pos.map((c,i)=>c.n?`<span>${i+1}ª</span>${bar(c)}<span class="mut">${pc(c.V,c.V+c.H)}% V</span>`:'').join('')}</div>
+ <div class="dlg2"><span><i class="fH"></i>Horizontal</span><span><i class="fV"></i>Vertical</span><span><i class="f_"></i>Sem etiqueta</span></div></div>
+ <div class="dbc"><h3>Fluxo dos últimos cultos<small>cada bloco é uma música</small></h3>${cu}<p class="mut">A marca escura indica a música de abertura. Toque para abrir o repertório.</p></div>
+ <div class="dbc"><h3>Mais escolhidas para abrir<small>vezes</small></h3>${ab.map((o,i)=>row(o,i,o.ab,mxa,isAb(SM[o.id])?'':'falta a etiqueta Abertura no cadastro')).join('')||'<p class="mut">Sem aberturas registradas. Marque a 1ª música dos cultos como Abertura.</p>'}</div>
+ <div class="dbc"><h3>Há mais tempo sem tocar<small>todo o histórico</small></h3>${old.map((o,i)=>`<button class="dbr" onclick="dsGo('${o.id}')"><i>${i+1}</i><span>${esc(o.t)}</span><em>${ago(o.l)}</em><small>última em ${fd(o.l)} · ${o.n}× no total</small></button>`).join('')}${nev.length?`<details class="dmo"><summary>${nev.length} música${nev.length>1?'s':''} do catálogo nunca tocada${nev.length>1?'s':''}</summary>${nev.slice(0,40).map(s=>`<button class="dbr" onclick="dsGo('${s.id}')"><i>•</i><span>${esc(s.title)}</span><em></em>${s.artist?`<small>${esc(s.artist)}</small>`:''}</button>`).join('')}${nev.length>40?`<p class="mut">+${nev.length-40}</p>`:''}</details>`:''}</div>
+
+ </div>`:'<div class="dbc"><p class="mut">Nenhum culto neste período. Toque em <b>Tudo</b> ou em outro período lá em cima.</p></div>'}</div>`}
+
+
+
+
+function dsScr(id){if(id.startsWith('tab:')){S.tab=id.slice(4);R();scrollTo(0,0);return}const e=document.getElementById(id);if(e)e.scrollIntoView({behavior:'smooth',block:'center'})}
+/* painel: resumo do próximo culto (frase, pendências, confirmação da equipe) */
+function dashSum(T){const N=S.lists.filter(l=>l.date&&l.date>=T).sort((a,b)=>a.date.localeCompare(b.date))[0];
+ if(!N)return`<div class="dsm"><div class="dsq">Nenhum culto cadastrado pela frente</div><p class="mut">Cadastre o próximo culto em Repertórios.</p></div>`;
+ const pe=lPend(N),dt=new Date(N.date+'T00:00'),dia=N.date==T?'hoje':['domingo','segunda','terça','quarta','quinta','sexta','sábado'][dt.getDay()]+' ('+N.date.slice(8,10)+'/'+N.date.slice(5,7)+')',
+ q=pe.length?`${pe.length} pendência${pe.length>1?'s':''} para ${dia}`:`Tudo pronto para ${dia}`,sub=[N.place,N.turno,N.name].filter(Boolean).join(' · ');
+ const b=N.banda||{},DA=DISP_ALL?(DISP_ALL[N.id]||[]):null;let eq='';
+ if(DA){const ppl=[];BR.forEach(([k,n])=>{const nm=(b[k]||'').trim();if(nm&&!ppl.some(x=>nz(x.nm)==nz(nm)))ppl.push({nm,fn:n})});
+  const st=ppl.map(x=>{const d=DA.find(y=>nz(y.nome)==nz(x.nm));return{...x,s:d?d.status:'',o:d?d.obs:''}}),ok=st.filter(x=>x.s=='sim'),no=st.filter(x=>x.s=='nao'),wt=st.filter(x=>x.s!='sim'&&x.s!='nao');
+  if(ppl.length)eq=`<div class="dtm"><h3>Confirmação da equipe<small>${ppl.length} pessoa${ppl.length>1?'s':''}</small></h3><div class="dtc"><span class="ok"><b>${ok.length}</b>confirmaram</span><span class="no"><b>${no.length}</b>não podem</span><span class="wt"><b>${wt.length}</b>sem resposta</span></div>${no.map(x=>`<p class="dtl no"><b>${esc(x.nm)}</b> · ${esc(x.fn)}${x.o?' · “'+esc(x.o)+'”':''}</p>`).join('')}${wt.length?`<p class="dtl wt">Sem resposta: ${wt.map(x=>esc(x.nm)).join(', ')}</p>`:''}</div>`}
+ return`<div class="dsm ${pe.length?'wa':'ok'}"><div class="dsq">${esc(q)}</div>${sub?`<p class="mut">${esc(sub)}</p>`:''}${pe.length?`<div class="dpl">${pe.slice(0,6).map(x=>`<button class="dbr" onclick="dsL('${N.id}')"><i>•</i><span>${esc(x)}</span><em>resolver</em></button>`).join('')}${pe.length>6?`<p class="mut">+${pe.length-6} pendências</p>`:''}</div>`:''}<button class="sm" onclick="dsL('${N.id}')">Abrir culto</button>${eq}</div>`}
+
+function dashKpi(c){const{SM,T,ALL,L,V,cnt}=c,DD=(d,n)=>{const x=new Date(d+'T12:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)},pc=(a,b)=>b?Math.round(a*100/b):0;
+ const F=S.lists.filter(l=>l.date&&l.date>=T&&l.date<=DD(T,45)),pe=F.filter(l=>lPend(l).length).length,pr=F.length-pe,pu=F.filter(l=>l.pub).length;
+ const first={};ALL.forEach(l=>l.songIds.forEach(id=>{const s=SM[id];if(!s)return;const k=tk(s);if(!first[k]||l.date<first[k])first[k]=l.date}));const nw=Object.values(first).filter(d=>d>=DD(T,-90)).length;
+ const vh=cnt.V+cnt.H,pv=pc(cnt.V,vh),vr=L.length?(V.length/L.length):0;
+ const k=(v,lb,sub,st,go)=>`<div class="dk ${st||''}"${go?` role="button" tabindex="0" onclick="dsScr('${go}')"`:''}><b>${v}</b><small>${lb}</small>${sub?`<i>${sub}</i>`:''}</div>`;
+ return`<div class="dbk">${k(F.length,'cultos nos próximos 45 dias',F.length?`${pr} pronto${pr==1?'':'s'} · ${pe} com pendências`:'',F.length&&!pe?'ok':pe?'wa':'','dp45')}${k(`${pu}<span>/${F.length}</span>`,'publicados para a banda',F.length&&pu<F.length?`${F.length-pu} aguardando`:F.length?'todos publicados':'',F.length&&pu==F.length?'ok':pu<F.length?'wa':'','dp45')}${k(vh?pv+'%':'—','do louvor é vertical',vh?(pv>=65?'acima do ideal (até 64%)':pv<=35?'abaixo do ideal (a partir de 36%)':'equilibrado'):'',vh?(pv>=65||pv<=35?'wa':'ok'):'','dvh')}${k(nw,'músicas novas em 3 meses',nw?'renovando o repertório':'nenhuma nova',nw?'ok':'wa','tab:songs')}${(()=>{const g=new Map();S.songs.filter(isEsp).forEach(s=>{const q=tk(s);g.set(q,(g.get(q)||0)||!!(s.cifra||'').trim())});const t=g.size,ok=[...g.values()].filter(Boolean).length;return t?k(`${ok}<span>/${t}</span>`,'do Espontâneo com cifra',ok<t?`${t-ok} para preparar`:'tudo à mão',ok<t?'wa':'ok'):''})()}</div>`}
+
+/* painel: apoio à decisão */
+function dashDec(c){const{SM,T,ALL,L,st,sAll,cnt,pos,slots,cat}=c,DD=(d,n)=>{const x=new Date(d+'T12:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)},pc=(a,b)=>b?Math.round(a*100/b):0;
+ const F=S.lists.filter(l=>l.date&&l.date>=T&&l.date<=DD(T,45)).sort((a,b)=>a.date.localeCompare(b.date));
+ const st60=tStat(ALL.filter(l=>l.date>=DD(T,-60)),SM),over=Object.values(st60).filter(o=>o.n>=3).sort((a,b)=>b.n-a.n).slice(0,6);
+ const back=Object.values(sAll).filter(o=>o.n>=4&&o.l<=DD(T,-90)&&cat.has(o.k)).sort((a,b)=>b.n-a.n||a.l.localeCompare(b.l)).slice(0,6);
+ const tips=[];const tip=(lv,t,b)=>tips.push({lv,t,b});
+ // próximos cultos
+ const fp=F.map(l=>[l,lPend(l)]),nr=fp.filter(x=>!x[1].length&&!x[0].pub);
+ {const na=F.filter(l=>l.songIds.length&&(!l.apv||l.apv.st!='ok'));if(na.length)tip('a',`${na.length} culto${na.length>1?'s':''} nos próximos 45 dias com repertório ainda não aprovado pela liderança.`,`<button class="sm" onclick="dsL('${na[0].id}')">Abrir culto</button>`)}
+ // aberturas
+ const ops={};let on=0;L.forEach(l=>{const f=l1st(l,SM);if(!f)return;const k=tk(SM[f]);ops[k]=(ops[k]||0)+1;on++});const to=Object.entries(ops).sort((a,b)=>b[1]-a[1])[0];
+ if(to&&on>=5&&to[1]/on>=.3){const nm=(st[to[0]]||{}).t||to[0],alt=Object.values(sAll).filter(o=>isAb(SM[o.id])&&o.k!=to[0]&&(!st60[o.k])).sort((a,b)=>b.n-a.n).slice(0,3);tip('i',`“${esc(nm)}” abriu ${pc(to[1],on)}% dos cultos do período. Variar a abertura renova o início do culto${alt.length?': experimente '+alt.map(o=>'“'+esc(o.t)+'”').join(', '):''}.`,'')}
+ // equilíbrio
+ const vh=cnt.V+cnt.H;if(vh>=10){const pv=pc(cnt.V,vh);if(pv>=65)tip('i',`O louvor está ${pv}% vertical. Incluir mais músicas horizontais (convite e declaração) equilibra o fluxo do culto.`,'');else if(pv<=35)tip('i',`O louvor está ${100-pv}% horizontal. Mais músicas verticais (adoração direta) aprofundam o momento de adoração.`,'')}
+ if(pos[0]&&pos[0].n>=5&&pc(pos[0].V,pos[0].n)>=70)tip('i',`${pc(pos[0].V,pos[0].n)}% das aberturas são verticais. Começar com uma horizontal costuma ajudar a congregação a entrar no louvor.`,'');
+ if(cnt['']&&slots&&pc(cnt[''],slots)>=10)tip('i',`${pc(cnt[''],slots)}% das músicas tocadas estão sem etiqueta Vertical ou Horizontal. Etiquetar melhora as sugestões.`,'');
+ // ministração
+ const mi={},md={};let mt=0,sn=0,se=0;L.forEach(l=>{const ids=l.songIds.filter(i=>SM[i]);ids.forEach(i=>{const v=((l.cant||{})[i]||'').trim();sn++;if(!v){se++;return}const ns=v.split('+').map(x=>x.trim()).filter(Boolean);ns.forEach(n=>{mi[n]=(mi[n]||0)+1;mt++;const o=md[n]=md[n]||{so:0,du:0,cu:new Set(),ab:0};ns.length>1?o.du++:o.so++;o.cu.add(l.id);if(i==l1st(l,SM))o.ab++})})});const MI=Object.entries(mi).sort((a,b)=>b[1]-a[1]);
+ if(sn>=10&&se/sn>=.25)tip('i',`${pc(se,sn)}% das músicas do período estão sem "quem canta". Preencher deixa este painel e as sugestões de tom mais precisos.`,'');
+ if(MI.length>=2&&mt>=10&&MI[0][1]/mt>=.65)tip('i',`${esc(MI[0][0])} conduziu ${pc(MI[0][1],mt)}% das músicas do período. Distribuir mais a ministração dá espaço às outras vozes.`,'');
+ // novas músicas
+ const first={};ALL.forEach(l=>l.songIds.forEach(id=>{const s=SM[id];if(!s)return;const k=tk(s);if(!first[k]||l.date<first[k])first[k]=l.date}));const nw=Object.values(first).filter(d=>d>=DD(T,-90)).length;
+ if(ALL.length>=10)tip(nw?'b':'i',nw?`${nw} música${nw>1?'s novas entraram':' nova entrou'} no repertório nos últimos 3 meses.`:'Nenhuma música nova nos últimos 3 meses. Que tal ensaiar uma nova para o próximo mês?',nw?'':`<button class="sm" onclick="S.tab='songs';R()">Ver catálogo</button>`);
+ if(over.length)tip('a',`${over.length} música${over.length>1?'s foram tocadas':' foi tocada'} 3 vezes ou mais nos últimos 60 dias. Veja o quadro "Dar descanso".`,'');
+ // preparação dos próximos
+ const prep=[];F.forEach(l=>l.songIds.forEach(id=>{const s=SM[id];if(!s)return;const m=[];if(!s.vs)m.push('VS');if(!(s.vmap||[]).length)m.push('mapa vocal');if(!s.bpm)m.push('BPM');if(m.length&&!prep.some(x=>x.s.id==s.id))prep.push({s,l,m})}));
+ const IC={a:'<svg class="ico" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3zM12 9v5M12 17h.01"/></svg>',b:'✓',i:'<svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2V16h6v-1.8A6 6 0 0 0 12 3z"/></svg>'};
+ const tl=tips.length?tips.map(x=>`<div class="dtp ${x.lv}"><span>${IC[x.lv]}</span><p>${x.t}</p>${x.b||''}</div>`).join(''):'<p class="mut">Nada pedindo atenção agora.</p>';
+ const fc=F.length?F.map(l=>{const pe=lPend(l),dt=new Date(l.date+'T00:00');return`<button class="dfc" onclick="dsL('${l.id}')"><b>${WD[dt.getDay()]} ${l.date.slice(8,10)}/${l.date.slice(5,7)}</b><span>${esc([l.place,l.turno].filter(Boolean).join(' - '))}</span><i class="${pe.length?'w':l.pub?'ok':'r'}">${pe.length?pe.length+' pendência'+(pe.length>1?'s':''):l.pub?'publicado':'pronto'}</i>${pe.length?`<small>Falta: ${esc(pe.join(' · '))}</small>`:''}</button>`}).join(''):'<p class="mut">Nenhum culto cadastrado nos próximos 45 dias.</p>';
+ const sl=(A,f)=>A.length?A.map(o=>`<button class="dbr" onclick="dsGo('${o.id}')"><i>•</i><span>${esc(o.t)}</span><em>${f(o)}</em></button>`).join(''):'<p class="mut">Nada por aqui por enquanto.</p>';
+ const mb=MI.length?`<div class="dmi">${MI.slice(0,8).map(([n,v])=>{const o=md[n];return`<div><span>${esc(n)}</span><u><b style="width:${Math.max(4,v*100/MI[0][1])}%"></b></u><em>${v*100/mt<1?'<1':pc(v,mt)}%</em><small>${v} música${v>1?'s':''} · ${o.so} solo · ${o.du} em dupla · ${o.cu.size} culto${o.cu.size>1?'s':''}${o.ab?' · abriu '+o.ab+'×':''}</small></div>`}).join('')}</div>${se?`<p class="mut" style="font-size:.78rem;margin:0">${se} de ${sn} músicas do período sem "quem canta" registrado.</p>`:''}`:'<p class="mut">Sem "quem canta" registrado no período.</p>';
+ return`<h2 class="dsh">Para decidir</h2><div class="dbg">
+ <div class="dbc dtw"><h3>Recomendações</h3>${tl}</div>
+ <div class="dbc" id="dp45"><h3>Próximos 45 dias<small>${F.length} culto${F.length==1?'':'s'}</small></h3><div class="dfl">${fc}</div></div>
+ <div class="dbc"><h3>Dar descanso<small>3+ vezes em 60 dias</small></h3>${sl(over,o=>o.n+'×')}<h3 style="margin-top:8px">Trazer de volta<small>queridas, paradas há 3+ meses</small></h3>${sl(back,o=>o.n+'× · '+fd(o.l).slice(3))}</div>
+ <div class="dbc"><h3>Quem conduz as músicas<small>período</small></h3>${mb}</div>
+ ${prep.length?`<div class="dbc"><h3>Preparar para os próximos cultos<small>falta no cadastro</small></h3>${prep.slice(0,8).map(x=>`<button class="dbr" onclick="dsGo('${x.s.id}')"><i>•</i><span>${esc(x.s.title)}</span><em>${x.m.join(', ')}</em><small>${fd(x.l.date).slice(0,5)} · ${esc(x.l.place||'')}</small></button>`).join('')}${prep.length>8?`<p class="mut">+${prep.length-8} músicas</p>`:''}</div>`:''}
+ </div>`}
+
+/* estrutura padrão do repertório: 4 principais, ceia (se houver), pós-break e pós-palavra */
+const isCeia=l=>/ceia/.test(nz(l&&l.name))||!!(l&&l.songIds.some(i=>oo(l,i)=='Ceia do Senhor'));
+const SLOTS=l=>['1','2','3','4',...(isCeia(l)?['Ceia do Senhor']:[]),'Pós-Break','Pós-Palavra'];
+const SLN={'1':'1ª música','2':'2ª música','3':'3ª música','4':'4ª música','Ceia do Senhor':'Ceia do Senhor','Pós-Break':'Pós-Break','Pós-Palavra':'Pós-Palavra'};
+function slotR(){const e=$('#slt');if(!e||!P)return;const SL=SLOTS(P),SM=Object.fromEntries(S.songs.map(s=>[s.id,s]));if(P.slot&&!SL.includes(P.slot))P.slot=null;
+ e.innerHTML=`<div class="slth">Estrutura do culto${isCeia(P)?' · com Ceia':''}<button type="button" class="ehp" title="Toda música adicionada ocupa a próxima posição vazia: 1ª a 4ª música${isCeia(P)?', Ceia do Senhor':''}, Pós-Break e Pós-Palavra. Toque numa posição vazia para escolher a música dela. Em eventos de Ceia aparece a posição da música da Ceia." aria-label="Ajuda" onclick="say(this.title)">?</button></div><div class="slg">${SL.map(v=>{const ids=P.songIds.filter(i=>SM[i]&&oo(P,i)==v);if(ids.length)return ids.map(i=>`<button type="button" class="slb${v=='Ceia do Senhor'?' cx':''}" onclick="slGo('${i}')"><small>${esc(SLN[v])}</small><span>${esc(SM[i].title)}</span></button>`).join('');return`<button type="button" class="slb e${P.slot==v?' on':''}" onclick="slPick(${ja(v)})"><small>${esc(SLN[v])}</small><span>${P.slot==v?'Escolha na lista ao lado':'+ Escolher música'}</span></button>`}).join('')}</div>`}
+function slPick(v){P.slot=P.slot==v?null:v;slotR();const i=dlg.querySelector('[data-p="mu"] input[placeholder^="Buscar"]');if(P.slot&&i){if(MOB())i.scrollIntoView({block:'center',behavior:'smooth'});i.focus({preventScroll:MOB()})}}
+function slGo(id){const i=P.songIds.indexOf(id),li=dlg.querySelector(`#sl li[data-i="${i}"]`);if(li){li.scrollIntoView({block:'center',behavior:'smooth'});li.classList.add('dgo');setTimeout(()=>li.classList.remove('dgo'),1200)}}
+{const _la=la;la=function(id){if(P.songIds.length>=100||P.songIds.includes(id))return _la(id);const SL=SLOTS(P),used=new Set(P.songIds.map(i=>oo(P,i))),t=P.slot&&!used.has(P.slot)?P.slot:SL.find(v=>!used.has(v));P.slot=null;
+ if(!t)return _la(id);P.ord=P.ord||{};P.ord[id]=t;const ti=SL.indexOf(t),at=P.songIds.findIndex(i=>{const k=SL.indexOf(oo(P,i));return k>ti});if(at<0)P.songIds.push(id);else P.songIds.splice(at,0,id);pkR();slR();toast(`Adicionada como ${SLN[t]}`)}}
+{const _s=slR;slR=function(){_s.apply(this,arguments);try{slotR()}catch(e){console.warn(e)}}}
+{const _g=ltG;ltG=function(x){_g(x);if(x=='mu'&&P&&$('#sl'))slR()}}
+
+

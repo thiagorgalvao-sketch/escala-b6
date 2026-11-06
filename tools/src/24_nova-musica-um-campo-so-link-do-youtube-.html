@@ -1,0 +1,35 @@
+/* ===== nova música: um campo só (link do YouTube, Spotify, Cifra Club ou nome) */
+let NS={},NSM='';
+function nsStart(q,go){NS={};NSM='';dlg.innerHTML=`<div class="ehd"><h2>Nova música</h2></div><p class="mut nsh">Cole o link do <b>YouTube</b> ou do <b>Cifra Club</b>, ou digite o nome da música. O Fervor encontra a cifra e o tom e já monta os blocos.</p><div class="cbs"><input id="nsq" type="search" enterkeyhint="search" autocomplete="off" value="${esc(q||'')}" placeholder="Link ou nome da música" maxlength="300" onkeydown="if(event.key=='Enter'){event.preventDefault();nsGo()}" onpaste="setTimeout(()=>{if(/^https?:/i.test(this.value.trim()))nsGo()},30)"><button class="pri" onclick="nsGo()">Buscar</button></div><div id="nsr" class="cbr nsr"></div><div class="ac"><button onclick="nsManual()">Preencher manualmente</button><button onclick="dlg.close()">Cancelar</button></div>`;if(!dlg.open)dlg.showModal();if(go&&q)nsGo();else setTimeout(()=>{const e=$('#nsq');if(e)e.focus()},60)}
+async function nsGo(){const e=$('#nsq'),r=$('#nsr');if(!e||!r)return;const v=e.value.trim();if(v.length<2)return say('Cole um link ou digite o nome da música.');const tk0=NS.tk=(NS.tk||0)+1,busy=t=>{r.innerHTML=`<div class="cbw"><span class="rps"></span>${t}</div>`};let q=v,head=NS.head||'';
+ const cc=CCRX.exec(v);
+ if(cc){busy('Trazendo a cifra do Cifra Club…');const x={dns:cc[1].toLowerCase(),url:cc[2].toLowerCase(),titulo:'',artista:'',foto:''};x.link=`https://www.cifraclub.com.br/${x.dns}/${x.url}/`;
+  try{const L=await ccSearch(slugT(x.url)+' '+slugT(x.dns)),h=L.find(y=>y.dns==x.dns&&y.url==x.url);if(h)Object.assign(x,h)}catch(e){}if(tk0!=NS.tk)return;if(!x.artista)x.artista=TC(slugT(x.dns).toUpperCase());return nsPick(x)}
+ if(/^https?:\/\//i.test(v)){const yt=YTRX.test(v)&&ytId(v),sp=/open\.spotify\.com\//i.test(v);if(!yt&&!sp){r.innerHTML='<p class="mut">Esse link não é do YouTube, Spotify nem Cifra Club. Cole um desses links ou digite o nome da música.</p>';return}
+  NS.yt=NS.sp=null;busy('Lendo o título do '+(yt?'vídeo':'Spotify')+'…');const P=await lnkMeta(v);if(tk0!=NS.tk)return;
+  if(yt)NS.yt='https://youtu.be/'+yt;else NS.sp=v.split('?')[0];NS.t=P&&P.title||'';NS.a=P&&P.artist||'';
+  head=NS.head=yt?`<div class="ytt nsv"><img src="https://i.ytimg.com/vi/${yt}/mqdefault.jpg" alt=""><div><small>Vídeo do YouTube · o link fica salvo</small><b>${esc(P&&P.raw||'Título não identificado')}</b><small>${esc(P&&P.author||'')}</small></div></div>`:`<div class="nsv dpx"><small class="mut">Spotify · o link fica salvo</small><br><b>${esc(P&&P.raw||'')}</b></div>`;
+  if(!NS.t){r.innerHTML=head+'<p class="mut">Não consegui ler o nome da música. Digite o nome no campo acima e toque em Buscar.</p>';e.value='';e.placeholder='Nome da música';e.focus();return}
+  e.value=(NS.t+' '+NS.a).trim();q=e.value}
+ else{NS.t=TC(v.toUpperCase());NS.a=''}
+ busy('Procurando a cifra…');let L=[],err=0;try{L=await ccSearch(q)}catch(x){err=1}if(tk0!=NS.tk)return;NS.L=L;
+ const key=nz(NS.t||q).replace(/[^a-z0-9]+/g,' ').trim(),yid=NS.yt?NS.yt.slice(-11):'',hit=S.songs.filter(s=>{const k=tk(s);return key&&(k==key||(k.length>3&&key.includes(k))||(key.length>3&&k.includes(key)))||(yid&&(s.link||'').includes(yid))}).slice(0,4);
+ r.innerHTML=head+(hit.length?`<div class="dpx"><b>Já existe no catálogo</b>${hit.map(s=>`<p><button class="lnk" onclick="dlg.close();dsGo('${s.id}')">${esc(s.title)}</button> <span class="mut">${esc(s.artist||'')} · Tom ${esc(s.key||'?')}</span></p>`).join('')}</div>`:'')
+  +(L.length?`<small class="mut">Escolha a versão da cifra (Cifra Club):</small>`+L.map((x,i)=>cbItem(x,`nsPick(NS.L[${i}])`)).join(''):`<p class="mut">${err?'A busca de cifras não respondeu agora.':'Nenhuma cifra encontrada para “'+esc(q)+'”.'} Tente outro nome, ou crie a música sem cifra.</p>`)
+  +`<div class="ac" style="margin-top:4px"><button class="sm" onclick="nsManual(1)">Criar “${esc(NS.t||v)}” sem cifra</button></div>`}
+async function nsPick(x){if(!x)return;const r=$('#nsr');if(r)r.innerHTML=`<div class="cbw"><span class="rps"></span>Trazendo a cifra de <b>${esc(x.titulo||'')}</b>…</div>`;const tk0=NS.tk;const o=await ccGet(x.dns,x.url);if(tk0!=NS.tk||!dlg.open)return;
+ const lk=NS.yt||NS.sp||'';editSong(null,1);if(lk)D.link=lk;D.cc=x.link;D.title=TC(String(x.titulo||o&&o.titulo||NS.t||'').trim().toUpperCase()).slice(0,120);D.artist=String(x.artista||NS.a||'').slice(0,120);
+ if(o){cifImp({cifra:o.cifra,tom:o.tom,bpm:o.bpm,link:x.link},1);DT='info';const n=(D.parts||[]).filter(q=>q.chords).length;NSM=`✓ Preenchido: nome, artista${D.key?', tom <b>'+esc(D.key)+'</b>':''}${D.bpm?', '+esc(D.bpm)+' BPM':''}, cifra${n?' e '+n+' blocos':''}${lk?', link do '+(NS.yt?'vídeo':'Spotify'):''} e link da cifra. Confira e toque em <b>Salvar</b>.`}
+ else{DT='cifra';NSM=`Não consegui trazer a cifra automaticamente agora. <a href="${esc(x.link)}" target="_blank" rel="noopener">Abra a cifra</a>, copie o texto e cole no campo abaixo.`}
+ sfR();dlg.scrollTop=0}
+function nsManual(nm){const v=(($('#nsq')||{}).value||'').trim(),lk=NS.yt||NS.sp||'',t=nm?NS.t:(!/^https?:/i.test(v)&&v?TC(v.toUpperCase()):NS.t),a=NS.a;editSong(null,1);if(t)D.title=t;if(a)D.artist=a;if(lk)D.link=lk;sfR();setTimeout(()=>{const e=$('.etit');if(e)e.focus()},60)}
+function cifImp(o,quiet){if(S.band)return;const c=cfClean(o.cifra);if(c.n.replace(/\s/g,'').length<20)return say('Não encontrei a cifra nesse texto.');
+ if(!(dlg.open&&dlg.querySelector('.ecf')))editSong(null,1);
+ const K=/^[A-G][#b]?m?$/,tom=K.test(String(o.tom||'').trim())?String(o.tom).trim():c.m?c.m[1]:'';let n=c.n,tr='';
+ if(!(D.title||'').trim()&&o.titulo)D.title=TC(String(o.titulo).trim().toUpperCase()).slice(0,120);if(!(D.artist||'').trim()&&o.artista)D.artist=String(o.artista).trim().slice(0,120);
+ if(/^https:\/\/[^\s"'<>]+$/.test(o.link||''))D.cc=o.link;if(!(+D.bpm)&&+o.bpm>=30&&+o.bpm<=260)D.bpm=+o.bpm;
+ if(tom){if(!K.test((D.key||'').trim()))D.key=tom;else{const d=md(pk(D.key).pc-pk(tom).pc);if(d){n=trc(n,d,D.key);tr=' (transposta de '+tom+' para '+D.key+')'}}}
+ D.cifra=n;const P=cfParts(n),old=(D.parts||[]).some(q=>q.chords||q.lyric);if(P.length&&!old)D.parts=P;DT=P.length&&!old?'blocos':'cifra';sfR();dlg.scrollTop=0;
+ if(quiet)return;toast('Cifra importada'+tr+(P.length&&!old?' · '+P.length+' blocos':''));if(P.length&&old)setTimeout(()=>ask('Cifra importada'+tr+'. Substituir os blocos atuais pelos '+P.length+' gerados da cifra?',()=>{D.parts=P;DT='blocos';sfR()},'Substituir'),400)}
+function cbHash(h){const m=/^#importar=(.+)$/.exec(h||'');if(!m||S.band)return;let d=null;try{d=JSON.parse(decodeURIComponent(m[1]))}catch(e){}if(!d||d.fv!==1||typeof d.cifra!='string')return say('Não consegui ler a cifra enviada.');cifImp(d)}
+function bIA(){gp()}

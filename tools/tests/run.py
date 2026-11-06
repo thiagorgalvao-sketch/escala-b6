@@ -11,6 +11,10 @@ def ok(cond, name, info=''):
     print(('✔ ' if cond else '✘ ') + name + (f' — {info}' if info and not cond else ''))
     if not cond: FAIL.append(name)
 
+# 0) o app.html precisa ser exatamente a junção dos módulos de tools/src
+r = subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'montar.py'), '--check'], capture_output=True, text=True)
+ok(r.returncode == 0, 'módulos de tools/src conferem com tools/app.html', r.stdout[-200:])
+
 # 1) sintaxe do JavaScript das páginas
 for f in ['index.html', 'admin/index.html']:
     s = open(os.path.join(ROOT, f), encoding='utf-8').read()
@@ -307,6 +311,33 @@ with sync_playwright() as p:
     r = pg.evaluate("""async()=>{const l=S.lists.find(x=>x.songIds.length);window.__pb=null;const o=window.claude&&window.claude.use;window.claude=window.claude||{};window.claude.use=async k=>k=='downloads'?{save:async a=>{window.__pb=new Uint8Array(a.data)}}:(o?o.call(window.claude,k):{});
      await pdfL(l.id);const b=window.__pb;if(o)window.claude.use=o;return b?[String.fromCharCode(...b.slice(0,5)),b.length>5000,(new TextDecoder('latin1').decode(b).match(/\\/Type\\s*\\/Page[^s]/g)||[]).length>=2]:null}""")
     ok(r == ['%PDF-', True, True], 'PDF do repertório: gera um arquivo válido com capa e uma página por música', str(r))
+    r = pg.evaluate("""()=>{const a=[];S.band=false;const v=verN();a.push(v.fix.length==4&&v.info.length==4);const l=S.lists.find(x=>x.songIds.length>1);l.cant=l.cant||{};l.cant['__fantasma']='X';a.push(verN().fix[3][1]>=1);verD();a.push(/Verificar dados/.test(dlg.innerHTML)&&/Corrigir tudo/.test(dlg.innerHTML));verGo();a.push(!('__fantasma' in l.cant));a.push(verN().fix[3][1]==0);dlg.close();d2.close&&d2.close();return a}""")
+    ok(r == [True]*5, 'Verificar dados: lista pendências e corrige tudo com um toque', str(r))
+    # 5b) varredura: percorre todas as telas e diálogos principais; qualquer erro de JavaScript derruba o teste
+    E0 = len(E); pg.on('console', lambda m: E.append('console: ' + m.text[:160]) if m.type == 'error' and 'supabase' not in m.text.lower() and 'Failed to load resource' not in m.text else None)
+    steps = pg.evaluate("""async()=>{const fails=[];let n=0;const T=async(name,f)=>{n++;try{await f()}catch(e){fails.push(name+': '+String(e).slice(0,100))}
+      document.querySelectorAll('dialog[open]').forEach(d=>{try{d.close()}catch(e){}});await new Promise(r=>setTimeout(r,40))};
+     const sg=S.songs.find(x=>(x.parts||[]).length)||S.songs[0],ls=S.lists.find(x=>x.songIds.length)||S.lists[0];
+     for(const t of ['hoje','esp','lists','songs','perf','dash']){await T('aba '+t,()=>{S.tab=t;S.sel=null;S.lv=null;R()})}
+     for(const dark of ['light','dark','auto']){await T('tema '+dark,()=>{themeSet(dark);R()})}
+     await T('música aberta',()=>{S.tab='songs';S.sel=sg.id;R()});
+     for(const m of ['mapa','cifra','vocal'])await T('modo '+m,()=>{S.vw=m;R()});
+     await T('editar música',()=>editSong(sg.id));
+     await T('menu da música',()=>{const b=document.querySelector('[onclick*="amq"],.amq');R()});
+     await T('repertório aberto',()=>{S.tab='lists';S.lv=ls.id;S.lvm=1;R()});
+     await T('repertório em lista',()=>{S.lvm=0;R()});
+     await T('palco',()=>{stage(ls.id)});
+     await T('PDF do repertório (diálogo)',()=>{typeof lpdfD=='function'&&lpdfD(ls.id)});
+     await T('aprovação',()=>apvD&&apvD());
+     await T('ajustes',()=>cfgD());
+     for(const q of ['tema','lideran','dados','conta','zzz',''])await T('busca ajustes '+q,()=>{cfgD();cfQ(q)});
+     await T('verificar dados',()=>{fixCount()});
+     await T('busca global',()=>spotD());
+     await T('sobre/ajuda',()=>{typeof helpD=='function'&&helpD()});
+     for(const b of [...document.querySelectorAll('.tabs button[data-t],#tbb [data-t]')])await T('botão '+b.dataset.t,()=>b.click());
+     S.tab='hoje';S.sel=null;S.lv=null;R();return{n,fails}}""")
+    ok(not steps['fails'] and steps['n'] > 30, f"varredura de telas: {steps['n']} passos sem erro", '; '.join(steps['fails'][:4]))
+    pg.wait_for_timeout(300); ok(len(E) == E0, 'varredura de telas: nenhum erro novo de JavaScript', '; '.join(E[E0:E0+3]))
     # 6) proteção contra código malicioso nos textos
     pg.evaluate("(x)=>{const s=S.songs[0];s.title+=x;s.artist=(s.artist||'')+x;s.nota=x;const l=S.lists.find(l=>l.songIds.length);l.pregador=x;l.name=(l.name||'')+x;(l.cant=l.cant||{})[l.songIds[0]]=x;S.tab='lists';S.lv=l.id;S.lvm=1;R()}", XSS)
     pg.wait_for_timeout(300); pg.evaluate("S.tab='songs';S.sel=S.songs[0].id;R()"); pg.wait_for_timeout(300); pg.evaluate("S.tab='dash';R()"); pg.wait_for_timeout(300)

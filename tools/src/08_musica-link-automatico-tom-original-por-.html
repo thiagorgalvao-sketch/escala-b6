@@ -1,0 +1,53 @@
+/* ===== música: link automático, tom original por IA, repertórios */
+let LKM='',PRET=null;
+function lkMsg(t){LKM=t;const e=$('#lks');if(e)e.innerHTML=t}
+const slugT=s=>decodeURIComponent(s||'').replace(/\.html?$/,'').replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
+async function lkMeta(u){const m=/(?:cifraclub\.com\.br|letras\.mus\.br|cifras\.com\.br)\/([^\/?#]+)\/([^\/?#]+)/i.exec(u);if(m&&!/^\d+$/.test(m[2]))return{title:slugT(m[2]),author_name:slugT(m[1]),slug:1};return null}
+const keyOk=k=>/^[A-G][#b]?m?$/.test(k||'');
+async function aiSong(t,a,extra){let sm=null;try{sm=window.claude&&await claude.use('sample')}catch(e){}if(!sm)return null;
+ try{const r=await sm.json(`Você ajuda um ministério de louvor brasileiro a cadastrar músicas. ${extra||''}
+Dados: título do vídeo/faixa: "${String(t||'').slice(0,200)}"; canal/autor: "${String(a||'').slice(0,120)}".
+Responda SOMENTE JSON: {"titulo":"nome da música, sem (Ao Vivo), (Clipe Oficial), feat. etc.","artista":"intérprete principal (cantor, banda ou ministério); vazio se não souber","tom":"tom original da gravação mais conhecida em notação americana (ex.: G, Bb, F#m); vazio se não tiver certeza razoável","confianca":"alta, media ou baixa"}`,{modelTier:'default'});return r&&typeof r=='object'?r:null}catch(e){return null}}
+async function lnkMeta(u){if(YTRX.test(u)&&ytId(u)){const m=await ytMeta('https://youtu.be/'+ytId(u));if(!m)return null;const P=ytParse(m.title,m.author_name);return{title:P.title,artist:P.artist,raw:m.title,author:m.author_name||''}}
+ if(/open\.spotify\.com\//i.test(u)){try{const r=await fetch('https://open.spotify.com/oembed?url='+encodeURIComponent(u.split('?')[0]));if(r.ok){const j=await r.json();if(j&&j.title)return{title:TC(String(j.title).toUpperCase()),artist:'',raw:j.title,author:'Spotify'}}}catch(e){}}return null}
+async function lkAuto(u,force){u=(u||'').trim();if(!u)return;
+ if(CCRX.test(u)&&!/youtu|spotify/i.test(u)){D.link='';D.cc=u;sfR();return ccLk(u,1)}
+ const yt=YTRX.test(u)&&ytId(u),sp=/open\.spotify\.com\//i.test(u);if(!yt&&!sp){if(force)lkMsg('Cole um link do YouTube ou do Spotify.');return}
+ const bb=()=>(D.cifra||'').trim()?'':` <button type="button" class="sm" onclick="cbD()"><svg class="ico" viewBox="0 0 24 24"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"/></svg> Buscar a cifra</button>`;
+ if((D.title||'').trim()&&!force){lkMsg('✓ Link salvo.'+bb());return}
+ lkMsg('Lendo o título do '+(yt?'vídeo':'Spotify')+'…');const P=await lnkMeta(u);if(!P){lkMsg('Link salvo. Não consegui ler o título; preencha o nome da música.'+bb());return}
+ const ch=[];if(!(D.title||'').trim()&&P.title){D.title=P.title;ch.push('nome')}if(!(D.artist||'').trim()&&P.artist){D.artist=P.artist;ch.push('artista')}sfR();
+ lkMsg((ch.length?'✓ Preenchido pelo link: '+ch.join(' e ')+'.':'✓ Link salvo.')+bb())}
+async function ccLk(u,force){u=String(u||'').trim();const m=CCRX.exec(u);if(!m){if(force)lkMsg(u?'Esse não parece um link de música do Cifra Club (www.cifraclub.com.br/artista/musica/).':'Cole primeiro o link do Cifra Club.');return}
+ const dns=m[1].toLowerCase(),url=m[2].toLowerCase();D.cc=`https://www.cifraclub.com.br/${dns}/${url}/`;
+ if((D.cifra||'').trim()&&!force){lkMsg(`✓ Link da cifra salvo. <button type="button" class="sm" onclick="ccLk(D.cc,1)">Importar a cifra deste link</button>`);return}
+ if(ccLk.busy)return;ccLk.busy=1;lkMsg('Trazendo a cifra do Cifra Club…');let o=null;try{o=await ccGet(dns,url)}finally{ccLk.busy=0}
+ if(!o){lkMsg(`Não consegui trazer esta cifra agora. <a href="${esc(D.cc)}" target="_blank" rel="noopener">Abra a cifra</a>, copie o texto e cole na aba Cifra.`);return}
+ cifImp({cifra:o.cifra,tom:o.tom,bpm:o.bpm,titulo:o.titulo,artista:TC(slugT(dns).toUpperCase()),link:D.cc});LKM='';}
+async function nmAuto(force){const t=(D.title||'').trim();if(!t)return;const hasA=!!(D.artist||'').trim(),hasK=keyOk((D.key||'').trim())&&D._kt;if(hasA&&hasK&&!force)return;
+ lkMsg('Identificando artista e tom original de “'+esc(t)+'”…');const r=await aiSong(t,D.artist||'','O usuário digitou o nome da música'+(hasA?' e o artista':'')+'. Mantenha o nome como está.');
+ if(!r){lkMsg('Não foi possível identificar agora. Preencha o artista e o tom manualmente.');return}
+ const ch=[];if(!hasA&&r.artista){D.artist=String(r.artista).slice(0,80);ch.push('artista')}const kk=(r.tom||'').replace('♯','#').replace('♭','b').trim();let km='';
+ if(keyOk(kk)){if(!keyOk((D.key||'').trim())||(!D.id&&!D._kt)){D.key=kk;ch.push('tom')}else if(kk!=D.key)km=` <button type="button" class="sm" onclick="D.key=${ja(kk)};sfR()">Usar ${esc(kk)}</button>`}
+ sfR();lkMsg((ch.length?'✓ Preenchido automaticamente: '+ch.join(' e ')+'. ':'')+(keyOk(kk)?`<span class="mut">Tom original ${esc(kk)}${r.confianca?' (confiança '+esc(String(r.confianca))+')':''} — sugerido pela IA, confira.</span>`:'<span class="mut">Tom original não identificado com segurança.</span>')+km+(r.artista&&hasA&&nz(r.artista)!=nz(D.artist)?` <span class="mut">Artista provável: ${esc(r.artista)}.</span>`:''))}
+async function keyAI(){if(!(D.title||'').trim())return say('Preencha o nome da música primeiro.');lkMsg('Buscando o tom original…');DT='info';const r=await aiSong(D.title,D.artist,'Identifique o tom original desta música.'),kk=(r&&r.tom||'').replace('♯','#').replace('♭','b').trim();
+ if(!keyOk(kk))return lkMsg('Não foi possível sugerir o tom com segurança.');if(!keyOk((D.key||'').trim())){D.key=kk;sfR();lkMsg(`✓ Tom original sugerido pela IA: <b>${esc(kk)}</b> (confiança ${esc(String(r.confianca||'?'))}). Confira.`)}else lkMsg(`Tom original sugerido pela IA: <b>${esc(kk)}</b> (confiança ${esc(String(r.confianca||'?'))}). <button type="button" class="sm" onclick="D.key=${ja(kk)};sfR()">Usar ${esc(kk)}</button>`)}
+function repCard(){const ls=S.lists.filter(l=>D.id&&l.songIds.includes(D.id)).sort((a,b)=>(b.date||'').localeCompare(a.date||'')),T=td();if(PRET)return`<div class="ecard"><div class="ect">Repertório</div><p class="mut" style="margin:0">Ao salvar, esta música entra no repertório que você está editando${PRET.date?' ('+fd(PRET.date)+')':''}.</p></div>`;
+ const op=[...S.lists].filter(l=>!(D.id&&l.songIds.includes(D.id))).sort((a,b)=>{const fa=(a.date||'')>=T,fb=(b.date||'')>=T;return fa!=fb?(fa?-1:1):fa?(a.date||'').localeCompare(b.date||''):(b.date||'').localeCompare(a.date||'')});
+ return`<div class="ecard"><div class="ect">Repertórios</div>${ls.length?`<p class="mut" style="margin:0 0 6px">Está em ${ls.length} repertório(s); o mais recente: ${fd(ls[0].date)||esc(ls[0].name)}.</p>`:''}<label class="ef">Adicionar a um repertório<select onchange="D._addL=this.value;$('#rcs').textContent=this.value?'Será adicionada ao salvar a música.':''"><option value="">— escolher —</option>${op.map(l=>`<option value="${l.id}"${D._addL==l.id?' selected':''}>${(l.date||'')>=T?'':'(passado) '}${fd(l.date)||'sem data'} · ${esc(lnm(l)||l.name||'')}${l.place?' · '+esc(l.place):''}</option>`).join('')}</select></label><small id="rcs" class="mut">${D._addL?'Será adicionada ao salvar a música.':''}</small></div>`}
+function lfNewSong(){const k=cl(P);dlg.close();editSong(null);PRET=k;DT='info';sfR()}
+let D0='';const sfDirty=()=>!!(D&&dlg.open&&dlg.querySelector('.etabs')&&D0&&JSON.stringify(D)!=D0);
+/* rascunho automático: guarda o que está sendo editado e oferece de volta se o editor fechar sem salvar */
+var P0='',DRT;
+function drfGet(){try{const o=JSON.parse(localStorage.getItem('rep.dr')||'null');return o&&Date.now()-o.t<48*36e5?o:null}catch(e){return null}}
+function drfClr(){try{localStorage.removeItem('rep.dr')}catch(e){}}
+function drfNow(){if(!dlg.open||S.band)return;let o=null;
+ if(D&&dlg.querySelector('[onclick="ssong()"]')&&D0&&JSON.stringify(D)!=D0)o={k:'s',id:D.id||'',j:JSON.stringify(D)};
+ else if(P&&dlg.querySelector('[onclick="slist()"]')&&P0&&JSON.stringify(P)!=P0)o={k:'l',id:P.id||'',j:JSON.stringify(P)};
+ if(!o)return;o.t=Date.now();try{localStorage.setItem('rep.dr',JSON.stringify(o))}catch(e){return}
+ let e=dlg.querySelector('.drfi');if(!e){e=document.createElement('div');e.className='drfi';dlg.appendChild(e)}e.textContent='Rascunho guardado · '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+function drfOffer(k,id){const o=drfGet();if(!o||o.k!=k||(o.id||'')!=(id||''))return;toastA('Há um rascunho não salvo','Restaurar',()=>{try{if(k=='s'){D=JSON.parse(o.j);sfR()}else{P=JSON.parse(o.j);lfR()}}catch(e){}},8000)}
+['input','change','click'].forEach(ev=>dlg.addEventListener(ev,()=>{clearTimeout(DRT);DRT=setTimeout(drfNow,1500)}));
+{const a0=ssong,b0=slist1;ssong=function(){const j=JSON.stringify(S.songs),r=a0.apply(this,arguments);if(JSON.stringify(S.songs)!=j)drfClr();return r};slist1=function(){const j=JSON.stringify(S.lists),r=b0.apply(this,arguments);if(JSON.stringify(S.lists)!=j)drfClr();return r}}
+function sfCancel(){if(PRET){P=PRET;PRET=null;LKM='';lfR();ltG('mu');return}if(sfDirty())return ask('Sair sem salvar? As alterações desta música serão perdidas.',()=>{D0='';LKM='';dlg.close()},'Sair sem salvar');LKM='';dlg.close()}
+dlg.addEventListener('cancel',e=>{if(sfDirty()){e.preventDefault();sfCancel()}});

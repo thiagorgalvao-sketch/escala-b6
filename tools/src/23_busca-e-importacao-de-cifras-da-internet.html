@@ -1,0 +1,29 @@
+/* ===== busca e importação de cifras da internet (Cifra Club) */
+const CBD=document.body.appendChild(document.createElement('dialog'));CBD.id='cbd';let CBI=[],CBH='';
+wtlEnsure(CBD);new MutationObserver(()=>wtlEnsure(CBD)).observe(CBD,{childList:true});
+CBD.addEventListener('click',e=>{if(e.target!==CBD)return;const r=CBD.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dClose(CBD)});
+const CCRX=/cifraclub\.com\.br\/([a-z0-9-]+)\/([a-z0-9-]+)/i;
+const cbQ=()=>[D&&D.title,D&&(D.artist||'').split(';')[0]].filter(Boolean).join(' ').trim();
+function ccBusca(){cbD()}
+function cbItem(x,oc){return`<button class="cbi" onclick="${oc}">${x.foto?`<img src="${esc(x.foto)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:'<i></i>'}<span><b>${esc(x.titulo)}</b><small>${esc(x.artista)}</small></span><em>›</em></button>`}
+async function cbCall(b){const sb=window.__SB;if(!sb||!sb.functions)throw new Error('sem conexão');const {data,error}=await sb.functions.invoke('buscar-cifra',{body:b});if(error){let m=error.message||'erro';try{const j=await error.context.json();m=j.erro||m}catch(e){}throw new Error(m)}if(data&&data.erro)throw new Error(data.erro);return data||{}}
+async function ccSearch(q){try{const r=await fetch('https://solr.sscdn.co/cc/c7/?q='+encodeURIComponent(q));if(!r.ok)throw new Error('busca '+r.status);const j=await r.json();
+ return((j&&j.response&&j.response.docs)||[]).filter(d=>d.dns&&d.url&&d.txt).slice(0,12).map(d=>({titulo:String(d.txt),artista:String(d.art||''),dns:String(d.dns),url:String(d.url),foto:/^https:\/\//.test(d.imgm||'')?d.imgm:'',link:`https://www.cifraclub.com.br/${d.dns}/${d.url}/`}))}
+ catch(e){const d=await cbCall({acao:'buscar',q});return d.itens||[]}}
+function ccParse(h){const doc=new DOMParser().parseFromString(String(h||''),'text/html'),pre=doc.querySelector('pre');if(!pre)return null;pre.querySelectorAll('.tabs').forEach(x=>x.remove());const cifra=pre.textContent||'';if(cifra.replace(/\s/g,'').length<20)return null;
+ let tom=((doc.querySelector('[data-anchor="--chord-tone"]')||{}).textContent||'').trim();if(!/^[A-G][#b]?m?$/.test(tom)){const m=/Tom\s*:\s*([A-G][#b]?m?)\b/.exec((doc.querySelector('[data-chord-config]')||doc.body||{}).textContent||'');tom=m?m[1]:''}
+ const h1=doc.querySelector('h1');return{cifra,tom,titulo:h1?h1.textContent.replace(/\s+/g,' ').trim():''}}
+async function ccGet(dns,url){const link=`https://www.cifraclub.com.br/${dns}/${url}/`,to=ms=>{const a=new AbortController();setTimeout(()=>a.abort(),ms);return a.signal};
+ const bp=fetch('https://r.jina.ai/'+link+'imprimir.html',{signal:to(15000)}).then(r=>r.ok?r.text():'').then(t=>{const m=/(\d{2,3})\s*bpm/i.exec(t||''),n=m?+m[1]:0;return n>=30&&n<=260?n:0}).catch(()=>0);
+ let o=null;try{const r=await fetch('https://r.jina.ai/'+link,{headers:{'X-Return-Format':'html','X-Target-Selector':'h1,[data-chord-config],pre'},signal:to(20000)});if(r.ok)o=ccParse(await r.text())}catch(e){}
+ if(!o){try{const d=await cbCall({acao:'cifra',dns,url});if(d&&d.ok&&d.cifra)o={cifra:d.cifra,tom:d.tom||'',titulo:d.titulo||''}}catch(e){}}
+ if(!o)return null;o.link=link;o.bpm=await Promise.race([bp,new Promise(r=>setTimeout(()=>r(0),5000))]);return o}
+function cbD(){if(S.band)return;const q=cbQ();CBD.innerHTML=`<h2>Buscar cifra na internet</h2><p class="mut" style="margin:0 0 10px;font-size:.86rem">Escolha a versão: a cifra, o tom e os blocos são preenchidos automaticamente.</p><div class="cbs"><input id="cbq" type="search" enterkeyhint="search" value="${esc(q)}" placeholder="Música e artista" maxlength="120" onkeydown="if(event.key=='Enter'){event.preventDefault();cbGo()}"><button class="pri" onclick="cbGo()">Buscar</button></div><div id="cbr" class="cbr"></div><div class="ac"><button onclick="cbPaste()">Colar cifra copiada</button></div>`;CBD.showModal();if(q.length>1)cbGo();else setTimeout(()=>$('#cbq').focus(),50)}
+async function cbGo(){const e=$('#cbq'),r=$('#cbr');if(!e||!r)return;const q=e.value.trim();if(q.length<2)return say('Digite o nome da música.');r.innerHTML='<div class="cbw"><span class="rps"></span>Procurando cifras…</div>';
+ try{CBI=await ccSearch(q);r.innerHTML=CBI.length?`<small class="mut">${CBI.length} resultado(s) no Cifra Club · toque na versão certa</small>`+CBI.map((x,i)=>cbItem(x,`cbPick(${i})`)).join(''):'<p class="mut">Nenhuma cifra encontrada. Tente só o nome da música, ou nome + artista.</p>'}
+ catch(x){r.innerHTML='<p class="mut">A busca de cifras não respondeu agora. Verifique a internet e tente de novo.</p>'}}
+async function cbPick(i){const x=CBI[i],r=$('#cbr');if(!x||!r)return;r.innerHTML=`<div class="cbw"><span class="rps"></span>Trazendo a cifra de <b>${esc(x.titulo)}</b>…</div>`;const o=await ccGet(x.dns,x.url);
+ if(o){CBD.close();cifImp({cifra:o.cifra,tom:o.tom,bpm:o.bpm,titulo:x.titulo,artista:x.artista,link:x.link});return}
+ if(D)D.cc=x.link;CBH=x.link;r.innerHTML=`<p>Não consegui trazer esta cifra automaticamente agora. <a href="${esc(x.link)}" target="_blank" rel="noopener">Abra a cifra</a>, copie todo o texto, volte e toque em <b>Colar cifra copiada</b>.</p><div class="ac"><button onclick="cbGo()">← Resultados</button></div>`}
+async function cbPaste(){let t='';try{t=await navigator.clipboard.readText()}catch(e){}if(t&&t.replace(/\s/g,'').length>=20){CBD.close();cifImp({cifra:t,link:CBH});return}
+ const r=$('#cbr');if(r)r.innerHTML=`<p class="mut" style="margin:0 0 6px">Cole aqui o texto da cifra (toque e segure › Colar):</p><textarea id="cbt" style="width:100%;min-height:160px"></textarea><div class="ac"><button class="pri" onclick="const v=$('#cbt').value;if(v.replace(/\\s/g,'').length<20)return say('Cole a cifra completa.');CBD.close();cifImp({cifra:v,link:CBH})">Importar</button><button onclick="cbGo()">← Resultados</button></div>`;setTimeout(()=>{const a=$('#cbt');if(a)a.focus()},50)}
