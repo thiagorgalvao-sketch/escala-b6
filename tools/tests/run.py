@@ -288,9 +288,11 @@ with sync_playwright() as p:
     r = pg.evaluate("""()=>{const a=[];a.push(/skl/.test(skl()));const s0=S.songs[0];S.band=false;spotD();$('#spq').value=s0.title.split(' ')[0];spR();a.push(/class="it"/.test($('#spr').innerHTML));$('#spq').value='zzzxqq';spR();a.push(/Nada encontrado/.test($('#spr').innerHTML));dlg.close();
      spM(s0.id);a.push(/Abrir/.test(dlg.innerHTML)&&/Adicionar ao repertório/.test(dlg.innerHTML));dlg.close();
      const l=S.lists.find(x=>x.date&&x.date>=td());if(l){const n=l.songIds.length,had=l.songIds.includes('__x');S.songs.push({id:'__x',title:'X',parts:[],key:'C'});lAddS(l.id,'__x');a.push(l.songIds.length==n+1);l.songIds.pop();S.songs.pop();R()}else a.push(true);
-     themeSet('light');a.push(document.documentElement.classList.contains('lt'));themeSet('dark');a.push(!document.documentElement.classList.contains('lt'));
+     themeSet('light');a.push(document.documentElement.classList.contains('ltm'));themeSet('dark');a.push(!document.documentElement.classList.contains('ltm'));
      a.push(!!document.getElementById('offb'));return a}""")
     ok(r == [True]*8, 'camada Apple: skeleton, busca única, menu de segurar, adicionar ao repertório, tema, offline', str(r))
+    r = pg.evaluate("""()=>{const l=S.lists.find(x=>x.songIds.length>2);S.band=false;vmGo(l.songIds[1],l.id);const a=S.sel,el=document.querySelector('.hd')||document.querySelector('#m');const send=(t,x,y)=>{const T=new Touch({identifier:1,target:el,clientX:x,clientY:y});el.dispatchEvent(new TouchEvent(t,{touches:t=='touchend'?[]:[T],changedTouches:[T],bubbles:true,cancelable:true}))};send('touchstart',300,300);send('touchend',120,310);const b=S.sel;S.tab='lists';R();return [a==l.songIds[1],b==l.songIds[2]]}""")
+    ok(r == [True, True], 'deslizar troca exatamente uma música por gesto', str(r))
     r = pg.evaluate("""()=>{const a=[];const n0=fixCount();a.push(Array.isArray(n0));const s=S.songs.find(x=>x.id=='s91');const had=s?[...(s.tags||[])]:null;
      if(s){s.tags=(s.tags||[]).filter(x=>!/^(Vertical|Horizontal)$/i.test(x))}const n1=fixCount();a.push(!s||n1[0]>=1);fixGo();a.push(!s||hasT(s,'Vertical'));const n2=fixCount();a.push(n2[0]==0&&n2[1]==0);uDo();const s2=S.songs.find(x=>x.id=='s91');a.push(!s2||!hasT(s2,'Vertical'));
      if(s2)s2.tags=had;return a}""")

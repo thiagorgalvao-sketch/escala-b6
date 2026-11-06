@@ -781,9 +781,11 @@ svg:not(.lg):not(.noicn),svg:not(.lg):not(.noicn) :is(path,circle,rect,line,poly
 a:not([class]),.mut a:not([class]),dialog a:not([class]),footer a,#m a:not([class]){color:#00CDD3;text-decoration:none}
 a:not([class]):hover,footer a:hover{text-decoration:underline}
 button.lnk,button.vfp{color:#00CDD3!important;text-decoration:none!important;background:none;border:0}button.lnk:hover,button.vfp:hover{text-decoration:underline!important}
-html.lt{filter:invert(1) hue-rotate(180deg);background:#fff}
-html.lt img,html.lt video,html.lt iframe,html.lt canvas,html.lt .noinv{filter:invert(1) hue-rotate(180deg)}
-html.lt body.fs.sun #m,html.lt body.fs.sun #stg{filter:none}
+html.ltm,html.ltm body{background:#fff!important}
+html.ltm body>*:not(script):not(style):not(link):not(header){filter:invert(1) hue-rotate(180deg)}
+html.ltm header>*{filter:invert(1) hue-rotate(180deg)}html.ltm header{background:rgba(255,255,255,.88)!important;border-color:#d1d1d6!important}
+html.ltm img,html.ltm video,html.ltm iframe,html.ltm canvas,html.ltm .noinv{filter:invert(1) hue-rotate(180deg)}
+html.ltm body.fs.sun #m,html.ltm body.fs.sun #stg{filter:none}
 
 /* ===== Sistema de design único (VER 358): 5 tamanhos de letra, 3 raios, alvos de 40–44 px ===== */
 :root{--r-s:10px;--r-m:16px}
@@ -1108,15 +1110,11 @@ const skl=()=>`<div class="wrap mobl" aria-busy="true" aria-label="Carregando">$
 function sysUi(){try{if(!CSS.supports('font','-apple-system-body'))return 100;const d=document.createElement('div');d.style.cssText='font:-apple-system-body;position:absolute;visibility:hidden';document.body.appendChild(d);const z=parseFloat(getComputedStyle(d).fontSize);d.remove();return z>0?Math.round(Math.min(130,Math.max(90,z/17*100))):100}catch(e){return 100}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!PF.ui)try{document.documentElement.style.fontSize=sysUi()+'%'}catch(e){}});
 /* tema claro/escuro/automático */
-function themeApply(){const m=PF.theme||'dark',l=m=='light'||(m=='auto'&&matchMedia('(prefers-color-scheme: light)').matches);document.documentElement.classList.toggle('lt',l);try{document.querySelector('meta[name=theme-color]').setAttribute('content',l?'#ffffff':'#000000')}catch(e){}}
+function themeApply(){const m=PF.theme||'dark',l=m=='light'||(m=='auto'&&matchMedia('(prefers-color-scheme: light)').matches);document.documentElement.classList.toggle('ltm',l);try{document.querySelector('meta[name=theme-color]').setAttribute('content',l?'#ffffff':'#000000')}catch(e){}}
 function themeSet(v){PF.theme=v;try{localStorage.setItem('rep.pf',JSON.stringify(PF))}catch(e){}themeApply()}
 try{matchMedia('(prefers-color-scheme: light)').addEventListener('change',themeApply)}catch(e){}
 /* offline */
 (()=>{const b=document.createElement('div');b.id='offb';b.hidden=true;b.setAttribute('role','status');b.textContent='Sem internet · usando o que está salvo';document.body.appendChild(b);const f=()=>{b.hidden=navigator.onLine!==false};addEventListener('online',f);addEventListener('offline',f);f()})();
-/* deslizar entre músicas */
-(()=>{let x0=0,y0=0,t0=0,ok=0;
-document.addEventListener('touchstart',e=>{ok=0;if(e.touches.length!=1||S.tab!='songs'||!S.sel||iOn||FS)return;const t=e.target;if(!t.closest||t.closest('.field,.ctl,.ctlw,input,select,textarea,.az,#ib,#sv,.asfx,#ytp,dialog,.ctx,.amr,summary,.tkc,#ls,.hd .acr'))return;const sc=t.closest('pre,.cf,.parts,#vmv');if(sc&&sc.scrollWidth>sc.clientWidth+2)return;x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now();ok=1},{passive:true});
-document.addEventListener('touchend',e=>{if(!ok)return;ok=0;const c=e.changedTouches[0],dx=c.clientX-x0,dy=c.clientY-y0;if(Math.abs(dx)<80||Math.abs(dy)>45||Math.abs(dx)<2*Math.abs(dy)||Date.now()-t0>700)return;const o=S.ctx?(S.lists.find(x=>x.id==S.ctx)||{songIds:[]}).songIds:fl().map(s=>s.id),i=o.indexOf(S.sel)+(dx<0?1:-1);if(!o[i])return;hap(8);nav(dx<0?1:-1);const m=$('#m');if(m&&m.animate&&!RM())m.animate([{transform:`translateX(${dx<0?44:-44}px)`,opacity:.35},{transform:'none',opacity:1}],{duration:240,easing:'cubic-bezier(.2,.8,.2,1)'})},{passive:true})})();
 /* menu de segurar nas músicas */
 (()=>{let tm=0,sx=0,sy=0,fired=0;const row=e=>e.target&&e.target.closest&&e.target.closest('#ls .it'),idOf=r=>((/pick\('([^']+)'/.exec(r.getAttribute('onclick')||''))||[])[1];
 document.addEventListener('pointerdown',e=>{if(e.pointerType=='mouse')return;const r=row(e);if(!r||S.bm)return;sx=e.clientX;sy=e.clientY;fired=0;clearTimeout(tm);tm=setTimeout(()=>{const id=idOf(r);if(id){fired=1;hap(14);spM(id)}},520)});
@@ -1297,7 +1295,7 @@ function stg(){let e=document.getElementById('stg');const l=S.ctx&&S.lists.find(
 function stzMk(){let z=document.getElementById('stz');if(!z){z=document.createElement('div');z.id='stz';z.innerHTML='<button aria-label="Diminuir a letra" onclick="stZ(-1)">A−</button><button aria-label="Aumentar a letra" onclick="stZ(1)">A+</button>';document.body.appendChild(z)}z.hidden=false}
 function stZ(d){S.z=Math.min(2.4,Math.max(.6,+((+S.z||1)+d*.15).toFixed(2)));zSv();R();toast('Letra '+Math.round(S.z*100)+'%')}
 function stL(){const l=S.lists.find(x=>x.id==S.ctx);if(!l)return;let o=document.getElementById('stgl');if(o){o.remove();return}o=document.createElement('div');o.id='stgl';o.innerHTML=`<div class="stgh"><b>${esc(l.name)}</b><button class="sm" onclick="this.closest('#stgl').remove()">Fechar</button></div>`+l.songIds.map((id,k)=>{const s=S.songs.find(x=>x.id==id);return s?`<button class="it${id==S.sel?' on':''}" onclick="S.sel='${id}';S.vw='mapa';asc(0);iu=[];scrollTo(0,0);document.getElementById('stgl').remove();R()">${k+1}. ${esc(s.title)} <span class="mut">· Tom ${fk(stK(l,s))}${+s.bpm?' · '+(+s.bpm)+' BPM':''}</span></button>`:''}).join('');document.body.appendChild(o)}
-function nav(d){const o=S.ctx?(S.lists.find(x=>x.id==S.ctx)||{songIds:[]}).songIds:fl().map(s=>s.id),i=o.indexOf(S.sel)+d;if(o[i]){S.vw=FS||S.vw=='vocal'?(S.vw||'mapa'):'mapa';if(FS||S.vw=='vocal'){S.vwAuto=0;S.vwA=o[i]}S.sel=o[i];asc(0);iu=[];scrollTo(0,0);R();toast((d>0?'→ ':'← ')+S.songs.find(x=>x.id==S.sel).title)}else toast(d>0?'Fim da lista':'Início da lista')}
+function nav(d){const o=S.ctx?(S.lists.find(x=>x.id==S.ctx)||{songIds:[]}).songIds:fl().map(s=>s.id),i=o.indexOf(S.sel)+d;if(o[i]){S.vw=FS||S.vw=='vocal'?(S.vw||'mapa'):'mapa';if(FS||S.vw=='vocal'){S.vwAuto=0;S.vwA=o[i]}S.sel=o[i];asc(0);iu=[];scrollTo(0,0);R();hap(8);try{const m=$('#m');if(m&&m.animate&&!RM())m.animate([{transform:'translateX('+(d>0?44:-44)+'px)',opacity:.35},{transform:'none',opacity:1}],{duration:240,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}toast((d>0?'→ ':'← ')+S.songs.find(x=>x.id==S.sel).title)}else toast(d>0?'Fim da lista':'Início da lista')}
 function delSong(id){delSong2(id)}function delSong2(id){try{dlg.close()}catch(e){}uSnap('Música excluída');toTrash('s',[id]);dq(['s_'+id]);S.songs=S.songs.filter(x=>x.id!=id);S.lists.forEach(l=>l.songIds=l.songIds.filter(x=>x!=id));S.sel=null;save();R()}
 /* cadastro de música */
 let D;
@@ -2882,7 +2880,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='05/11/2026 · 362';
+const VER='06/11/2026 · 363';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
