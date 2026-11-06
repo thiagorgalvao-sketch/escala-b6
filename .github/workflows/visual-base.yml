@@ -1,0 +1,37 @@
+name: Atualizar referência das capturas de tela
+# Use depois de mudar o visual de propósito: gera as capturas novas no GitHub e salva como referência.
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publicar-main
+  cancel-in-progress: false
+jobs:
+  base:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepara o navegador de testes
+        run: |
+          pip install -q playwright==1.48.0 pillow
+          python -m playwright install --with-deps chromium > /dev/null
+      - name: Gera as capturas (sem comparar)
+        run: python tools/tests/run.py || true
+      - name: Salva como referência
+        run: |
+          cp tools/tests/visual/atual/*.png tools/tests/visual/base/
+          git config user.name "escala-b6-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add tools/tests/visual/base
+          if ! git diff --cached --quiet; then
+            git commit -m "Referência das capturas de tela atualizada (gerada no GitHub)"
+            for i in 1 2 3 4 5; do git pull --rebase origin main && git push && exit 0; sleep $((i*5)); done; exit 1
+          fi

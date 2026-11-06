@@ -111,6 +111,11 @@ with sync_playwright() as p:
     ok(r == [True, True], 'banda: ao entrar na conta, o Confirmar presença aparece no Hoje sem precisar sair da tela', str(r))
     r = pg.evaluate("""()=>{const o=[ME_M,window.__SBB];ME_M={id:'m1',nome:'Ana Teste'};window.__SBB={};S.tab='hoje';R();const a=[!!document.querySelector('.hjcol > .hjbar'),!document.querySelector('.hjhero .hjb')];S.tab='perf';R();const d=document.querySelector('details.dmo2');a.push(!!d&&!d.open,!!d&&/Mais/.test(d.textContent));[ME_M,window.__SBB]=o;S.tab='lists';R();return a}""")
     ok(r == [True, True, True, True], 'um jeito só: barra de ações do Hoje fora do cartão e disponibilidade do Perfil em "Mais"', str(r))
+    r = pg.evaluate("""()=>{const a=[];const l=S.lists.find(x=>x.banda&&Object.values(x.banda).some(Boolean));const nome=Object.values(l.banda).find(Boolean);const d0=l.date,T=new Date(Date.now()-3*36e5);T.setDate(T.getDate()+1);
+     const am=T.toISOString().slice(0,10);l.date=am;try{localStorage.setItem('rep.me',nome);localStorage.removeItem('rep.lemb');localStorage.removeItem('rep.cf')}catch(e){}
+     a.push(!!lembAlvo());const f=lembPres();a.push(f&&/Amanhã é culto/.test(document.querySelector('#tt').textContent));a.push(lembPres()===false);
+     cfS(l.id,'s');a.push(lembAlvo()===null);localStorage.removeItem('rep.cf');localStorage.removeItem('rep.lemb');l.date=new Date(Date.now()-3*36e5+10*864e5).toISOString().slice(0,10);a.push(lembAlvo()===null);l.date=d0;localStorage.removeItem('rep.me');return a}""")
+    ok(r == [True]*5, 'lembrete de presença: avisa 1 vez por dia, some ao responder e só para culto de hoje/amanhã', str(r))
     ok(not E, 'banda: sem erros de JavaScript', '; '.join(E[:3])); c.close()
 
     # 2b) Hoje abre na hora pela cópia salva e atualiza por trás sem mexer na tela

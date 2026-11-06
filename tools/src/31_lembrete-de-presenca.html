@@ -1,0 +1,10 @@
+/* ===== lembrete de presença dentro do app (VER 369): "amanhã é culto, confirme" ===== */
+function lembAlvo(){if(!S.band)return null;const me=meG();if(!me)return null;const T=td(),dd=x=>Math.round((new Date(x+'T00:00')-new Date(T+'T00:00'))/864e5),logged=!!(ME_M&&FVC());
+ const l=S.lists.filter(x=>x.date&&dd(x.date)>=0&&dd(x.date)<=1&&meRoles(x,me).length).sort((a,b)=>a.date.localeCompare(b.date))[0];if(!l)return null;
+ const ans=logged?(MY_DISP[l.id]||{}).status:cfG()[l.id];if(ans)return null;return{l,dd:dd(l.date),logged}}
+function lembD(lid){const l=S.lists.find(x=>x.id==lid);if(!l)return;const me=meG(),ro=meRoles(l,me).join(', '),dt=new Date(l.date+'T00:00');
+ dlg.innerHTML=`<h2>Você vai servir?</h2><p class="mut" style="margin:0 0 6px">${esc(WD[dt.getDay()]+' '+fd(l.date).slice(0,5)+' · '+[l.place,l.turno].filter(Boolean).join(' - '))}${l.name?' · '+esc(l.name):''}</p>${ro?`<p style="margin:0 0 14px">${esc(ro)}</p>`:''}<div class="ac"><button class="pri" onclick="dlg.close();dispSet('${lid}','sim')">✓ Vou</button><button onclick="dlg.close();dispSet('${lid}','nao')">Não posso</button><button onclick="dlg.close()">Depois</button></div>`;dlg.showModal()}
+function lembPres(force){try{const a=lembAlvo();if(!a)return false;const k='rep.lemb',T=td();let m={};try{m=JSON.parse(localStorage.getItem(k)||'{}')}catch(e){}
+ if(!force&&m[a.l.id]==T)return false;m[a.l.id]=T;try{localStorage.setItem(k,JSON.stringify(m))}catch(e){}
+ toastA((a.dd==0?'Hoje':'Amanhã')+' é culto · confirme sua presença','Responder',()=>a.logged?lembD(a.l.id):cfD(a.l.id),14000);bdgUp(1);return true}catch(e){return false}}
+function lembIni(){if(!S.band||lembIni.on)return;lembIni.on=1;let n=0;const t=setInterval(()=>{n++;const pronto=!FVC()||ME_M||n>=4;if(!pronto)return;clearInterval(t);if(S.band)lembPres()},3000)}
