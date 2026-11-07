@@ -116,10 +116,10 @@ with sync_playwright() as p:
     ok(r == [True, True], 'banda: ao entrar na conta, o Confirmar presença aparece no Hoje sem precisar sair da tela', str(r))
     r = pg.evaluate("""()=>{const o=[ME_M,window.__SBB];ME_M={id:'m1',nome:'Ana Teste'};window.__SBB={};S.tab='hoje';R();const a=[!!document.querySelector('.hjcol > .hjbar'),!document.querySelector('.hjhero .hjb')];S.tab='perf';R();const d=document.querySelector('details.dmo2');a.push(!!d&&!d.open,!!d&&/Mais/.test(d.textContent));[ME_M,window.__SBB]=o;S.tab='lists';R();return a}""")
     ok(r == [True, True, True, True], 'um jeito só: barra de ações do Hoje fora do cartão e disponibilidade do Perfil em "Mais"', str(r))
-    r = pg.evaluate("""()=>{const a=[];const l=S.lists.find(x=>x.banda&&Object.values(x.banda).some(Boolean));const nome=Object.values(l.banda).find(Boolean);const d0=l.date,T=new Date(Date.now()-3*36e5);T.setDate(T.getDate()+1);
-     const am=T.toISOString().slice(0,10);l.date=am;try{localStorage.setItem('rep.me',nome);localStorage.removeItem('rep.lemb');localStorage.removeItem('rep.cf')}catch(e){}
+    r = pg.evaluate("""()=>{const a=[];const l=S.lists.find(x=>x.banda&&Object.values(x.banda).some(Boolean));const nome=Object.values(l.banda).find(Boolean);const d0=l.date,z=n=>String(n).padStart(2,'0'),mais=k=>{const x=new Date(td()+'T12:00');x.setDate(x.getDate()+k);return x.getFullYear()+'-'+z(x.getMonth()+1)+'-'+z(x.getDate())};
+     l.date=mais(1);try{localStorage.setItem('rep.me',nome);localStorage.removeItem('rep.lemb');localStorage.removeItem('rep.cf')}catch(e){}
      a.push(!!lembAlvo());const f=lembPres();a.push(f&&/Amanhã é culto/.test(document.querySelector('#tt').textContent));a.push(lembPres()===false);
-     cfS(l.id,'s');a.push(lembAlvo()===null);localStorage.removeItem('rep.cf');localStorage.removeItem('rep.lemb');l.date=new Date(Date.now()-3*36e5+10*864e5).toISOString().slice(0,10);a.push(lembAlvo()===null);l.date=d0;localStorage.removeItem('rep.me');return a}""")
+     cfS(l.id,'s');a.push(lembAlvo()===null);localStorage.removeItem('rep.cf');localStorage.removeItem('rep.lemb');l.date=mais(10);a.push(lembAlvo()===null);l.date=d0;localStorage.removeItem('rep.me');return a}""")
     ok(r == [True]*5, 'lembrete de presença: avisa 1 vez por dia, some ao responder e só para culto de hoje/amanhã', str(r))
     ok(not E, 'banda: sem erros de JavaScript', '; '.join(E[:3])); c.close()
 
@@ -353,6 +353,7 @@ with sync_playwright() as p:
      el.dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true}));a.push(dlg.open);dlg.close();return a}""")
     ok(r == [True]*4, 'gestos: segurar abre o menu; arrastar ou toque curto não abrem', str(r))
     # 5a3) visual: sem rolagem lateral nem elementos para fora da tela; compara capturas com a referência (aviso, não derruba)
+    pg.clock.set_fixed_time('2026-11-06T15:00:00Z')  # data fixa: as telas mostram 'hoje/amanhã' e não podem mudar com o calendário
     VD = os.path.join(HERE, 'visual'); os.makedirs(os.path.join(VD, 'base'), exist_ok=True); os.makedirs(os.path.join(VD, 'atual'), exist_ok=True)
     telas = {'musica': "S.tab='songs';S.sel=S.songs.find(x=>(x.vmap||[]).length)?.id||S.songs[0].id;S.vw='mapa'", 'lista': "S.tab='songs';S.sel=null", 'repertorio': "S.tab='lists';S.lv=(S.lists.find(x=>x.songIds.length)||S.lists[0]).id;S.lvm=1", 'ajustes': "S.tab='songs';S.sel=null"}
     for nome, js in telas.items():
