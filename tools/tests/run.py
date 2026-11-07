@@ -25,6 +25,11 @@ _dup = sum(1 for k, n in _sel.items() if n > 1)
 ok(_imp <= 251, f'CSS: no máximo 251 usos de !important (hoje {_imp})')
 ok(_dup <= 43, f'CSS: no máximo 43 seletores repetidos (hoje {_dup})')
 
+# 0c) compatibilidade com Safari 15 (iPad Air 2 / iOS 15): nada de lookbehind em regex nem de bloco "static {}" (derrubam o app inteiro)
+_js = open(os.path.join(ROOT, 'tools', 'app.html'), encoding='utf-8').read()
+_ruim = re.findall(r'\(\?<[=!]|static\s*\{|\.findLast\(|\.toSorted\(|\.toReversed\(|structuredClone\(|Object\.groupBy|AbortSignal\.timeout|Promise\.withResolvers|Array\.fromAsync|[\w\)\]]\.at\(-?\d', _js)
+ok(not _ruim, 'compatível com Safari 15 (iPad antigo): sem recursos novos demais', str(sorted(set(_ruim))[:5]))
+
 # 1) sintaxe do JavaScript das páginas
 for f in ['index.html', 'admin/index.html']:
     s = open(os.path.join(ROOT, f), encoding='utf-8').read()

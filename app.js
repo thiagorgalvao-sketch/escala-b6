@@ -28,7 +28,7 @@ const nm=(l,pc)=>{const d=md(pc-NAT[l]+6)-6;return LT[l]+(d>0?'#'.repeat(d):'b'.
 function scale(k){const p=pk(k),b=p.min?{l:(p.l+2)%7,pc:md(p.pc+3)}:{l:p.l,pc:p.pc};const n=[],pcs=[];for(let i=0;i<7;i++){pcs.push(md(b.pc+NAT[i]));n.push(nm((b.l+i)%7,pcs[i]))}return{n,pcs,p}}
 function field(k){const{n,p}=scale(k);return p.min?{c:[5,6,0,1,2,3,4].map((j,i)=>n[j]+['m','','','m','m','',''][i]),r:['i','ii°','III','iv','v','VI','VII']}:{c:n.map((x,i)=>x+['','m','m','','','m',''][i]),r:['I','ii','iii','IV','V','vi','vii°']}}
 function tr(t,s,k){if(!t)return t;const{n,pcs}=scale(k),fl=n.some(x=>x.includes('b')),mp=(fl?FL:SH).slice();pcs.forEach((q,i)=>mp[q]=n[i]);
- return t.replace(/(?<![A-Za-z])([A-G])([#b♯♭]?)(?=(?:maj|min|dim|aug|sus|add|m|M)?(?![A-Za-z]))/g,(m,l,a)=>mp[md(NAT[LT.indexOf(l)]+(a=='#'||a=='♯'?1:a?-1:0)+s)])}
+ return t.replace(/([A-G])([#b♯♭]?)(?=(?:maj|min|dim|aug|sus|add|m|M)?(?![A-Za-z]))/g,(m,l,a,o,st)=>o>0&&/[A-Za-z]/.test(st[o-1])?m:mp[md(NAT[LT.indexOf(l)]+(a=='#'||a=='♯'?1:a?-1:0)+s)])}
 const fk=k=>esc(String(k||'').replace(/([A-G])#/g,'$1♯').replace(/([A-G])b/g,'$1♭'));
 function chn(t){const d=S.deg;S.deg=0;try{return ch(t)}finally{S.deg=d}}
 function lkSlot(u){u=(u||'').trim();if(u&&!/^https?:\/\//i.test(u)&&!/^[a-z][a-z0-9+.-]*:/i.test(u))u='https://'+u;const ok=u&&/^https?:/i.test(u);if(ok){const b=LB.find(x=>x[0].test(u))||[0,'Link','#D1D1D6','<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'],c=(h=>{h=h.replace('#','');if(h.length==3)h=h.split('').map(x=>x+x).join('');const n=parseInt(h,16);return((n>>16)*.3+((n>>8)&255)*.59+(n&255)*.11)<70})(b[2])?'#e5e5ea':b[2],sv=b[3].replace(/#fff|#000/g,c);return`<a class="vsbt on lks2" href="${esc(u)}" target="_blank" rel="noopener" onclick="return lkGo(this)" title="${b[1]}" aria-label="${b[1]}" style="color:${c}"><svg viewBox="0 0 24 24" style="stroke:none;fill:none">${sv}</svg><span>${b[1].length>8?'LINK':b[1].toUpperCase()}</span></a>`}
@@ -1151,9 +1151,9 @@ function lsParse(t){const P=[];let c=null;for(const raw of t.split('\n')){const 
 function cifraParts(t){let P=lsParse(t);if(P.length==1&&P[0].type=='Cifra'){const g=t.split(/\n\s*\n/).map(x=>lsParse(x)[0]).filter(q=>q&&q.chords);if(g.length>1)P=g.map((q,i)=>(q.type='Parte '+(i+1),q))}return P.filter(q=>q.chords)}
 
 let CK='C',aOn=0,snd=1,ac,mOn=0,nT=0,bt=0,mTm,tps=[],aL=0,aA=0,it='pen',ic=0,iOn=0,lv2=null,iu=[];
-const RX=/(?<![A-Za-z])([A-G])([#b♯♭]?)(?=(?:maj|min|dim|aug|sus|add|m|M)?(?![A-Za-z]))/g;
+const RX=/([A-G])([#b♯♭]?)(?=(?:maj|min|dim|aug|sus|add|m|M)?(?![A-Za-z]))/g;
 const DG=['1','♭2','2','♭3','3','4','♯4','5','♭6','6','♭7','7'],sp1=a=>a=='#'||a=='♯'?1:a?-1:0;
-function dgr(t){const b=scale(CK).pcs[0],ds='236';return t.replace(RX,(m,l,a)=>DG[md(NAT[LT.indexOf(l)]+sp1(a)-b)]).replace(/(?<![♭♯0-9])([1-7])m(?![A-Za-z0-9])/g,(m,d)=>ds.includes(d)?d:m)}
+function dgr(t){const b=scale(CK).pcs[0],ds='236';return t.replace(RX,(m,l,a,o,st)=>o>0&&/[A-Za-z]/.test(st[o-1])?m:DG[md(NAT[LT.indexOf(l)]+sp1(a)-b)]).replace(/([1-7])m(?![A-Za-z0-9])/g,(m,d,o,st)=>o>0&&/[♭♯0-9]/.test(st[o-1])?m:ds.includes(d)?d:m)}
 const CTK=/^[(\[]?[A-G][#b]?(?:maj|min|dim|aug|sus|add|m|M|º|°|ø|\+|-|\d|[()]|[#b](?=\d))*(?:\/[A-G][#b]?)?[)\]]?[,.*]?$/,IGN=/^(\(?\d+x\)?|x\d+|[|\-–—.~:]+|%)$/i;
 function isCL(l){const t=l.trim().split(/\s+/).filter(Boolean);return t.length>0&&t.some(x=>CTK.test(x))&&t.every(x=>CTK.test(x)||IGN.test(x))}
 const chordLine=isCL;
@@ -2007,7 +2007,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='06/11/2026 · 369';
+const VER='06/11/2026 · 370';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
