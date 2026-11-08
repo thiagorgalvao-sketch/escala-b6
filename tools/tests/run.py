@@ -116,6 +116,10 @@ with sync_playwright() as p:
     ok(r == [True, True], 'banda: ao entrar na conta, o Confirmar presença aparece no Hoje sem precisar sair da tela', str(r))
     r = pg.evaluate("""()=>{const o=[ME_M,window.__SBB];ME_M={id:'m1',nome:'Ana Teste'};window.__SBB={};S.tab='hoje';R();const a=[!!document.querySelector('.hjcol > .hjbar'),!document.querySelector('.hjhero .hjb')];S.tab='perf';R();const d=document.querySelector('details.dmo2');a.push(!!d&&!d.open,!!d&&/Mais/.test(d.textContent));[ME_M,window.__SBB]=o;S.tab='lists';R();return a}""")
     ok(r == [True, True, True, True], 'um jeito só: barra de ações do Hoje fora do cartão e disponibilidade do Perfil em "Mais"', str(r))
+    r = pg.evaluate("""async()=>{const a=[],u='https://thiagorgalvao-sketch.github.io/escala-b6/media/46b9579c1e83de4b8b69c1b9d6cc915b.mp3';
+     a.push(locU(u)==location.origin+'/media/46b9579c1e83de4b8b69c1b9d6cc915b.mp3',locU('https://x.supabase.co/storage/v1/object/public/midias/a.mp4')=='https://x.supabase.co/storage/v1/object/public/midias/a.mp4');
+     const b=await getBl(u);a.push(b.size>100000);return a}""")
+    ok(r == [True, True, True], 'baixar para offline: áudios do site são buscados no mesmo endereço do app (sem bloqueio entre domínios)', str(r))
     r = pg.evaluate("""()=>{const a=[];const l=S.lists.find(x=>x.banda&&Object.values(x.banda).some(Boolean));const kk=Object.keys(l.banda).find(k=>l.banda[k]),antes=l.banda[kk],nome='Fulano Lembrete Teste';l.banda[kk]=nome;const d0=l.date,z=n=>String(n).padStart(2,'0'),mais=k=>{const x=new Date(td()+'T12:00');x.setDate(x.getDate()+k);return x.getFullYear()+'-'+z(x.getMonth()+1)+'-'+z(x.getDate())};
      l.date=mais(1);try{localStorage.setItem('rep.me',nome);localStorage.removeItem('rep.lemb');localStorage.removeItem('rep.cf')}catch(e){}
      a.push(!!lembAlvo());const f=lembPres();a.push(f&&/Amanhã é culto/.test(document.querySelector('#tt').textContent));a.push(lembPres()===false);

@@ -381,7 +381,10 @@ async function bigUp(as,b,ty){try{if(b.size<=150*1048576)b=new Blob([await b.arr
  if(b.size<=19.5*1048576){const r=await as.upload(b,{type:ty||'video/mp4'});return{id:r.id,url:r.url,size:r.sizeBytes||b.size}}
  const ids=[],us=[],mk=new Uint8Array([0,69,80,67]),n=Math.ceil(b.size/CKS);try{for(let i=0;i<n;i++){if(window._bupP)_bupP(i+1,n);const r=await as.upload(new Blob([mk,b.slice(i*CKS,(i+1)*CKS)]),{type:'video/mp4'});ids.push(r.id);us.push(r.url)}}
  catch(e){try{for(const i of ids)await as.delete(i)}catch(x){}throw e}return{id:ids.join(','),url:'ck:'+us.join('|'),size:b.size}}
-async function getBl(u){if(String(u).startsWith('ck:')){const ps=[];for(const x of u.slice(3).split('|')){const r=await fetch(x);if(!r.ok)throw new Error('http');ps.push((await r.blob()).slice(4))}return new Blob(ps)}const r=await fetch(u);if(!r.ok)throw new Error('http');return r.blob()}
+/* áudios que ficam no próprio site (…github.io/escala-b6/media/x.mp3) são baixados do mesmo endereço em que o app está aberto (fervor.website): o endereço antigo redireciona e o navegador bloqueia o download */
+function locU(u){const m=/^https?:\/\/[^\/]*github\.io\/escala-b6\/(media\/[^?#]+)/i.exec(String(u||''));if(!m||!/^https?:$/.test(location.protocol))return u;return location.origin+location.pathname.replace(/\/(admin\/)?[^\/]*$/,'/')+m[1]}
+async function fetchOk(u){const a=locU(u);try{const r=await fetch(a);if(r.ok)return r}catch(e){}if(a!==u){const r=await fetch(u);if(r.ok)return r}throw new Error('http')}
+async function getBl(u){if(String(u).startsWith('ck:')){const ps=[];for(const x of u.slice(3).split('|')){const r=await fetchOk(x);ps.push((await r.blob()).slice(4))}return new Blob(ps)}const r=await fetchOk(u);return r.blob()}
 async function sniffB(bl){try{const ty=sniffA(await bl.slice(0,12).arrayBuffer());if(ty)return new Blob([bl],{type:ty})}catch(e){}return bl}
 function sniffA(b){const h=new Uint8Array(b.slice(0,12)),s=String.fromCharCode(...h);if(s.startsWith('ID3')||(h[0]==255&&(h[1]&224)==224))return'audio/mpeg';if(s.startsWith('RIFF'))return'audio/wav';if(s.slice(4,8)=='ftyp')return'audio/mp4';if(s.startsWith('OggS'))return'audio/ogg';if(h[0]==255&&(h[1]&246)==240)return'audio/aac';return''}
 function offAud(){document.querySelectorAll('[data-off]').forEach(e=>{const u=e.dataset.off;if(e.dataset.offd)return;e.dataset.offd='1';msrc(u,e.tagName=='AUDIO').then(x=>{if(x!==u){if(e.tagName=='A')e.href=x;else e.src=x}})})}
@@ -2009,7 +2012,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='07/11/2026 · 371';
+const VER='07/11/2026 · 372';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
