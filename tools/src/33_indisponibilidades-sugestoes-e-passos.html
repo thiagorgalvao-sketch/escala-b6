@@ -56,3 +56,18 @@ function rsR(){const w=$('#rsw');if(!w||!P)return;const ok=[],wr=[],sg=(P.songId
  pe.forEach(nm=>{const d=dispDe(nm,P);if(d&&d.status=='nao')wr.push(nm+' avisou que não pode'+(d.obs?': '+d.obs:''))});
  w.innerHTML=`<div class="ect">Resumo antes de salvar</div><div class="rsh"><b>${esc(P.name||'Novo culto')}</b><span>${esc([P.date&&fdl(P.date),P.place,P.turno].filter(Boolean).join(' · ')||'sem data')}</span></div>${wr.map(x=>`<p class="rsl w"><i>!</i><span>${esc(x)}</span></p>`).join('')}${ok.map(x=>`<p class="rsl o"><i>✓</i><span>${esc(x)}</span></p>`).join('')}${sg.length?`<ol class="rsm2">${sg.map(s=>`<li>${esc(s.title)} <small>${fk((P.keys||{})[s.id]||s.key)}</small></li>`).join('')}</ol>`:''}<p class="mut">${wr.length?'Você pode salvar assim mesmo e completar depois.':'Tudo certo! Toque em Salvar.'}</p>`}
 {const _g=ltG;ltG=function(x){_g.apply(this,arguments);if(x=='rs')rsR();if(x=='eq')perW();ltU()}}
+/* Navegação: botão Voltar fixo no topo das telas de detalhe (menu de baixo fica sempre visível, exceto no Palco) */
+var TABP='',TABC='';
+const TABNM={hoje:'Hoje',lists:'Repertórios',songs:'Músicas',dash:'Painel',esp:'Espiritual'};
+function bkLbl(){if(FS||!MOB()||S.bandPrev||dlg.open||(window.d2&&d2.open))return'';
+ if(S.tab=='songs'&&S.ctx)return'Culto';
+ if(S.tab=='songs'&&S.hide&&S.sel)return'Músicas';
+ if(S.tab=='lists'&&S.lvm)return'Repertórios';
+ if(S.tab=='perf'&&!S.band&&TABP&&TABP!='perf')return TABNM[TABP]||'Voltar';
+ return''}
+function bkGo(){hap(8);if(S.tab=='perf'){S.tab=TABP&&TABP!='perf'?TABP:'hoje';R();scrollTo(0,0);return}doBack()}
+function bkUp(){const b=$('#nvb');if(!b)return;if(S.tab!=TABC){TABP=TABC;TABC=S.tab}const t=bkLbl();b.hidden=!t;if(t)b.querySelector('span').textContent=t}
+{const _u=uiPost;uiPost=function(){_u.apply(this,arguments);bkUp()}}
+dlg.addEventListener('close',bkUp);
+/* Agilidade: coisas caras que rodavam a cada troca de tela */
+{const _sy=sysUi;let c=null;sysUi=function(){if(c==null)c=_sy();return c};addEventListener('resize',()=>{c=null});document.addEventListener('visibilitychange',()=>{c=null})}

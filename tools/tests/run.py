@@ -399,6 +399,16 @@ with sync_playwright() as p:
      PKF='top';pkR();a.push(has(s2.id)&&!has(s3.id)&&has(s1.id));
      PKF='';S.lists=o;document.querySelector('#pk').remove();document.querySelector('#pkf').remove();P=null;return a}""")
     ok(r == [True]*3, 'sugestões ao escolher músicas: sem tocar há 2+ meses, nunca tocadas e mais tocadas', str(r))
+    r = pg.evaluate("""()=>{const a=[],o=[S.tab,S.lv,S.lvm,S.sel,S.hide,S.ctx,S.band];S.band=false;document.querySelectorAll('dialog[open]').forEach(d=>d.close());
+     const l=S.lists.find(x=>x.songIds.length&&x.date);S.tab='lists';S.lv=l.id;S.lvm=1;R();const b=document.querySelector('#nvb');
+     a.push(!b.hidden&&/Repertórios/.test(b.textContent)&&document.body.classList.contains('tbon'));        // detalhe do culto: Voltar + menu fixo
+     S.tab='songs';S.ctx=l.id;S.sel=l.songIds[0];S.hide=true;R();a.push(!b.hidden&&/Culto/.test(b.textContent)&&document.body.classList.contains('tbon'));   // música: menu fixo
+     bkGo();a.push(S.tab=='lists'&&S.lv==l.id&&!S.ctx);                                                  // Voltar leva ao culto
+     bkGo();a.push(S.lvm==0&&b.hidden);                                                                  // e depois à lista
+     S.tab='hoje';R();S.tab='perf';R();a.push(!b.hidden&&/Hoje/.test(b.textContent));bkGo();a.push(S.tab=='hoje');
+     FS=true;uiPost();a.push(b.hidden&&!document.body.classList.contains('tbon'));FS=false;                 // Palco: sem menu e sem Voltar
+     [S.tab,S.lv,S.lvm,S.sel,S.hide,S.ctx,S.band]=o;R();return a}""")
+    ok(r == [True]*7, 'navegação: menu fixo em todas as telas (menos no Palco) e botão Voltar no topo', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
      ltG('ev');ltS(1);a.push(LTB=='ev');const sy=dlg.querySelector('.ltb .tb[data-lt="ev"]');Object.assign(P,{name:'Culto',date:'2099-05-05',place:'Mauá',turno:'Noite'});ltS(1);a.push(LTB=='eq'&&!document.querySelector('#lvt').hidden&&/Passo 2 de 7/.test(document.querySelector('#lsh').textContent)&&document.querySelector('.ltb .tb[data-lt="ev"]').classList.contains('ok'));ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
      ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")

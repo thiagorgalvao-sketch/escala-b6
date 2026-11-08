@@ -2011,7 +2011,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='08/11/2026 · 376';
+const VER='08/11/2026 · 377';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2166,7 +2166,7 @@ var UD=null,UDT;function uSnap(m){if(S.band)return;UD={m,j:JSON.stringify({songs
 function uShow(){if(!UD||UD.armed)return;UD.armed=1;const b=$('#ub');$('#ubt').textContent='✓ '+UD.m;b.hidden=false;clearTimeout(UDT);UDT=setTimeout(()=>{b.hidden=true;UD=null},6000)}
 function uDo(){if(!UD)return;const o=JSON.parse(UD.j),nk=new Set([...o.songs.map(s=>'s_'+s.id),...o.lists.map(l=>'l_'+l.id)]);dq([...S.songs.map(s=>'s_'+s.id),...S.lists.map(l=>'l_'+l.id)].filter(k=>!nk.has(k)));[...nk].forEach(k=>DQ.delete(k));dqSave();S.songs=o.songs;S.lists=o.lists;trashSync();S.sel=UD.sel;S.lv=UD.lv;UD=null;$('#ub').hidden=true;clearTimeout(UDT);save();$('#ub').hidden=true;UD=null;R();toast('Desfeito')}
 /* ui post-render: tab bar, fab, hash, anim, font */
-var SCK='';function uiPost(){const m=MOB()&&!FS&&!S.bandPrev,s=S.songs.find(x=>x.id==S.sel),c=S.lists.find(x=>x.id==S.lv),ls=S.tab=='hoje'||S.tab=='dash'||S.tab=='esp'||S.tab=='perf'?true:S.tab=='songs'?!(s&&(S.hide||S.ctx)):!(c&&S.lvm),on=m&&ls;document.body.classList.toggle('tbon',on);
+var SCK='';function uiPost(){const m=MOB()&&!FS&&!S.bandPrev,s=S.songs.find(x=>x.id==S.sel),c=S.lists.find(x=>x.id==S.lv),on=m;document.body.classList.toggle('tbon',on);
  document.querySelectorAll('#tbb [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab));
  {const a=$('#add');if(a){const tx=S.tab=='songs'?'+ Música':'+ Repertório';if(a.textContent!=tx)a.textContent=tx}}
  const k=[S.tab,S.tab=='songs'?(S.hide||S.ctx?S.sel:'L'):(S.lvm||!MOB()?S.lv:'L'),FS?1:0].join('|');if(k!=SCK){if(SCK){const mm=$('#m');mm.classList.remove('anim');mm.dataset.nv=S.tab=='songs'&&(S.hide||S.ctx)?'song':'';void mm.offsetWidth;mm.classList.add('anim')}SCK=k}
@@ -2582,3 +2582,18 @@ function rsR(){const w=$('#rsw');if(!w||!P)return;const ok=[],wr=[],sg=(P.songId
  pe.forEach(nm=>{const d=dispDe(nm,P);if(d&&d.status=='nao')wr.push(nm+' avisou que não pode'+(d.obs?': '+d.obs:''))});
  w.innerHTML=`<div class="ect">Resumo antes de salvar</div><div class="rsh"><b>${esc(P.name||'Novo culto')}</b><span>${esc([P.date&&fdl(P.date),P.place,P.turno].filter(Boolean).join(' · ')||'sem data')}</span></div>${wr.map(x=>`<p class="rsl w"><i>!</i><span>${esc(x)}</span></p>`).join('')}${ok.map(x=>`<p class="rsl o"><i>✓</i><span>${esc(x)}</span></p>`).join('')}${sg.length?`<ol class="rsm2">${sg.map(s=>`<li>${esc(s.title)} <small>${fk((P.keys||{})[s.id]||s.key)}</small></li>`).join('')}</ol>`:''}<p class="mut">${wr.length?'Você pode salvar assim mesmo e completar depois.':'Tudo certo! Toque em Salvar.'}</p>`}
 {const _g=ltG;ltG=function(x){_g.apply(this,arguments);if(x=='rs')rsR();if(x=='eq')perW();ltU()}}
+/* Navegação: botão Voltar fixo no topo das telas de detalhe (menu de baixo fica sempre visível, exceto no Palco) */
+var TABP='',TABC='';
+const TABNM={hoje:'Hoje',lists:'Repertórios',songs:'Músicas',dash:'Painel',esp:'Espiritual'};
+function bkLbl(){if(FS||!MOB()||S.bandPrev||dlg.open||(window.d2&&d2.open))return'';
+ if(S.tab=='songs'&&S.ctx)return'Culto';
+ if(S.tab=='songs'&&S.hide&&S.sel)return'Músicas';
+ if(S.tab=='lists'&&S.lvm)return'Repertórios';
+ if(S.tab=='perf'&&!S.band&&TABP&&TABP!='perf')return TABNM[TABP]||'Voltar';
+ return''}
+function bkGo(){hap(8);if(S.tab=='perf'){S.tab=TABP&&TABP!='perf'?TABP:'hoje';R();scrollTo(0,0);return}doBack()}
+function bkUp(){const b=$('#nvb');if(!b)return;if(S.tab!=TABC){TABP=TABC;TABC=S.tab}const t=bkLbl();b.hidden=!t;if(t)b.querySelector('span').textContent=t}
+{const _u=uiPost;uiPost=function(){_u.apply(this,arguments);bkUp()}}
+dlg.addEventListener('close',bkUp);
+/* Agilidade: coisas caras que rodavam a cada troca de tela */
+{const _sy=sysUi;let c=null;sysUi=function(){if(c==null)c=_sy();return c};addEventListener('resize',()=>{c=null});document.addEventListener('visibilitychange',()=>{c=null})}

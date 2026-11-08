@@ -6,7 +6,7 @@ var UD=null,UDT;function uSnap(m){if(S.band)return;UD={m,j:JSON.stringify({songs
 function uShow(){if(!UD||UD.armed)return;UD.armed=1;const b=$('#ub');$('#ubt').textContent='✓ '+UD.m;b.hidden=false;clearTimeout(UDT);UDT=setTimeout(()=>{b.hidden=true;UD=null},6000)}
 function uDo(){if(!UD)return;const o=JSON.parse(UD.j),nk=new Set([...o.songs.map(s=>'s_'+s.id),...o.lists.map(l=>'l_'+l.id)]);dq([...S.songs.map(s=>'s_'+s.id),...S.lists.map(l=>'l_'+l.id)].filter(k=>!nk.has(k)));[...nk].forEach(k=>DQ.delete(k));dqSave();S.songs=o.songs;S.lists=o.lists;trashSync();S.sel=UD.sel;S.lv=UD.lv;UD=null;$('#ub').hidden=true;clearTimeout(UDT);save();$('#ub').hidden=true;UD=null;R();toast('Desfeito')}
 /* ui post-render: tab bar, fab, hash, anim, font */
-var SCK='';function uiPost(){const m=MOB()&&!FS&&!S.bandPrev,s=S.songs.find(x=>x.id==S.sel),c=S.lists.find(x=>x.id==S.lv),ls=S.tab=='hoje'||S.tab=='dash'||S.tab=='esp'||S.tab=='perf'?true:S.tab=='songs'?!(s&&(S.hide||S.ctx)):!(c&&S.lvm),on=m&&ls;document.body.classList.toggle('tbon',on);
+var SCK='';function uiPost(){const m=MOB()&&!FS&&!S.bandPrev,s=S.songs.find(x=>x.id==S.sel),c=S.lists.find(x=>x.id==S.lv),on=m;document.body.classList.toggle('tbon',on);
  document.querySelectorAll('#tbb [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab));
  {const a=$('#add');if(a){const tx=S.tab=='songs'?'+ Música':'+ Repertório';if(a.textContent!=tx)a.textContent=tx}}
  const k=[S.tab,S.tab=='songs'?(S.hide||S.ctx?S.sel:'L'):(S.lvm||!MOB()?S.lv:'L'),FS?1:0].join('|');if(k!=SCK){if(SCK){const mm=$('#m');mm.classList.remove('anim');mm.dataset.nv=S.tab=='songs'&&(S.hide||S.ctx)?'song':'';void mm.offsetWidth;mm.classList.add('anim')}SCK=k}
