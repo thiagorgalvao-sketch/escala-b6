@@ -25,7 +25,7 @@ async function perDel(k){const c=FVC();if(!c||!ME_M)return;const r=await c.from(
 /* Equipe do culto: avisos de quem não pode */
 function perW(){const e=$('#eqw');if(!e||!P)return;const o=[],seen={};BR.forEach(([k,n])=>{const nm=((P.banda||{})[k]||'').trim();if(!nm||seen[nz(nm)])return;seen[nz(nm)]=1;const d=dispDe(nm,P);if(d&&d.status=='nao')o.push({nm,fn:n,o:d.obs})});
  e.innerHTML=o.map(x=>`<p class="perw"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3zM12 9v5M12 17h.01"/></svg><span><b>${esc(x.nm)}</b> (${esc(x.fn)}) avisou que não pode${x.o?': '+esc(x.o):''}</span></p>`).join('')}
-{const _s=slR;slR=function(){_s.apply(this,arguments);perW()}}
+{const _s=slR;slR=function(){_s.apply(this,arguments);perW();if(typeof ltU=='function')ltU()}}
 /* Músicas: filtros de sugestão no seletor */
 var PKF='';
 const PKFS=[['','Todas'],['old','Sem tocar há 2+ meses'],['new','Nunca tocadas'],['top','Mais tocadas']];
@@ -39,9 +39,13 @@ function pkR(){const n=nz(P.q).split(' ').filter(Boolean),ST=pkSt(),f=PKF,T=(a,b
  if(f=='top')A=A.filter(s=>ST[s.id]);
  $('#pk').innerHTML=A.map(s=>{const o=ST[s.id];return`<button class="it" onclick="la('${s.id}')">${esc(s.title)}${md1(s)}<small>Tom ${fk(s.key)} · ${o?'tocada '+o.n+'× · última em '+fd(o.l)+' ('+pkAgo(o.l)+')':'nunca tocada'}</small></button>`}).join('')||'<p class="mut">Nenhuma música com este filtro.</p>'}
 /* Passos: Voltar / Próxima e etapa de Resumo */
-const LTO=['ev','mu','rt','en','eq','pa','rs'];
-function ltS(d){const i=LTO.indexOf(LTB),j=Math.max(0,Math.min(LTO.length-1,i+d));ltG(LTO[j])}
-function ltU(){const i=LTO.indexOf(LTB),ro=P&&P.ro,v=$('#lvt'),x=$('#lnx');if(!v||!x)return;v.hidden=ro||i<=0;x.hidden=ro||i>=LTO.length-1;const nm=x.querySelector('span'),nx=['Músicas','Roteiro','Ensaio','Equipe','Paleta','Resumo'][i];if(nx&&nm)nm.textContent=nx}
+const LTO=['ev','eq','mu','rt','en','pa','rs'];
+const LTH={ev:['Dados do culto','Quando e onde será? Preencha o tipo, a data, o local e o horário.'],eq:['Equipe','Quem vai servir? Escolha as vozes, a banda e quem faz a direção musical.'],mu:['Repertório','Escolha as músicas, o tom e quem canta cada uma.'],rt:['Roteiro','Opcional: defina os momentos do culto e as passagens.'],en:['Ensaio','Quando e onde a banda ensaia. Marque “Sem ensaio” se não houver.'],pa:['Paleta','Opcional: a cor da roupa da equipe neste culto.'],rs:['Resumo','Confira tudo antes de salvar.']};
+function ltOk(k){if(!P)return null;switch(k){case 'ev':return !!((P.name||'').trim()&&P.date&&(P.place||'').trim()&&(P.turno||'').trim());case 'eq':return BR.some(r=>((P.banda||{})[r[0]]||'').trim());case 'mu':return (P.songIds||[]).length>0;case 'en':return !!(P.semEns||P.ensData);default:return null}}
+function ltS(d){const i=LTO.indexOf(LTB),j=Math.max(0,Math.min(LTO.length-1,i+d));if(d>0&&LTB=='ev'&&!P.ro&&!ltOk('ev')){const mi=[];if(!(P.name||'').trim())mi.push('tipo de evento');if(!P.date)mi.push('data');if(!(P.place||'').trim())mi.push('local');if(!(P.turno||'').trim())mi.push('horário');return say('Antes de seguir, preencha: '+mi.join(', ')+'.')}ltG(LTO[j])}
+function ltU(){const i=LTO.indexOf(LTB),ro=P&&P.ro,v=$('#lvt'),x=$('#lnx');if(!v||!x)return;v.hidden=ro||i<=0;x.hidden=ro||i>=LTO.length-1;const nm=x.querySelector('span'),nx=LTO[i+1]&&LTH[LTO[i+1]][0];if(nx&&nm)nm.textContent=nx;const sv=dlg.querySelector('.eft .pri');if(sv)sv.textContent=LTB=='rs'&&P&&!P.id?'Criar repertório':'Salvar';
+ const h=$('#lsh');if(h&&!ro){const t=LTH[LTB]||['',''];h.innerHTML=`<div class="lsp"><i style="width:${Math.round((i+1)*100/LTO.length)}%"></i></div><b>Passo ${i+1} de ${LTO.length} · ${esc(t[0])}</b><span>${esc(t[1])}</span>`}else if(h)h.innerHTML='';
+ dlg.querySelectorAll('.ltb .tb').forEach(b=>{const o=ltOk(b.dataset.lt);b.classList.toggle('ok',o===true);b.classList.toggle('pend',o===false&&b.dataset.lt!=LTB)})}
 function rsR(){const w=$('#rsw');if(!w||!P)return;const ok=[],wr=[],sg=(P.songIds||[]).map(id=>S.songs.find(s=>s.id==id)).filter(Boolean);
  (P.name||'').trim()&&P.date&&(P.place||'').trim()&&(P.turno||'').trim()?ok.push('Evento, data, local e horário preenchidos'):wr.push('Faltam dados do evento (tipo, data, local ou horário)');
  sg.length?ok.push(sg.length+' música'+(sg.length>1?'s':'')+' no repertório'):wr.push('Nenhuma música adicionada ainda');

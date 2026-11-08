@@ -400,9 +400,9 @@ with sync_playwright() as p:
      PKF='';S.lists=o;document.querySelector('#pk').remove();document.querySelector('#pkf').remove();P=null;return a}""")
     ok(r == [True]*3, 'sugestões ao escolher músicas: sem tocar há 2+ meses, nunca tocadas e mais tocadas', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
-     ltG('ev');ltS(1);a.push(LTB=='mu'&&!document.querySelector('#lvt').hidden);ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
+     ltG('ev');ltS(1);a.push(LTB=='ev');const sy=dlg.querySelector('.ltb .tb[data-lt="ev"]');Object.assign(P,{name:'Culto',date:'2099-05-05',place:'Mauá',turno:'Noite'});ltS(1);a.push(LTB=='eq'&&!document.querySelector('#lvt').hidden&&/Passo 2 de 7/.test(document.querySelector('#lsh').textContent)&&document.querySelector('.ltb .tb[data-lt="ev"]').classList.contains('ok'));ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
      ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")
-    ok(r == [True]*5, 'culto em passos: Próxima/Voltar percorre as etapas até o Resumo', str(r))
+    ok(r == [True]*6, 'culto em passos: Próxima/Voltar percorre as etapas até o Resumo', str(r))
     r = pg.evaluate("""()=>{const a=[];const mk=(d,t,n)=>({id:'__q'+d,date:d,place:'Mauá',turno:t,name:n,songIds:[],banda:{}});
      const dn=mk('2099-03-01','Noite','Culto de Domingo'),qu=mk('2099-03-05','Noite','Culto de Quinta'),qs=mk('2099-03-05','','Culto');[dn,qu,qs].forEach(tecFill);
      a.push([dn.hCrtv,dn.hBanda,dn.hGain,dn.passHora,dn.passFim].join()=='16:50,17:00,17:00,17:10,17:40');
