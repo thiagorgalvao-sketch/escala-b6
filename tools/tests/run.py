@@ -286,11 +286,11 @@ with sync_playwright() as p:
     ok(r == [75, 75], 'player: retoma a música de onde parou', str(r))
     r = pg.evaluate("()=>{const l=nextL();if(!l.songIds.length)l.songIds=[S.songs[0].id];const s=S.songs.find(x=>x.id==l.songIds[0]);const old=s.vs;s.vs={url:'https://x.test/vs.mp3',name:'vs'};S.tab='hoje';R();const b=document.querySelector('.hjb .offb2');const t=b&&b.textContent;s.vs=old;S.tab='lists';R();return t}")
     ok(r == 'Baixar para offline', 'Hoje: botão Baixar para offline aparece quando há áudio', str(r))
-    r = pg.evaluate("""async()=>{const l=nextL(),o=[l.hBanda,l.hGain,l.passHora,l.passFim,l.date];l.hBanda='07:00';l.hGain='07:30';l.passHora='07:45';l.passFim='08:10';l.date='2099-05-10';
+    r = pg.evaluate("""async()=>{const l=nextL(),o=[l.hBanda,l.hGain,l.passHora,l.passFim,l.date,l.hCrtv];l.hCrtv='';l.hBanda='07:00';l.hGain='07:30';l.passHora='07:45';l.passFim='08:10';l.date='2099-05-10';
      const w=document.createElement('div');w.innerHTML=tlV(l,td());const a=[w.querySelectorAll('.tll li').length,w.querySelector('.tlt').textContent,w.querySelectorAll('li.pas').length,w.querySelector('.tls').textContent];
      a.push(tlSt({k:'pas',s:465,e:490},0,400),tlSt({k:'pas',s:465,e:490},0,470),tlSt({k:'pas',s:465,e:490},0,500),tlSt({k:'pas',s:465},5,0),tlSt({k:'pas',s:465},-1,0));
      a.push(typeof tlIcs=='undefined',!/Agenda/.test(w.innerHTML));
-     [l.hBanda,l.hGain,l.passHora,l.passFim,l.date]=o;return a}""")
+     [l.hBanda,l.hGain,l.passHora,l.passFim,l.date,l.hCrtv]=o;return a}""")
     ok(r == [3, '07:45 – 08:10', 1, 'Em 2099 dias'.replace('2099', str(r[3]).split(' ')[1]) if isinstance(r[3], str) and r[3].startswith('Em ') else r[3], 'up', 'now', 'done', 'up', 'done', True, True], 'horários do culto: linha do tempo, passagem em destaque e estados (sem botão de Agenda)', str(r))
     r = pg.evaluate("()=>{S.tab='esc';R();const a=[S.tab,document.querySelectorAll('[data-t=\"esc\"]').length,typeof vEsc];S.tab='lists';R();return a}")
     ok(r == ['hoje', 0, 'undefined'], 'menu Escala removido (sem botão, sem tela)', str(r))
@@ -370,6 +370,14 @@ with sync_playwright() as p:
                 dif = ImageChops.difference(A, Bm).convert('L').point(lambda v: 255 if v > 24 else 0); pct = sum(1 for v in dif.getdata() if v) / (A.size[0] * A.size[1]) * 100
                 if pct > 2: print(f'⚠ visual {nome}: {pct:.1f}% da tela mudou em relação à referência'); (FAIL.append('visual ' + nome) if os.environ.get('VISUAL_ESTRITO') else None)
         except ImportError: pass
+    r = pg.evaluate("""()=>{const a=[];S.band=false;const l={id:'__mm',date:'2099-03-01',place:'Mauá',turno:'Manhã',name:'Culto de Domingo',songIds:[],banda:{}};
+     a.push(tecK(l)=='mm');tecFill(l);a.push([l.hCrtv,l.hBanda,l.hGain,l.passHora,l.passFim].join()=='07:20,07:30,07:30,07:40,08:10');
+     const n={id:'__mn',date:'2099-03-08',place:'Mauá',turno:'Noite',name:'Culto de Domingo',songIds:[],banda:{}};tecFill(n);a.push(tecK(n)==''&&!n.hCrtv&&!n.hBanda);
+     const sa={id:'__sa',date:'2099-03-08',place:'Santo André',turno:'Manhã',name:'Culto de Domingo',songIds:[],banda:{}};tecFill(sa);a.push(sa.hBanda=='07:30'&&sa.passHora=='07:45'&&!sa.hCrtv);
+     const o={id:'__mo',date:'2099-03-15',place:'Mauá',turno:'Manhã',name:'Ceia',songIds:[],banda:{},hBanda:'07:00',hGain:'07:30',passHora:'07:45',passFim:'08:10'},pas={id:'__mp',date:'2000-01-01',place:'Mauá',turno:'Manhã',name:'Antigo',songIds:[],banda:{},hBanda:'07:00'};
+     S.lists.push(o,pas);const was=S.mig.mm1;delete S.mig.mm1;mm1();a.push([o.hCrtv,o.hBanda,o.passHora].join()=='07:20,07:30,07:40'&&pas.hBanda=='07:00'&&!pas.hCrtv&&S.mig.mm1==1);
+     a.push(/Chegada CRTV/.test(tecV(o))&&tlItems(o).some(x=>x.k=='crtv'));S.lists=S.lists.filter(x=>!/^__m/.test(x.id));S.mig.mm1=was;return a}""")
+    ok(r == [True]*6, 'Mauá manhã: horários padrão da tabela (CRTV 7h20, banda 7h30, passagem 7h40–8h10) e ajuste dos próximos cultos', str(r))
     # 5b) varredura: percorre todas as telas e diálogos principais; qualquer erro de JavaScript derruba o teste
     E0 = len(E); pg.on('console', lambda m: E.append('console: ' + m.text[:160]) if m.type == 'error' and 'supabase' not in m.text.lower() and 'Failed to load resource' not in m.text else None)
     steps = pg.evaluate("""async()=>{const fails=[];let n=0;const T=async(name,f)=>{n++;try{await f()}catch(e){fails.push(name+': '+String(e).slice(0,100))}

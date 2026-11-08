@@ -2,7 +2,7 @@
 function cEv(l){const p2=n=>String(n).padStart(2,'0'),ok=h=>/^\d{1,2}:\d{2}$/.test(h||''),add=(h,m)=>{const[a,b]=h.split(':').map(Number);const x=a*60+b+m;return p2(Math.floor(x/60)%24)+':'+p2(x%60)};
  const st=ok(l.hBanda)?l.hBanda:ok(l.passHora)?l.passHora:'',k=tecK(l);let en='';if(st){en=k=='dm'?'11:30':k=='dn'?'20:30':add(ok(l.passFim)?l.passFim:add(st,40),150);if(en<=st)en=add(st,180)}
  const nm=[l.place,l.turno].filter(Boolean).join(' - ')+(l.name?' · '+l.name:''),hr=[];
- if(l.hBanda)hr.push('Banda pronta: '+l.hBanda);if(l.hGain)hr.push('Gain / check de sinal: '+l.hGain);if(l.passHora)hr.push('Início da passagem: '+l.passHora);if(l.passFim)hr.push('Término da passagem: '+l.passFim);
+ if(l.hCrtv)hr.push('Chegada CRTV: '+l.hCrtv);if(l.hBanda)hr.push('Banda pronta: '+l.hBanda);if(l.hGain)hr.push('Gain / check de sinal: '+l.hGain);if(l.passHora)hr.push('Início da passagem: '+l.passHora);if(l.passFim)hr.push('Término da passagem: '+l.passFim);
  const desc=(hr.length?'HORÁRIOS\n'+hr.join('\n')+'\n\n':'')+'REPERTÓRIO\n'+(l.songIds.length?shTxt(l).split('\n').filter(x=>!/^(Banda pronta|Passagem de som|Ensaio):/.test(x)).join('\n'):'Repertório a definir');
  return{t:'Culto · '+(nm||'Culto'),d:l.date,st,en,loc:addrOf(l.place,l.date)||l.place||'',desc}}
 function icsTxt(evs){const D=d=>d.replace(/-/g,''),T=(d,h)=>D(d)+'T'+h.replace(':','')+'00',nx=d=>{const x=new Date(d+'T12:00');x.setDate(x.getDate()+1);return x.toISOString().slice(0,10).replace(/-/g,'')},E=s=>String(s||'').replace(/\\/g,'\\\\').replace(/[;,]/g,m=>'\\'+m).replace(/\n/g,'\\n'),stp=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';

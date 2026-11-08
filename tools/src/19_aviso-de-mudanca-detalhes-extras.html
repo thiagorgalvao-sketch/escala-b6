@@ -1,5 +1,5 @@
 /* ===== aviso de mudança (detalhes extras) */
-const fp2=l=>JSON.stringify([l.cant||{},l.ensData||'',l.ensHora||'',l.ensLocal||'',(l.passHora||'')+(l.passFim||l.hBanda||l.hGain?'|'+(l.passFim||'')+'|'+(l.hBanda||'')+'|'+(l.hGain||''):''),!!l.semEns,l.banda||{},l.rot||null,l.rn||{},l.tr||{}]);
+const fp2=l=>JSON.stringify([l.cant||{},l.ensData||'',l.ensHora||'',l.ensLocal||'',(l.passHora||'')+(l.passFim||l.hBanda||l.hGain||l.hCrtv?'|'+(l.passFim||'')+'|'+(l.hBanda||'')+'|'+(l.hGain||'')+'|'+(l.hCrtv||''):''),!!l.semEns,l.banda||{},l.rot||null,l.rn||{},l.tr||{}]);
 const sn2=l=>({o:JSON.stringify(l.ord||{}),d:drTxt(l)||'',g:l.pregador||'',c:Object.assign({},l.cant||{}),e:l.semEns?'sem ensaio':[l.ensData&&fd(l.ensData),l.ensHora,l.ensLocal].filter(Boolean).join(' · '),p:pasR(l)+(l.hBanda?' · banda pronta '+l.hBanda:''),b:Object.assign({},l.banda||{}),r:JSON.stringify([l.rot||null,l.rn||{},l.tr||{}])});
 function chg2(l,o){if(!o.s2)return[];const a=o.s2,n=sn2(l),it=[],nm=id=>{const s=S.songs.find(x=>x.id==id);return s?esc(s.title):'?'};
  if(a.e!=n.e)it.push('Ensaio: '+esc(n.e||'a definir'));if(a.p!=n.p)it.push('Passagem de som: '+esc(n.p||'a definir'));
