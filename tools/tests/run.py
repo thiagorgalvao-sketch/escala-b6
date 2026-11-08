@@ -390,6 +390,27 @@ with sync_playwright() as p:
      const f={id:'__qf',date:'2099-06-04',place:'Mauá',turno:'Noite',name:'Quinta',songIds:[],banda:{},hBanda:'19:00',passHora:'19:10'},d2={id:'__qg',date:'2099-06-07',place:'Mauá',turno:'Noite',name:'Domingo',songIds:[],banda:{}};
      S.lists.push(f,d2);const was=S.mig.mm2;delete S.mig.mm2;mm1();a.push(f.hBanda=='18:40'&&f.passFim=='19:20'&&d2.hCrtv=='16:50');S.lists=S.lists.filter(x=>!/^__q/.test(x.id));S.mig.mm2=was;return a}""")
     ok(r == [True]*5, 'Mauá: tabelas de quinta (18h30) e domingo à noite (18h30) viram padrão e ajustam os próximos cultos', str(r))
+    r = pg.evaluate("""async()=>{const a=[];S.band=false;localStorage.removeItem('rep.stzm');localStorage.setItem('rep.stgp','1');S.z=1;
+     let rel=0;const lk={release:async()=>{rel++},addEventListener(){}};let req=0;Object.defineProperty(navigator,'wakeLock',{configurable:true,value:{request:async()=>{req++;return lk}}});
+     const l=S.lists.find(x=>x.songIds.length>2);stage(l.id);await new Promise(r=>setTimeout(r,300));
+     a.push([FS,req].join()=="true,1");                                 // 0: tela acesa
+     a.push(document.getElementById('stg')&&!document.getElementById('stg').hidden&&!!document.querySelector('#stg .stp'));   // 1: botão fixar
+     toast('teste');toastA('teste','x',()=>{});a.push(!document.querySelector('#tt.on'));      // 2: sem avisos
+     const i0=l.songIds.indexOf(S.sel);stNav(1);stNav(1);a.push(l.songIds.indexOf(S.sel)==i0+1);   // 3: toque duplo vale um
+     stgT();a.push(stPin()===false);stCol(true);a.push(document.getElementById('stg').classList.contains('col')&&document.body.classList.contains('stgc'));  // 4,5: recolhe
+     stOpen();a.push(!document.getElementById('stg').classList.contains('col'));stgT();a.push(stPin()===true);    // 6,7
+     const z=S.z;fsExit();await new Promise(r=>setTimeout(r,200));a.push(FS===false&&!NSV);   // 8: sai do Palco sem sobras
+     toast('depois');a.push(!!document.querySelector('#tt.on'));    // 9: avisos voltam fora do Palco
+     delete navigator.wakeLock;WL=null;S.tab='lists';S.lv=null;R();return a.concat([z])}""")
+    ok(r[:10] == [True]*10, 'Palco: tela acesa, barra fixável/recolhível, toque duplo protegido, sem avisos por cima da cifra', str(r))
+    r = pg.evaluate("""async()=>{const a=[];S.band=false;Object.defineProperty(navigator,'wakeLock',{configurable:true,value:undefined});const l=S.lists.find(x=>x.songIds.length>3);stage(l.id);await new Promise(r=>setTimeout(r,300));
+     a.push(!!NSV&&NSV.tagName=='VIDEO'&&NSV.muted);                          // sem wakeLock: vídeo mudo mantém a tela acesa
+     const el=document.querySelector('#m')||document.body;const go=async(dx,ms)=>{await new Promise(r=>setTimeout(r,600));const el=document.querySelector('#m')||document.body;const i=l.songIds.indexOf(S.sel);const T=(x)=>new Touch({identifier:1,target:el,clientX:x,clientY:300});const f=(t,x)=>el.dispatchEvent(new TouchEvent(t,{touches:t=='touchend'?[]:[T(x)],changedTouches:[T(x)],bubbles:true,cancelable:true}));f('touchstart',300);return new Promise(r=>setTimeout(()=>{f('touchend',300+dx);r(l.songIds.indexOf(S.sel)-i)},ms))};
+     stNt=0;a.push(await go(-80,100)==0);                                        // deslize curto: nada
+     stNt=0;a.push(await go(-160,100)==1);                                       // deslize firme: uma música
+     stNt=0;a.push(await go(-160,700)==0);                                       // deslize lento: nada
+     fsExit();await new Promise(r=>setTimeout(r,200));a.push(!NSV);delete navigator.wakeLock;S.tab='lists';S.lv=null;R();return a}""")
+    ok(r == [True]*5, 'Palco: sem a função de tela acesa usa o vídeo mudo; só deslize firme e rápido troca de música', str(r))
     # 5b) varredura: percorre todas as telas e diálogos principais; qualquer erro de JavaScript derruba o teste
     E0 = len(E); pg.on('console', lambda m: E.append('console: ' + m.text[:160]) if m.type == 'error' and 'supabase' not in m.text.lower() and 'Failed to load resource' not in m.text else None)
     steps = pg.evaluate("""async()=>{const fails=[];let n=0;const T=async(name,f)=>{n++;try{await f()}catch(e){fails.push(name+': '+String(e).slice(0,100))}

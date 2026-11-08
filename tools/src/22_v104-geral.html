@@ -26,8 +26,8 @@ try{history.replaceState({ep:0},'');history.pushState({ep:1},'');addEventListene
 function hashGo(){const h=location.hash||'';if(h=='#esp'){S.tab='esp';return 1}if(h=='#perfil'){S.tab='perf';return 1}let m=/^#r=(.+)$/.exec(h);if(m&&S.lists.some(l=>l.id==m[1])){S.tab='lists';S.lv=m[1];S.lvm=1;return 1}m=/^#m=(.+)$/.exec(h);if(m&&S.songs.some(s=>s.id==m[1])){S.tab='songs';S.sel=m[1];S.hide=true;S.ctx=null;return 1}return 0}
 
 /* swipe in stage (6) */
-{let sx=0,sy=0,st=0,ok=0;document.addEventListener('touchstart',e=>{if(!FS||e.touches.length!=1){ok=0;return}const t=e.target;ok=!t.closest('.field,.pj,.cf,.vlj,input,select,textarea,#stg,#stgl,#ink,button,a,pre');const p=e.touches[0];sx=p.clientX;sy=p.clientY;st=Date.now()},{passive:true});
- document.addEventListener('touchend',e=>{if(!ok||!FS)return;ok=0;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;if(Date.now()-st<600&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.8)nav(dx<0?1:-1)},{passive:true})}
+{let sx=0,sy=0,st=0,ok=0;document.addEventListener('touchstart',e=>{if(!FS||e.touches.length!=1){ok=0;return}const t=e.target;ok=!t.closest('.field,.pj,.cf,.vlj,input,select,textarea,#stg,#stgl,#ink,button,a,pre');const p=e.touches[0];sx=p.clientX;sy=p.clientY;st=performance.now()},{passive:true});
+ document.addEventListener('touchend',e=>{if(!ok||!FS)return;ok=0;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;if(performance.now()-st<500&&Math.abs(dx)>=110&&Math.abs(dx)>Math.abs(dy)*2.2&&!(p.radiusX>38))stNav(dx<0?1:-1)},{passive:true})}
 /* retomar a música de onde parou (VS/original e fila de reprodução) */
 {const K='rep.pos',ID=['vsa','vqa'];let P={},lt=0;try{P=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
  const key=a=>a.dataset.ou||a.dataset.off||'',sv=()=>{try{P=Object.fromEntries(Object.entries(P).sort((a,b)=>b[1].t-a[1].t).slice(0,40));localStorage.setItem(K,JSON.stringify(P))}catch(e){}};

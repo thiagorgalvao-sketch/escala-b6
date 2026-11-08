@@ -812,6 +812,14 @@ footer a,.ft a,#m>p a,#m a[href*=privac]{display:inline-flex;align-items:center;
 :focus-visible{outline:2px solid #00CDD3;outline-offset:2px}
 @media(hover:none){button:active,.sm:active,.it:active{transform:scale(.97);transition:transform .08s}}
 
+/* ===== Palco como instrumento (VER 374) ===== */
+#stg .stp{position:absolute;right:8px;top:-34px;width:40px;height:34px;min-height:0;padding:0;border-radius:10px 10px 0 0;background:#0A0A0B;border:1px solid #38383A;border-bottom:0;color:#8E8E93;display:flex;align-items:center;justify-content:center}
+#stg .stp .ico{width:18px;height:18px}#stg .stp.on{color:#00CDD3}
+#stg.col{padding-top:4px;padding-bottom:calc(4px + env(safe-area-inset-bottom,0px))}#stg.col .stb{display:none}#stg.col .stc{min-height:36px;flex-direction:row;gap:10px;justify-content:center;align-items:center}#stg.col .sti{font-size:.8rem;flex-wrap:nowrap}#stg.col .stn{font-size:.9rem}
+body.stgc #m{padding-bottom:56px}body.fs.stgc #tt{bottom:56px}
+body.fs{background:#000}body.fs:not(.sun) .mut,body.fs:not(.sun) small{color:#E5E5EA}
+body.fs #offb{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:8px;transform:none;font-size:11px;padding:3px 9px;opacity:.85;z-index:6;box-shadow:none}
+#stz .stzp{display:none}
 </style></head><body>
 <header><svg class="lg" height="30" viewBox="0 0 720 160" preserveAspectRatio="xMinYMid slice" role="img" aria-label="Escala B6"><g transform="scale(.3125)"><circle cx="256" cy="256" r="256" fill="#000"/><circle cx="256" cy="256" r="226" fill="none" stroke="#fff" stroke-width="14"/><text x="256" y="338" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="232" font-weight="800" letter-spacing="-6" fill="#fff">B6</text></g><text x="190" y="112" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif" font-size="92" font-weight="700" letter-spacing="-2" fill="currentColor">Escala</text></svg><span id="hti" aria-hidden="true"></span><div class="tabs"><button data-t="hoje" onclick="tab('hoje')">Hoje</button> <button data-t="lists" onclick="tab('lists')">Repertórios</button> <button data-t="songs" onclick="tab('songs')">Músicas</button> <button data-t="dash" onclick="tab('dash')">Painel</button> <button data-t="esp" onclick="tab('esp')">Espiritual</button></div>
 <input id="q" placeholder="Buscar por artista ou nome da música" oninput="qin(this.value)">
@@ -880,6 +888,6 @@ const db={collection:coll,doc:p=>{const i=p.lastIndexOf('/');return coll(p.slice
 const user={isOwner:async()=>false,canEdit:async()=>false,id:async()=>(window.__FVME&&window.__FVME.user_id)||'banda',profiles:async()=>({})};
 window.__B6SITE=1;window.claude={use:async n=>{await ready;return n=='db'?db:n=='user'?user:null}};})();
 </script>
-<script src="app.js?v=373"></script></body></html>
+<script src="app.js?v=374"></script></body></html>
 
 </body></html>

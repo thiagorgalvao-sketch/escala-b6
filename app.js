@@ -2012,7 +2012,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='07/11/2026 · 373';
+const VER='08/11/2026 · 374';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2084,7 +2084,7 @@ async function cpS(b){const v=$('#sht').value;let ok=false;try{await navigator.c
 function shL(id){const l=S.lists.find(x=>x.id==id),ss=l.songIds.map(i=>S.songs.find(x=>x.id==i)).filter(Boolean);
  const t=shTxt(l);
  dlg.innerHTML=`<h2>Compartilhar repertório</h2><textarea id="sht" readonly style="width:100%;height:50vh">${esc(t)}</textarea><div class="ac"><a class="wab" href="https://api.whatsapp.com/send?text=${encodeURIComponent(t)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.5 11.5 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.5-.3z"/></svg>WhatsApp</a><button class="pri" onclick="cpS(this)">COPIAR</button></div>`;dlg.showModal()}
-var WL=null;async function wl(){try{if(!navigator.wakeLock||WL||document.hidden||((S.tab!='songs'||!S.sel)&&!FXPLAYING&&!Q))return;WL=await navigator.wakeLock.request('screen');WL.addEventListener('release',()=>{WL=null})}catch(e){}}
+var WL=null,WLq=0;async function wl(){try{if(!navigator.wakeLock||WL||WLq||document.hidden||((S.tab!='songs'||!S.sel)&&!FXPLAYING&&!Q&&!FS))return;WLq=1;try{WL=await navigator.wakeLock.request('screen');WL.addEventListener('release',()=>{WL=null})}finally{WLq=0}}catch(e){}}
 document.addEventListener('visibilitychange',wl);document.addEventListener('play',wl,true);
 document.addEventListener('keydown',e=>{if(e.defaultPrevented||FS||e.repeat||(e.target.closest&&e.target.closest('input,textarea,select'))||dlg.open||S.tab!='songs'||!S.sel)return;if(e.key=='ArrowRight'){e.preventDefault();nav(1)}else if(e.key=='ArrowLeft'){e.preventDefault();nav(-1)}});
 /* sincronização entre aparelhos (conta Claude) */
@@ -2155,7 +2155,7 @@ var dg=0;
 function goP(i){const e=document.getElementById('p'+i);e&&e.scrollIntoView({behavior:'smooth',block:'start'})}
 let tx=0,ty=0,tT=0,t1=true;
 document.addEventListener('touchstart',e=>{t1=e.touches.length==1;tx=e.touches[0].clientX;ty=e.touches[0].clientY;tT=Date.now()},{passive:true});
-document.addEventListener('touchend',e=>{if(!t1||iOn||S.tab!='songs'||!S.sel||dlg.open||d2.open||e.target.closest('input,textarea,select,.lst,#dk,#ib,audio,.au,.ctx'))return;
+document.addEventListener('touchend',e=>{if(!t1||FS||iOn||S.tab!='songs'||!S.sel||dlg.open||d2.open||e.target.closest('input,textarea,select,.lst,#dk,#ib,audio,.au,.ctx'))return;
  const c=e.target.closest('.cf');if(c&&c.scrollWidth>c.clientWidth+4)return;
  const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Date.now()-tT<900&&Math.abs(dx)>70&&Math.abs(dy)<60&&Math.abs(dx)>1.8*Math.abs(dy))nav(dx<0?1:-1)},{passive:true});
 var tt0;
@@ -2187,8 +2187,8 @@ try{history.replaceState({ep:0},'');history.pushState({ep:1},'');addEventListene
 function hashGo(){const h=location.hash||'';if(h=='#esp'){S.tab='esp';return 1}if(h=='#perfil'){S.tab='perf';return 1}let m=/^#r=(.+)$/.exec(h);if(m&&S.lists.some(l=>l.id==m[1])){S.tab='lists';S.lv=m[1];S.lvm=1;return 1}m=/^#m=(.+)$/.exec(h);if(m&&S.songs.some(s=>s.id==m[1])){S.tab='songs';S.sel=m[1];S.hide=true;S.ctx=null;return 1}return 0}
 
 /* swipe in stage (6) */
-{let sx=0,sy=0,st=0,ok=0;document.addEventListener('touchstart',e=>{if(!FS||e.touches.length!=1){ok=0;return}const t=e.target;ok=!t.closest('.field,.pj,.cf,.vlj,input,select,textarea,#stg,#stgl,#ink,button,a,pre');const p=e.touches[0];sx=p.clientX;sy=p.clientY;st=Date.now()},{passive:true});
- document.addEventListener('touchend',e=>{if(!ok||!FS)return;ok=0;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;if(Date.now()-st<600&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.8)nav(dx<0?1:-1)},{passive:true})}
+{let sx=0,sy=0,st=0,ok=0;document.addEventListener('touchstart',e=>{if(!FS||e.touches.length!=1){ok=0;return}const t=e.target;ok=!t.closest('.field,.pj,.cf,.vlj,input,select,textarea,#stg,#stgl,#ink,button,a,pre');const p=e.touches[0];sx=p.clientX;sy=p.clientY;st=performance.now()},{passive:true});
+ document.addEventListener('touchend',e=>{if(!ok||!FS)return;ok=0;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;if(performance.now()-st<500&&Math.abs(dx)>=110&&Math.abs(dx)>Math.abs(dy)*2.2&&!(p.radiusX>38))stNav(dx<0?1:-1)},{passive:true})}
 /* retomar a música de onde parou (VS/original e fila de reprodução) */
 {const K='rep.pos',ID=['vsa','vqa'];let P={},lt=0;try{P=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
  const key=a=>a.dataset.ou||a.dataset.off||'',sv=()=>{try{P=Object.fromEntries(Object.entries(P).sort((a,b)=>b[1].t-a[1].t).slice(0,40));localStorage.setItem(K,JSON.stringify(P))}catch(e){}};
@@ -2498,3 +2498,30 @@ function lembPres(force){try{const a=lembAlvo();if(!a)return false;const k='rep.
  if(!force&&m[a.l.id]==T)return false;m[a.l.id]=T;try{localStorage.setItem(k,JSON.stringify(m))}catch(e){}
  toastA((a.dd==0?'Hoje':'Amanhã')+' é culto · confirme sua presença','Responder',()=>a.logged?lembD(a.l.id):cfD(a.l.id),14000);bdgUp(1);return true}catch(e){return false}}
 function lembIni(){if(!S.band||lembIni.on)return;lembIni.on=1;let n=0;const t=setInterval(()=>{n++;const pronto=!FVC()||ME_M||n>=4;if(!pronto)return;clearInterval(t);if(S.band)lembPres()},3000)}
+/* ===== Palco como instrumento (VER 374): tela acesa, toques protegidos, barra fixável, letra adaptada, sem avisos por cima ===== */
+var NSV=null,stNt=0;
+const NSMP4='AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAMsbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAlZ0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAEAAAABAAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAAAAABAAAAAAHObWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAABAAAAAQABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABeW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAATlzdGJsAAAAuXN0c2QAAAAAAAAAAQAAAKlhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAQABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAL2F2Y0MBQsAK/+EAF2dCwArZBCbARAAAAwAEAAADABA8SJkgAQAFaMuDyyAAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAUyAAAFMgAAAAYc3R0cwAAAAAAAAABAAAAAgAAIAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAAgAAAAEAAAAcc3RzegAAAAAAAAAAAAAAAgAAAo8AAAAKAAAAFHN0Y28AAAAAAAAAAQAAA1wAAABidWR0YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAAJal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAAhmcmVlAAACoW1kYXQAAAJwBgX//2zcRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY0IHIzMTA4IDMxZTE5ZjkgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MCByZWY9MyBkZWJsb2NrPTE6MDowIGFuYWx5c2U9MHgxOjB4MTExIG1lPWhleCBzdWJtZT03IHBzeT0xIHBzeV9yZD0xLjAwOjAuMDAgbWl4ZWRfcmVmPTEgbWVfcmFuZ2U9MTYgY2hyb21hX21lPTEgdHJlbGxpcz0xIDh4OGRjdD0wIGNxbT0wIGRlYWR6b25lPTIxLDExIGZhc3RfcHNraXA9MSBjaHJvbWFfcXBfb2Zmc2V0PS0yIHRocmVhZHM9MiBsb29rYWhlYWRfdGhyZWFkcz0xIHNsaWNlZF90aHJlYWRzPTAgbnI9MCBkZWNpbWF0ZT0xIGludGVybGFjZWQ9MCBibHVyYXlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTAgd2VpZ2h0cD0wIGtleWludD0yNTAga2V5aW50X21pbj0yIHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAF2WIhAU8mKAAP78nJyddddddddddddeAAAAABkGaOAl4Rg==';
+async function wlOn(){if(!FS)return;if(navigator.wakeLock&&navigator.wakeLock.request){try{await wl()}catch(e){}return}
+ /* aparelhos sem a função (iOS antes do 16.4): um vídeo mudo de 1 pixel em loop impede a tela de apagar */
+ try{if(!NSV){NSV=document.createElement('video');NSV.setAttribute('playsinline','');NSV.setAttribute('muted','');NSV.muted=true;NSV.loop=true;NSV.setAttribute('aria-hidden','true');NSV.style.cssText='position:fixed;width:1px;height:1px;opacity:.01;pointer-events:none;left:0;top:0';NSV.src='data:video/mp4;base64,'+NSMP4;document.body.appendChild(NSV)}const p=NSV.play();p&&p.catch&&p.catch(()=>{})}catch(e){}}
+function wlOff(){try{if(NSV){NSV.pause();NSV.remove();NSV=null}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible'&&FS)wlOn()});
+/* tamanho da letra adaptado ao aparelho (só até a pessoa mexer em A−/A+ no Palco) */
+var STA=null;
+function stAuto(){STA=null;try{if(localStorage.getItem('rep.stzm')=='1')return;const n=innerWidth,z=n>=1000?1.4:n>=700?1.2:1;if(Math.abs((+S.z||1)-z)>.01){STA={o:S.z,v:z};S.z=z;zSv()}}catch(e){}}
+function stAutoOff(){try{if(STA&&S.z===STA.v){S.z=STA.o;zSv();R()}}catch(e){}STA=null}
+{const fa0=fsApply;fsApply=function(on){const r=fa0.apply(this,arguments);if(on){stAuto();wlOn();if(STA)R()}else{wlOff();stAutoOff()}return r}}
+{const z0=stZ;stZ=function(d){try{localStorage.setItem('rep.stzm','1')}catch(e){}return z0.apply(this,arguments)}}
+/* sem surpresa: avisos (toast) não aparecem por cima da cifra enquanto o Palco está ativo */
+{const t0=toast,a0=toastA;toast=function(){if(FS)return;return t0.apply(this,arguments)};toastA=function(){if(FS)return;return a0.apply(this,arguments)}}
+/* barra da próxima música: fixa (sempre aberta) ou recolhida (faixa fina que reabre ao toque) */
+function stPin(){try{return localStorage.getItem('rep.stgp')!='0'}catch(e){return true}}
+var stCT=0;
+function stCol(on){const e=document.getElementById('stg');if(!e)return;e.classList.toggle('col',!!on);document.body.classList.toggle('stgc',!!on)}
+function stArm(){clearTimeout(stCT);if(stPin())return;stCT=setTimeout(()=>stCol(true),5000)}
+function stgT(ev){if(ev)ev.stopPropagation();const p=!stPin();try{localStorage.setItem('rep.stgp',p?'1':'0')}catch(e){}stCol(false);stgPinUi();stArm()}
+function stgPinUi(){const b=document.querySelector('#stg .stp');if(b){b.classList.toggle('on',stPin());b.setAttribute('aria-pressed',stPin()?'true':'false');b.title=stPin()?'Barra fixa. Toque para deixar recolher sozinha':'Barra recolhe sozinha. Toque para fixar'}}
+function stOpen(){if(!document.getElementById('stg'))return;stCol(false);stArm()}
+/* toques acidentais: o botão não vale duas vezes em seguida, e só um deslize firme troca de música */
+function stNav(d){const n=performance.now();if(n-stNt<700)return;stNt=n;stOpen();nav(d)}
+{const s0=stg;stg=function(){const r=s0.apply(this,arguments);const e=document.getElementById('stg');if(e&&!e.hidden){e.querySelectorAll('.stb').forEach((b,i)=>{b.setAttribute('onclick','stNav('+(i?1:-1)+')')});if(!e.querySelector('.stp')){const p=document.createElement('button');p.type='button';p.className='stp';p.setAttribute('aria-label','Fixar ou recolher a barra');p.innerHTML='<svg class="ico" viewBox="0 0 24 24"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3-1-6zM12 15v5"/></svg>';p.onclick=stgT;e.appendChild(p)}stgPinUi();const c=e.querySelector('.stc');if(c)c.onclick=function(){if(e.classList.contains('col')){stOpen()}else stL()};stArm()}else{clearTimeout(stCT);document.body.classList.remove('stgc')}return r}}
