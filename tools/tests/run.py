@@ -376,12 +376,20 @@ with sync_playwright() as p:
         except ImportError: pass
     r = pg.evaluate("""()=>{const a=[];S.band=false;const l={id:'__mm',date:'2099-03-01',place:'Mauá',turno:'Manhã',name:'Culto de Domingo',songIds:[],banda:{}};
      a.push(tecK(l)=='mm');tecFill(l);a.push([l.hCrtv,l.hBanda,l.hGain,l.passHora,l.passFim].join()=='07:20,07:30,07:30,07:40,08:10');
-     const n={id:'__mn',date:'2099-03-08',place:'Mauá',turno:'Noite',name:'Culto de Domingo',songIds:[],banda:{}};tecFill(n);a.push(tecK(n)==''&&!n.hCrtv&&!n.hBanda);
+     const n={id:'__mn',date:'2099-03-10',place:'Mauá',turno:'Noite',name:'Reunião',songIds:[],banda:{}};tecFill(n);a.push(tecK(n)==''&&!n.hCrtv&&!n.hBanda);
      const sa={id:'__sa',date:'2099-03-08',place:'Santo André',turno:'Manhã',name:'Culto de Domingo',songIds:[],banda:{}};tecFill(sa);a.push(sa.hBanda=='07:30'&&sa.passHora=='07:45'&&!sa.hCrtv);
      const o={id:'__mo',date:'2099-03-15',place:'Mauá',turno:'Manhã',name:'Ceia',songIds:[],banda:{},hBanda:'07:00',hGain:'07:30',passHora:'07:45',passFim:'08:10'},pas={id:'__mp',date:'2000-01-01',place:'Mauá',turno:'Manhã',name:'Antigo',songIds:[],banda:{},hBanda:'07:00'};
-     S.lists.push(o,pas);const was=S.mig.mm1;delete S.mig.mm1;mm1();a.push([o.hCrtv,o.hBanda,o.passHora].join()=='07:20,07:30,07:40'&&pas.hBanda=='07:00'&&!pas.hCrtv&&S.mig.mm1==1);
-     a.push(/Chegada CRTV/.test(tecV(o))&&tlItems(o).some(x=>x.k=='crtv'));S.lists=S.lists.filter(x=>!/^__m/.test(x.id));S.mig.mm1=was;return a}""")
+     S.lists.push(o,pas);const was=S.mig.mm2;delete S.mig.mm2;mm1();a.push([o.hCrtv,o.hBanda,o.passHora].join()=='07:20,07:30,07:40'&&pas.hBanda=='07:00'&&!pas.hCrtv&&S.mig.mm2==1);
+     a.push(/Chegada CRTV/.test(tecV(o))&&tlItems(o).some(x=>x.k=='crtv'));S.lists=S.lists.filter(x=>!/^__m/.test(x.id));S.mig.mm2=was;return a}""")
     ok(r == [True]*6, 'Mauá manhã: horários padrão da tabela (CRTV 7h20, banda 7h30, passagem 7h40–8h10) e ajuste dos próximos cultos', str(r))
+    r = pg.evaluate("""()=>{const a=[];const mk=(d,t,n)=>({id:'__q'+d,date:d,place:'Mauá',turno:t,name:n,songIds:[],banda:{}});
+     const dn=mk('2099-03-01','Noite','Culto de Domingo'),qu=mk('2099-03-05','Noite','Culto de Quinta'),qs=mk('2099-03-05','','Culto');[dn,qu,qs].forEach(tecFill);
+     a.push([dn.hCrtv,dn.hBanda,dn.hGain,dn.passHora,dn.passFim].join()=='16:50,17:00,17:00,17:10,17:40');
+     a.push([qu.hCrtv,qu.hBanda,qu.hGain,qu.passHora,qu.passFim].join()=='18:30,18:40,18:40,18:50,19:20',qs.hCrtv=='18:30');
+     const sx=mk('2099-03-03','Noite','Reunião');tecFill(sx);a.push(!sx.hBanda&&tecK(sx)==='');
+     const f={id:'__qf',date:'2099-06-04',place:'Mauá',turno:'Noite',name:'Quinta',songIds:[],banda:{},hBanda:'19:00',passHora:'19:10'},d2={id:'__qg',date:'2099-06-07',place:'Mauá',turno:'Noite',name:'Domingo',songIds:[],banda:{}};
+     S.lists.push(f,d2);const was=S.mig.mm2;delete S.mig.mm2;mm1();a.push(f.hBanda=='18:40'&&f.passFim=='19:20'&&d2.hCrtv=='16:50');S.lists=S.lists.filter(x=>!/^__q/.test(x.id));S.mig.mm2=was;return a}""")
+    ok(r == [True]*5, 'Mauá: tabelas de quinta (18h30) e domingo à noite (18h30) viram padrão e ajustam os próximos cultos', str(r))
     # 5b) varredura: percorre todas as telas e diálogos principais; qualquer erro de JavaScript derruba o teste
     E0 = len(E); pg.on('console', lambda m: E.append('console: ' + m.text[:160]) if m.type == 'error' and 'supabase' not in m.text.lower() and 'Failed to load resource' not in m.text else None)
     steps = pg.evaluate("""async()=>{const fails=[];let n=0;const T=async(name,f)=>{n++;try{await f()}catch(e){fails.push(name+': '+String(e).slice(0,100))}

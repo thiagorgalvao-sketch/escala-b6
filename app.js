@@ -1824,11 +1824,11 @@ const fp3=l=>JSON.stringify([l.ord||{},l.dress||null,l.pregador||'',l.live||''])
 
 /* ===== horários técnicos (210) */
 const pasR=l=>l.passHora?(l.passHora+(l.passFim?' – '+l.passFim:'')):'';
-const TECG={dn:['17:00','17:00','17:15','17:40'],dm:['07:30','07:30','07:45','08:10'],q:['18:40','18:40','18:55','19:20'],mm:['07:30','07:30','07:40','08:10','07:20']};
-function tecK(l){const pl=nz(l.place||'').trim(),t0=nz(l.turno||'');if(pl=='maua')return/manh/.test(t0)?'mm':'';if(pl!='santo andre')return'';const n=nz(l.name||''),t=nz(l.turno||'');if(/quarta/.test(n))return'q';if(/domingo/.test(n)||(l.date&&new Date(l.date+'T12:00').getDay()==0))return/manh/.test(t)?'dm':/noite/.test(t)?'dn':'';return''}
+const TECG={dn:['17:00','17:00','17:15','17:40'],dm:['07:30','07:30','07:45','08:10'],q:['18:40','18:40','18:55','19:20'],mm:['07:30','07:30','07:40','08:10','07:20'],mn:['17:00','17:00','17:10','17:40','16:50'],mq:['18:40','18:40','18:50','19:20','18:30']};
+function tecK(l){const pl=nz(l.place||'').trim(),t0=nz(l.turno||'');if(pl=='maua'){const wd=l.date?new Date(l.date+'T12:00').getDay():-1,n0=nz(l.name||'');if(wd==4||/quinta/.test(n0))return'mq';if(/manh/.test(t0))return'mm';if(/noite/.test(t0)&&(wd==0||/domingo/.test(n0)))return'mn';return''}if(pl!='santo andre')return'';const n=nz(l.name||''),t=nz(l.turno||'');if(/quarta/.test(n))return'q';if(/domingo/.test(n)||(l.date&&new Date(l.date+'T12:00').getDay()==0))return/manh/.test(t)?'dm':/noite/.test(t)?'dn':'';return''}
 function tecFill(l){const k=tecK(l);if(!k)return;const g=TECG[k];if(!l.hBanda)l.hBanda=g[0];if(!l.hGain)l.hGain=g[1];if(!l.passHora)l.passHora=g[2];if(!l.passFim)l.passFim=g[3];if(g[4]&&!l.hCrtv)l.hCrtv=g[4]}
-/* Mauá, culto da manhã (tabela de 07/11/2026): aplica uma vez nos próximos cultos, sobrescrevendo os horários antigos */
-function mm1(){if(S.mig.mm1)return;const T=td();S.lists.forEach(l=>{if((l.date||'')>=T&&tecK(l)=='mm'){const g=TECG.mm;l.hBanda=g[0];l.hGain=g[1];l.passHora=g[2];l.passFim=g[3];l.hCrtv=g[4]}});S.mig.mm1=1}
+/* Mauá (tabelas de 07/11/2026: domingo manhã, domingo noite e quinta): aplica uma vez nos próximos cultos, sobrescrevendo os horários antigos */
+function mm1(){if(S.mig.mm2)return;const T=td();S.lists.forEach(l=>{const k=tecK(l);if((l.date||'')>=T&&/^m[mnq]$/.test(k)){const g=TECG[k];l.hBanda=g[0];l.hGain=g[1];l.passHora=g[2];l.passFim=g[3];l.hCrtv=g[4]}});S.mig.mm1=1;S.mig.mm2=1}
 /* linha do tempo do dia: passagem de som em destaque, com contagem regressiva */
 const tmM=h=>{const m=/^\s*(\d{1,2}):(\d{2})/.exec(String(h||''));return m?(+m[1])*60+(+m[2]):null};
 function tlItems(l){const a=[];if(l.hCrtv)a.push({k:'crtv',t:'Chegada CRTV',r:String(l.hCrtv),s:tmM(l.hCrtv)});if(l.hBanda)a.push({k:'ban',t:'Banda pronta',r:String(l.hBanda),s:tmM(l.hBanda)});if(l.hGain)a.push({k:'gain',t:'Gain / check',r:String(l.hGain),s:tmM(l.hGain)});if(l.passHora||l.passFim)a.push({k:'pas',t:'Passagem de som',r:pasR(l)||('até '+l.passFim),s:tmM(l.passHora),e:tmM(l.passFim)});return a.sort((x,y)=>(x.s==null?1e4:x.s)-(y.s==null?1e4:y.s))}
@@ -2012,7 +2012,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='07/11/2026 · 372';
+const VER='07/11/2026 · 373';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
