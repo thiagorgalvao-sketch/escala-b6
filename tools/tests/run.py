@@ -382,6 +382,27 @@ with sync_playwright() as p:
      S.lists.push(o,pas);const was=S.mig.mm2;delete S.mig.mm2;mm1();a.push([o.hCrtv,o.hBanda,o.passHora].join()=='07:20,07:30,07:40'&&pas.hBanda=='07:00'&&!pas.hCrtv&&S.mig.mm2==1);
      a.push(/Chegada CRTV/.test(tecV(o))&&tlItems(o).some(x=>x.k=='crtv'));S.lists=S.lists.filter(x=>!/^__m/.test(x.id));S.mig.mm2=was;return a}""")
     ok(r == [True]*6, 'Mauá manhã: horários padrão da tabela (CRTV 7h20, banda 7h30, passagem 7h40–8h10) e ajuste dos próximos cultos', str(r))
+    r = pg.evaluate("""async()=>{const a=[],o=[DISP_ALL,ME_M,MY_DISP,window.__SBB];S.band=false;
+     DISP_ALL={'per:2099-12-20:2100-01-05':[{nome:'Ana Teste',status:'nao',obs:'viagem'}]};
+     const h=perHit('ANA TESTE','2099-12-25');a.push(!!h&&h.status=='nao'&&/viagem/.test(h.obs)&&h.obs.includes('20/12'));a.push(perHit('Ana Teste','2100-01-06')===null&&perHit('Outro','2099-12-25')===null);
+     const l={id:'__pe',date:'2099-12-25',place:'Mauá',turno:'Noite',name:'Culto',songIds:[],banda:{vm:'Ana Teste'}};DISP_ALL['__pe']=[{nome:'Ana Teste',status:'sim',obs:''}];a.push(dispDe('Ana Teste',l).status=='sim');delete DISP_ALL['__pe'];a.push(dispDe('Ana Teste',l).status=='nao');
+     const calls=[],q={upsert:x=>{calls.push(x);return Promise.resolve({})},delete:()=>q,eq:()=>q,then:f=>f({})};window.__SBB={from:()=>q};ME_M={id:'m1',nome:'Ana Teste'};MY_DISP={};
+     S.band=false;S.tab='perf';R();a.push(!!document.querySelector('.perc'));
+     document.querySelector('#per_de').value='2099-12-20';document.querySelector('#per_ate').value='2099-12-22';document.querySelector('#per_obs').value='viagem';await perAdd();
+     a.push(calls.length==1&&calls[0].culto_id=='per:2099-12-20:2099-12-22'&&calls[0].status=='nao'&&perMine().length==1);
+     [DISP_ALL,ME_M,MY_DISP,window.__SBB]=o;S.tab='lists';R();const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on');return a}""")
+    ok(r == [True]*6, 'indisponibilidade por período: perfil grava, aviso cobre as datas e o culto respondido vale mais', str(r))
+    r = pg.evaluate("""()=>{const a=[],T=td(),d=n=>{const x=new Date(T+'T12:00');x.setDate(x.getDate()-n);return x.toISOString().slice(0,10)};
+     const s1=S.songs[0],s2=S.songs[1],s3=S.songs[2],o=S.lists;S.lists=[{id:'__a',date:d(200),songIds:[s1.id],banda:{}},{id:'__b',date:d(10),songIds:[s2.id],banda:{}},{id:'__c',date:d(5),songIds:[s2.id],banda:{}}];
+     P={id:'__n',songIds:[],banda:{},q:''};document.body.insertAdjacentHTML('beforeend','<div id="pkf"></div><div id="pk"></div>');PKF='old';pkR();const has=(id)=>document.querySelector('#pk').innerHTML.includes("la('"+id+"')");a.push(has(s1.id)&&!has(s2.id));
+     PKF='new';pkR();a.push(!has(s1.id)&&!has(s2.id)&&has(s3.id));
+     PKF='top';pkR();a.push(has(s2.id)&&!has(s3.id)&&has(s1.id));
+     PKF='';S.lists=o;document.querySelector('#pk').remove();document.querySelector('#pkf').remove();P=null;return a}""")
+    ok(r == [True]*3, 'sugestões ao escolher músicas: sem tocar há 2+ meses, nunca tocadas e mais tocadas', str(r))
+    r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
+     ltG('ev');ltS(1);a.push(LTB=='mu'&&!document.querySelector('#lvt').hidden);ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
+     ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")
+    ok(r == [True]*5, 'culto em passos: Próxima/Voltar percorre as etapas até o Resumo', str(r))
     r = pg.evaluate("""()=>{const a=[];const mk=(d,t,n)=>({id:'__q'+d,date:d,place:'Mauá',turno:t,name:n,songIds:[],banda:{}});
      const dn=mk('2099-03-01','Noite','Culto de Domingo'),qu=mk('2099-03-05','Noite','Culto de Quinta'),qs=mk('2099-03-05','','Culto');[dn,qu,qs].forEach(tecFill);
      a.push([dn.hCrtv,dn.hBanda,dn.hGain,dn.passHora,dn.passFim].join()=='16:50,17:00,17:00,17:10,17:40');
