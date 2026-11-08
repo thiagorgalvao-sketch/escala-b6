@@ -361,7 +361,7 @@ with sync_playwright() as p:
     VD = os.path.join(HERE, 'visual'); os.makedirs(os.path.join(VD, 'base'), exist_ok=True); os.makedirs(os.path.join(VD, 'atual'), exist_ok=True)
     telas = {'musica': "S.tab='songs';S.sel=S.songs.find(x=>(x.vmap||[]).length)?.id||S.songs[0].id;S.vw='mapa'", 'lista': "S.tab='songs';S.sel=null", 'repertorio': "S.tab='lists';S.lv=(S.lists.find(x=>x.songIds.length)||S.lists[0]).id;S.lvm=1", 'ajustes': "S.tab='songs';S.sel=null"}
     for nome, js in telas.items():
-        pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close());S.band=false;" + js + (";R();cfgD()" if nome == 'ajustes' else ";R()")); pg.wait_for_timeout(500)
+        pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d=>d.close());S.band=false;" + js + (";R();cfgD()" if nome == 'ajustes' else ";R()")); pg.wait_for_timeout(500); pg.evaluate("(()=>{const t=document.getElementById('tt');if(t)t.classList.remove('on','act')})()")  # aviso (toast) de testes anteriores não entra na captura
         g = pg.evaluate("""()=>{const W=innerWidth,bad=[];document.querySelectorAll('body *').forEach(e=>{if(!e.offsetParent&&getComputedStyle(e).position!='fixed')return;const r=e.getBoundingClientRect();if(r.width&&r.right>W+2&&!e.closest('[class*=scr],.tabs,#tbb,pre,table,.hscroll,svg,canvas,dialog,[style*=overflow]')&&getComputedStyle(e).position!='fixed')bad.push((e.tagName+'.'+(e.className&&e.className.baseVal===undefined?e.className:'')).slice(0,40))});return{sw:document.documentElement.scrollWidth-W,bad:bad.slice(0,4)}}""")
         ok(g['sw'] <= 1, f'visual {nome}: sem rolagem lateral (390 px)', str(g))
         arq = nome + '.png'; pg.screenshot(path=os.path.join(VD, 'atual', arq))
