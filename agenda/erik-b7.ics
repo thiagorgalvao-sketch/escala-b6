@@ -16,18 +16,4 @@ TZOFFSETTO:-0300
 TZNAME:-03
 END:STANDARD
 END:VTIMEZONE
-BEGIN:VEVENT
-UID:culto-e_2026-09-23_santoandre_quartadoenco@escala-b6
-DTSTAMP:20261107T215708Z
-DTSTART;TZID=America/Sao_Paulo:20260923T185500
-DTEND;TZID=America/Sao_Paulo:20260923T220500
-SUMMARY:Culto · Santo André - Noite · Quarta do Encontro
-LOCATION:Av. Pedro Américo\, 36 - Vila Humaita\, Santo André - SP\, 09110-560
-DESCRIPTION:Você: Tenor\n\nHORÁRIOS\nInício da passagem: 18:55\n\nREPERTÓRIO\n- Sou Grato por Seu Amor\n- Vida aos Sepulcros\n- Além do Impossível\n- Digno É o Senhor\n- Digno de Tudo\n- Tá Chorando por Quê?\n\nhttps://fervor.website/
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Culto · Santo André - Noite · Quarta do Encontro
-TRIGGER:-PT1H
-END:VALARM
-END:VEVENT
 END:VCALENDAR
