@@ -850,6 +850,7 @@ body:not(.chon) #chb{display:none}#chb{position:relative}#chbd{position:absolute
 body.chaton #vft{display:none}
 
 .chwho{display:flex;flex-wrap:wrap;gap:8px}.chwho .sm{min-height:44px;padding:0 16px}
+body.chon #chb{display:inline-flex;flex:none}
 </style></head><body>
 <header><button type="button" id="nvb" class="nvb" hidden onclick="bkGo()" aria-label="Voltar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span></span></button><svg class="lg" height="30" viewBox="0 0 720 160" preserveAspectRatio="xMinYMid slice" role="img" aria-label="Escala B6"><g transform="scale(.3125)"><circle cx="256" cy="256" r="256" fill="#000"/><circle cx="256" cy="256" r="226" fill="none" stroke="#fff" stroke-width="14"/><text x="256" y="338" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="232" font-weight="800" letter-spacing="-6" fill="#fff">B6</text></g><text x="190" y="112" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif" font-size="92" font-weight="700" letter-spacing="-2" fill="currentColor">Escala</text></svg><span id="hti" aria-hidden="true"></span><div class="tabs"><button data-t="hoje" onclick="tab('hoje')">Hoje</button> <button data-t="lists" onclick="tab('lists')">Repertórios</button> <button data-t="songs" onclick="tab('songs')">Músicas</button> <button data-t="dash" onclick="tab('dash')">Painel</button> <button data-t="esp" onclick="tab('esp')">Espiritual</button></div>
 <input id="q" placeholder="Buscar por artista ou nome da música" oninput="qin(this.value)">
@@ -957,6 +958,6 @@ const go=()=>check().catch(e=>loginForm('Sem conexão com o servidor. Tente de n
 if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
 })();
 </script>
-<script src="app.js?v=383"></script></body></html>
+<script src="app.js?v=384"></script></body></html>
 
 </body></html>
