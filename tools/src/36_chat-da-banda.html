@@ -37,7 +37,7 @@ async function chPoll(force){if(!(CH.anon||CH.u)||CH.live||CH.ld||CH.pl||documen
  const full=on&&CH.pn%6==0,last=chLastId();CH.pl=1;
  try{let fresh=[],chg=0;
   if(!full&&CH.ok&&last){const rows=(await chRows(0,last)).slice().reverse();const have=new Set(CH.msgs.map(x=>x.id));fresh=rows.filter(x=>!have.has(x.id));if(fresh.length){const tmp=CH.msgs.filter(x=>x.tmp);CH.msgs=CH.msgs.filter(x=>!x.tmp).concat(fresh,tmp);chg=1}}
-  else{const rows=(await chRows()).slice().reverse(),sig=a=>a.map(x=>x.id).join(','),mn=rows.length?rows[0].id:0;
+  else{const rows=(await chRows()).slice().reverse(),sig=a=>a.map(x=>x.id+(x.editado_em||'')).join(','),mn=rows.length?rows[0].id:0;
    const cur=CH.msgs.filter(x=>typeof x.id=='number'&&x.id>=mn);
    if(!CH.ok||sig(cur)!=sig(rows)){const have=new Set(CH.msgs.map(x=>x.id));fresh=CH.ok?rows.filter(x=>!have.has(x.id)):[];CH.msgs=CH.msgs.filter(x=>typeof x.id=='number'&&x.id<mn).concat(rows,CH.msgs.filter(x=>x.tmp));chg=1}}
   CH.ok=1;CH.err='';fresh=fresh.filter(x=>!chMe(x));
@@ -70,7 +70,7 @@ function chEmo(on){const p=$('#chp');if(!p)return;p.hidden=on===0?true:on===1?fa
 function chPut(e){const t=$('#chi');if(!t)return;const s=t.selectionStart==null?t.value.length:t.selectionStart,f=t.selectionEnd==null?s:t.selectionEnd;t.value=t.value.slice(0,s)+e+t.value.slice(f);const p=s+e.length;try{t.setSelectionRange(p,p)}catch(x){}t.focus();chGrow(t)}
 function chGrow(t){t.style.height='auto';t.style.height=Math.min(120,t.scrollHeight)+'px'}
 function chKey(ev){if(ev.key=='Enter'&&!ev.shiftKey&&!MOB()){ev.preventDefault();chSend()}}
-function vChat(){const hd='<div class="dbh"><div><h1>Chat da banda</h1><p class="mut">'+(CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.')+'</p></div></div>';
+function vChat(){const hd='<div class="dbh"><div><h1>Chat B6 (Lugar do Encontro)</h1><p class="mut">'+(CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.')+'</p></div></div>';
  if(!chEnabled())return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">O chat está desligado no momento. A liderança pode ligar em Ajustes &rsaquo; Acesso da banda.</p></div></div>`;
  if(!CH.u&&!CH.anon)return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">Conectando ao chat…</p></div></div>`;
  if(!chOn()){const N=CH.fx||[];return`<div class="dbw chw">${hd}<div class="dbc"><h3 style="margin:0 0 6px">Quem é você?</h3><p class="mut" style="margin:0 0 10px">Toque no seu nome (integrantes da banda fixa) para entrar na conversa.</p><div class="chwho">${N.map((n,i)=>`<button type="button" class="sm" onclick="chWho(${i})">${esc(n)}</button>`).join('')||'<span class="mut">'+(CH.fx?'Nenhum integrante da banda fixa encontrado. A liderança confere em Acesso da banda se os nomes estão marcados como “Banda fixa” e “Ativo”.':'Carregando a lista…')+'</span>'}</div></div></div>`}

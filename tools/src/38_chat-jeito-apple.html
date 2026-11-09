@@ -1,0 +1,78 @@
+/* ===== Chat no jeito Apple: segurar para abrir o menu, desfazer envio e editar, arrastar para ver horários,
+   resumo do que você perdeu, menções a pessoas, privacidade (leitura e prévia do aviso), tamanho do texto,
+   acessibilidade e número de não lidas no ícone do app ===== */
+function chOpt(k,d){try{const v=localStorage.getItem('rep.chat.'+k);return v==null?d:v}catch(e){return d}}
+function chOptSet(k,v){try{localStorage.setItem('rep.chat.'+k,String(v))}catch(e){}}
+function chRR(){return chOpt('rr','1')!='0'}
+/* --- pessoas para @menção --- */
+function chPessoas(){return (CH.fx&&CH.fx.length?CH.fx:CH.pp||[]).slice()}
+async function chPessoasLoad(){if(CH.ppl||(CH.fx&&CH.fx.length))return;CH.ppl=1;try{CH.pp=(await chRpc('chat_membros',{})||[]).map(x=>x.nome).filter(Boolean)}catch(e){CH.pp=[]}}
+function chEsMeu(nm){const me=chNome();return !!me&&nz(String(nm).replace(/&amp;/g,'&'))==nz(me)}
+function chMencionaMe(m){const me=chNome();if(!me||!m||!m.texto)return false;const rx=/\[\[p:[\w-]*\|([^\]\[]+)\]\]/g;let x;while((x=rx.exec(m.texto)))if(nz(x[1])==nz(me))return true;return false}
+/* --- desfazer envio (até 2 min) --- */
+async function chUndo(id){chSheetX();const m=CH.msgs.find(x=>x.id===id);if(!m)return;
+ try{if(CH.u){const r=await FVC().from('chat_mensagens').delete().eq('id',id);if(r.error)throw r.error}else{const r=await chRpc('chat_apagar',{p_id:id,p_device:chDev()});if(r!==true)throw new Error('não foi possível')}
+  chOut(id);toast('Envio desfeito');hap(8)}catch(e){say('Não consegui desfazer: '+chErr(e))}}
+/* --- editar (até 15 min) --- */
+function chEdit(id){const m=CH.msgs.find(x=>x.id===id);chSheetX();if(!m)return;CH.ed={id:id};CH.rep=null;CH.refs={};
+ const tx=String(m.texto||'').replace(/\[\[(m|c|p):([\w-]*)\|([^\]\[]+)\]\]/g,(x,k,i,n)=>{const lb='@'+n;CH.refs[lb]=x;return lb});CH.draft=tx;CH.foc=1;R()}
+function chEditX(){CH.ed=null;CH.draft='';R()}
+async function chEditGo(v){const id=CH.ed.id;CH.ed=null;const m=CH.msgs.find(x=>x.id===id);if(!m){R();return}const old=m.texto;
+ if(old===v){R();return}m.texto=v;m.editado_em=new Date().toISOString();R();
+ try{const d=await chRpc('chat_editar',{p_id:id,p_texto:v,p_device:chDev()});if(d&&d.texto!=null){m.texto=d.texto;m.editado_em=d.editado_em}chR()}
+ catch(e){m.texto=old;m.editado_em=null;chR();say('Não consegui editar: '+chErr(e)+(/function|404|chat_editar/i.test(chErr(e))?' (rode o 21_chat_jeito_apple.sql no Supabase)':''))}}
+{const _s=chSend;chSend=async function(){if(CH.ed){const t=$('#chi');if(!t)return;let v=t.value.trim();if(!v)return;v=chRefApply(v);CH.refs={};t.value='';CH.draft=null;return chEditGo(v)}return _s.apply(this,arguments)}}
+/* edições de outras pessoas chegando ao vivo (quem tem conta) */
+function chUpd(n){if(!n||!n.id)return;const m=CH.msgs.find(x=>x.id===n.id);if(!m)return;let ch=0;['texto','editado_em','fixada'].forEach(k=>{if(k in n&&m[k]!==n[k]){m[k]=n[k];ch=1}});if(ch&&S.tab=='chat')chR()}
+function chSubUp(){if(CH.sub2||!CH.u||!CH.v3)return;const c=FVC();if(!c||!c.channel)return;try{CH.sub2=c.channel('chat-banda-ed').on('postgres_changes',{event:'UPDATE',schema:'public',table:'chat_mensagens'},p=>chUpd(p.new)).subscribe()}catch(e){}}
+/* --- segurar para abrir o menu (com vibração); toque simples não faz nada --- */
+(function(){let tm=0,x0=0,y0=0,b=null,fired=0;
+ const cancel=()=>{clearTimeout(tm);tm=0;if(b)b.classList.remove('press');b=null};
+ document.addEventListener('pointerdown',e=>{const el=e.target.closest&&e.target.closest('.chm .chb[data-id]');if(!el||e.button>0||e.target.closest('a,button,audio,.chpo,.chq'))return;
+  b=el;x0=e.clientX;y0=e.clientY;fired=0;el.classList.add('press');tm=setTimeout(()=>{const id=+el.dataset.id;cancel();fired=1;hap(12);chSheet(id)},430)},{passive:true});
+ document.addEventListener('pointermove',e=>{if(b&&(Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10))cancel()},{passive:true});
+ ['pointerup','pointercancel','scroll'].forEach(k=>document.addEventListener(k,cancel,{passive:true,capture:true}));
+ document.addEventListener('contextmenu',e=>{const el=e.target.closest&&e.target.closest('.chm .chb[data-id]');if(!el)return;e.preventDefault();if(fired){fired=0;return}cancel();chSheet(+el.dataset.id)});
+ document.addEventListener('click',e=>{if(fired&&e.target.closest&&e.target.closest('.chm .chb')){e.preventDefault();e.stopPropagation();fired=0}},true);
+ /* teclado / leitor de tela: Enter ou Espaço na mensagem abre o menu */
+ document.addEventListener('keydown',e=>{const el=e.target&&e.target.closest&&e.target.closest('.chm .chb[data-id]');if(!el||e.target!==el)return;if(e.key=='Enter'||e.key==' '||e.key=='ContextMenu'){e.preventDefault();chSheet(+el.dataset.id)}})})();
+/* --- arrastar para a esquerda mostra os horários --- */
+(function(){let x0=0,y0=0,on=0,box=null;
+ document.addEventListener('touchstart',e=>{const m=e.target.closest&&e.target.closest('.chm');if(!m||e.target.closest('audio,.chpo'))return;box=m;x0=e.touches[0].clientX;y0=e.touches[0].clientY;on=0},{passive:true});
+ document.addEventListener('touchmove',e=>{if(!box)return;const dx=e.touches[0].clientX-x0,dy=Math.abs(e.touches[0].clientY-y0);if(!on&&dy>24){box=null;return}
+  if(dx<-18){on=1;box.classList.add('chtm');box.style.setProperty('--chsl',Math.max(dx,-64)+'px')}},{passive:true});
+ document.addEventListener('touchend',()=>{if(!box)return;const m=box;box=null;m.style.setProperty('--chsl','0px');setTimeout(()=>m.classList.remove('chtm'),220)},{passive:true})})();
+/* --- resumo do que você perdeu --- */
+function chResumo(){const s0=CH.s0;if(!s0)return null;const N=CH.msgs.filter(m=>typeof m.id=='number'&&m.id>s0&&!chMe(m));if(N.length<6)return null;
+ const pes=new Set(N.map(m=>m.autor)).size,enq=N.filter(m=>m.tipo=='enquete').length,aud=N.filter(m=>m.tipo=='audio').length,men=N.filter(chMencionaMe).length;
+ const p=[N.length+' mensagens de '+pes+(pes>1?' pessoas':' pessoa')];if(men)p.push('📣 você foi mencionado'+(men>1?' '+men+' vezes':''));if(enq)p.push('📊 '+enq+(enq>1?' enquetes':' enquete'));if(aud)p.push('🎤 '+aud+(aud>1?' áudios':' áudio'));
+ return{id:N[0].id,txt:p.join(' · ')}}
+{const _v=vChat;vChat=function(){if(!CH.in)CH.s0=CH.seen||0;let h=_v.apply(this,arguments);const r=chResumo();
+ if(r){const k='id="cm'+r.id+'"',i=h.indexOf(k);if(i>0){const j=h.lastIndexOf('<div class="chb',i);if(j>0)h=h.slice(0,j)+`<div class="chsum" id="chsum" role="note"><b>Novas mensagens</b><span>${esc(r.txt)}</span></div>`+h.slice(j)}}
+ const fs=+chOpt('fs','1')||1;h=h.replace('<div class="dbw chw">','<div class="dbw chw" style="--chfs:'+fs+'">');
+ return h.replace('<div class="chtb">','<div class="chtb"><button type="button" class="sm" onclick="chOpts()" aria-label="Opções do chat">⚙︎ Opções</button>')}}
+/* o botão de avisos sai do topo (vai para Opções) */
+{const _v=vChat;vChat=function(){return _v.apply(this,arguments).replace(/<button type="button" class="sm" onclick="chAv(On|Off)\(\)" title="Avisos no celular">[^<]*<\/button>/,'')}}
+/* --- opções do chat (privacidade, avisos, tamanho do texto) --- */
+async function chOpts(){const av=chAvLoc(),pv=chOpt('pv','1')!='0',rr=chRR(),fs=+chOpt('fs','1')||1;
+ dlg.innerHTML=`<h2>Opções do chat</h2>
+ <label class="tg cft"><input type="checkbox"${av?' checked':''} onchange="this.checked?chAvOn():chAvOff()"><span></span><div><b>Avisos no celular</b><small class="mut" style="display:block">Receber um aviso quando chegar mensagem com o app fechado.</small></div></label>
+ <label class="tg cft"><input type="checkbox"${pv?' checked':''} onchange="chPv(this.checked)"><span></span><div><b>Mostrar o texto nos avisos</b><small class="mut" style="display:block">Desligado, o aviso diz só “Nova mensagem no chat”, sem mostrar o conteúdo na tela bloqueada.</small></div></label>
+ <label class="tg cft"><input type="checkbox"${rr?' checked':''} onchange="chRrSet(this.checked)"><span></span><div><b>Confirmação de leitura</b><small class="mut" style="display:block">Ligada, você aparece no “Visto por” e vê quem leu as suas mensagens. Desligada, nenhum dos dois.</small></div></label>
+ <div class="chfsz"><b>Tamanho do texto</b><div><button type="button" class="sm" onclick="chFs(-1)" aria-label="Diminuir texto">A−</button><span id="chfsv">${Math.round(fs*100)}%</span><button type="button" class="sm" onclick="chFs(1)" aria-label="Aumentar texto">A+</button></div></div>
+ <div class="ac"><button class="pri" onclick="dlg.close()">Pronto</button></div>`;if(!dlg.open)dlg.showModal()}
+function chFs(d){let v=+chOpt('fs','1')||1;v=Math.min(1.5,Math.max(.85,Math.round((v+d*.1)*100)/100));chOptSet('fs',v);const e=$('#chfsv');if(e)e.textContent=Math.round(v*100)+'%';const w=$('.chw');if(w)w.style.setProperty('--chfs',v)}
+async function chRrSet(on){chOptSet('rr',on?'1':'0');if(!on){try{await chRpc('chat_li_ocultar',{p_device:chDev()})}catch(e){}}else{CH.lis=0;chLi()}CH.exk='';chEx();chR()}
+async function chPv(on){chOptSet('pv',on?'1':'0');try{const reg=await navigator.serviceWorker.getRegistration();const s=reg&&await reg.pushManager.getSubscription();if(s)await chRpc('chat_aviso_pref',{ep:s.endpoint,p_previa:on})}catch(e){say('Não consegui salvar: '+chErr(e)+(/function|404/i.test(chErr(e))?' (rode o 21_chat_jeito_apple.sql)':''))}}
+{const _o=chAvOn;chAvOn=async function(){await _o.apply(this,arguments);if(chOpt('pv','1')=='0')chPv(false);if(dlg.open&&$('.chfsz'))chOpts()}}
+{const _o=chAvOff;chAvOff=async function(){await _o.apply(this,arguments);if(dlg.open&&$('.chfsz'))chOpts()}}
+/* quem desligou a confirmação de leitura não informa que leu */
+{const _l=chLi;chLi=async function(){if(!chRR())return;return _l.apply(this,arguments)}}
+/* --- número de não lidas no ícone do app instalado --- */
+function chIcon(n){try{if(!('setAppBadge' in navigator))return;if(n>0)navigator.setAppBadge(n).catch(()=>{});else navigator.clearAppBadge().catch(()=>{})}catch(e){}
+ if(!n){try{caches.open('fv-badge').then(c=>c.put('n',new Response('0'))).catch(()=>{})}catch(e){}}}
+{const _b=chBadge;chBadge=function(){const r=_b.apply(this,arguments);try{chIcon(chOn()?chUnread():0)}catch(e){}return r}}
+/* --- ao entrar no chat: guarda o ponto onde você parou (para o resumo) e vai até lá --- */
+{const _a=chAfter;chAfter=function(){const was=CH.in;_a.apply(this,arguments);
+ if(S.tab!='chat'){CH.s0=0;CH.ed=null;return}chPessoasLoad();chSubUp();
+ if(!was&&$('#chsum'))setTimeout(()=>{const e=$('#chsum');if(e)e.scrollIntoView({block:'start'});window.scrollBy(0,-90)},80)}}

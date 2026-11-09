@@ -3,6 +3,8 @@
 // O app chama esta função logo depois de enviar uma mensagem, passando só o número dela.
 // A função confere no banco se a mensagem é nova (menos de 3 minutos) e ainda não foi avisada,
 // por isso ninguém consegue usá-la para mandar avisos falsos ou repetidos.
+// Versão 2: avisa quem foi mencionado (@nome) mesmo com os avisos do chat desligados, e respeita
+// quem pediu para não mostrar o texto da mensagem no aviso.
 // Ao criar a função no Supabase, DESLIGUE a opção "Verify JWT" (quem está sem login também envia mensagens).
 import webpush from "npm:web-push@3.6.7";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -40,22 +42,32 @@ Deno.serve(async (req) => {
     if (!m) return json({ enviados: 0, motivo: "mensagem já avisada ou antiga" });
 
     const autorQuem = m.user_id ? "u:" + m.user_id : "d:" + m.device;
-    const corpo = m.tipo === "audio" ? "🎤 Mensagem de voz" : m.tipo === "enquete" ? "📊 Enquete: " + m.texto : m.texto;
-    const payload = JSON.stringify({
-      title: "💬 " + String(m.autor || "Chat da banda").slice(0, 60),
-      body: String(corpo || "").slice(0, 200),
+    const texto = String(m.texto || "");
+    // menções: [[p:...|Nome]] -> "Nome"
+    const mencionados = [...texto.matchAll(/\[\[p:[^|\]]*\|([^\]]+)\]\]/g)].map((x) => x[1].trim().toLowerCase());
+    const limpo = texto.replace(/\[\[(m|c|p):[^|\]]*\|([^\]]+)\]\]/g, (_x, k, n) => (k === "p" ? "@" : "") + n);
+    const corpo = m.tipo === "audio" ? "🎤 Mensagem de voz" : m.tipo === "enquete" ? "📊 Enquete: " + limpo : limpo;
+    let quemMenc = new Set<string>();
+    if (mencionados.length) {
+      const { data: li } = await db.from("chat_lidos").select("quem,nome");
+      quemMenc = new Set((li ?? []).filter((x) => mencionados.includes(String(x.nome).trim().toLowerCase())).map((x) => x.quem));
+    }
+    const carga = (menc: boolean, previa: boolean) => JSON.stringify({
+      title: previa ? (menc ? "📣 " + String(m.autor).slice(0, 50) + " mencionou você" : "💬 " + String(m.autor || "Chat da banda").slice(0, 60)) : "Fervor",
+      body: previa ? corpo.slice(0, 200) : (menc ? "Você foi mencionado no chat da banda" : "Nova mensagem no chat da banda"),
       url: SITE + "#chat",
       tag: "chat",
     });
 
     webpush.setVapidDetails(SITE, pub, priv);
-    const { data: subs, error } = await db.from("push_subs").select("endpoint,p256dh,auth,quem").eq("chat", true);
+    const { data: subs, error } = await db.from("push_subs").select("endpoint,p256dh,auth,quem,chat,previa");
     if (error) return json({ erro: error.message }, 500);
 
     let enviados = 0, removidos = 0, falhas = 0;
-    await Promise.all((subs ?? []).filter((s) => s.quem !== autorQuem).map(async (s) => {
+    await Promise.all((subs ?? []).filter((s) => s.quem !== autorQuem && (s.chat || (s.quem && quemMenc.has(s.quem)))).map(async (s) => {
       try {
-        await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { TTL: 3600, urgency: "high" });
+        const menc = !!s.quem && quemMenc.has(s.quem);
+        await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, carga(menc, s.previa !== false), { TTL: 3600, urgency: "high" });
         enviados++;
       } catch (e) {
         const st = (e as { statusCode?: number }).statusCode;

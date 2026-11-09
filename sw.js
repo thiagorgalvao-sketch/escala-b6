@@ -15,6 +15,7 @@ self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET')return;c
 // (chat: se o app estiver aberto e na frente, não mostra o aviso — a mensagem já aparece na tela)
 self.addEventListener('push',e=>{let d={};try{d=e.data?e.data.json():{}}catch(x){d={title:'Escala B6',body:e.data?e.data.text():''}}
  const show=()=>self.registration.showNotification(d.title||'Escala B6',{body:d.body||'',icon:'icon-192.png',badge:'icon-192.png',tag:d.tag||'escala-b6',renotify:true,data:{url:d.url||self.registration.scope}});
- e.waitUntil(d.tag==='chat'?clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>cs.some(c=>c.focused&&c.visibilityState==='visible')?null:show()):show())});
+ const badge=()=>caches.open('fv-badge').then(c=>c.match('n').then(r=>r?r.text():'0').then(v=>{const n=(+v||0)+1;return c.put('n',new Response(String(n))).then(()=>self.navigator&&self.navigator.setAppBadge?self.navigator.setAppBadge(n).catch(()=>{}):null)})).catch(()=>{});
+ e.waitUntil(d.tag==='chat'?clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>cs.some(c=>c.focused&&c.visibilityState==='visible')?null:Promise.all([show(),badge()])):show())});
 self.addEventListener('notificationclick',e=>{e.notification.close();const u=(e.notification.data&&e.notification.data.url)||self.registration.scope;
  e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>{const chat=u.includes('#chat');for(const c of cs){if(c.url.startsWith(self.registration.scope)&&(chat||!c.url.includes('/admin/'))&&'focus' in c){if(chat)c.postMessage({fervor:'chat'});return c.focus()}}return clients.openWindow(u)}))});

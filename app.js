@@ -152,7 +152,7 @@ const fd=d=>d?new Date(d+'T00:00').toLocaleDateString('pt-BR'):'';
 /* telas */
 function orphN(prune){let n=0;(S.lists||[]).forEach(l=>{const ids=l.songIds||[];['ord','cant','keys'].forEach(k=>{const o=l[k];if(o&&typeof o=='object'&&!Array.isArray(o))Object.keys(o).forEach(s=>{if(!ids.includes(s)){n++;if(prune)delete o[s]}})})});return n}
 function fixAuto(){if(!S.songs||fixAuto.b)return;const g=fixGn(),o=orphN();if(!g&&!o)return;fixAuto.b=1;try{if(g)S.songs.forEach(s=>(s.vmap||[]).forEach(r=>{if(r&&typeof r.t=='string')r.t=fixGt(r.t)}));if(o)orphN(1);if(!S.band)save()}finally{fixAuto.b=0}}
-function R(){try{fixAuto()}catch(e){}try{if(S.band&&!lembIni.on)lembIni()}catch(e){}if(S.tab=='esc')S.tab='hoje';if(S.band&&S.tab=='dash')S.tab='lists';document.body.classList.toggle('dash',S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='chat'||S.tab=='hoje');document.body.classList.toggle('bvocal',!!S.band&&S.vw=='vocal');document.body.classList.toggle('vv',S.vw=='vocal');document.body.classList.toggle('bsongs',S.tab=='songs');document.body.classList.toggle('vblk',S.tab=='songs'&&S.vw!='vocal'&&S.vw!='cifra');document.body.classList.toggle('nofh',!PF.fh);document.body.classList.toggle('noblk',!PF.blk);setTimeout(stg,0);setTimeout(offAud,50);document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab));$('#q').style.display=(S.tab=='songs'&&S.hide)||S.tab=='hoje'||S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='chat'?'none':'';$('#q').value=S.tab=='songs'?S.q:S.ql;$('#q').placeholder=S.tab=='songs'?'Buscar por nome, artista ou trecho da letra':'Buscar repertório, local, pregador, músico ou música';{const t=S.tab=='songs'?'Incluir música':'Novo repertório';$('#add').title=t;$('#add').setAttribute('aria-label',t)}{const h=$('#hti');if(h)h.textContent={hoje:'Hoje',lists:'Repertórios',songs:'Músicas',esc:'Escala',dash:'Painel',esp:'Espiritual',perf:'Meu perfil',chat:'Chat da banda'}[S.tab]||''}$('#m').innerHTML=(S.tab=='hoje'?vHoje():S.tab=='perf'?vPerf():S.tab=='chat'?vChat():S.tab=='esp'?vEspi():S.tab=='dash'?vDash():S.tab=='songs'?vSongs():vLists())+VFT;dkr();uiPost();if((S.tab=='songs'?S.q:S.ql))document.body.classList.add('qo');setTimeout(hhU,0);setTimeout(vftFit,0)}
+function R(){try{fixAuto()}catch(e){}try{if(S.band&&!lembIni.on)lembIni()}catch(e){}if(S.tab=='esc')S.tab='hoje';if(S.band&&S.tab=='dash')S.tab='lists';document.body.classList.toggle('dash',S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='chat'||S.tab=='hoje');document.body.classList.toggle('bvocal',!!S.band&&S.vw=='vocal');document.body.classList.toggle('vv',S.vw=='vocal');document.body.classList.toggle('bsongs',S.tab=='songs');document.body.classList.toggle('vblk',S.tab=='songs'&&S.vw!='vocal'&&S.vw!='cifra');document.body.classList.toggle('nofh',!PF.fh);document.body.classList.toggle('noblk',!PF.blk);setTimeout(stg,0);setTimeout(offAud,50);document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab));$('#q').style.display=(S.tab=='songs'&&S.hide)||S.tab=='hoje'||S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='chat'?'none':'';$('#q').value=S.tab=='songs'?S.q:S.ql;$('#q').placeholder=S.tab=='songs'?'Buscar por nome, artista ou trecho da letra':'Buscar repertório, local, pregador, músico ou música';{const t=S.tab=='songs'?'Incluir música':'Novo repertório';$('#add').title=t;$('#add').setAttribute('aria-label',t)}{const h=$('#hti');if(h)h.textContent={hoje:'Hoje',lists:'Repertórios',songs:'Músicas',esc:'Escala',dash:'Painel',esp:'Espiritual',perf:'Meu perfil',chat:'Chat B6 (Lugar do Encontro)'}[S.tab]||''}$('#m').innerHTML=(S.tab=='hoje'?vHoje():S.tab=='perf'?vPerf():S.tab=='chat'?vChat():S.tab=='esp'?vEspi():S.tab=='dash'?vDash():S.tab=='songs'?vSongs():vLists())+VFT;dkr();uiPost();if((S.tab=='songs'?S.q:S.ql))document.body.classList.add('qo');setTimeout(hhU,0);setTimeout(vftFit,0)}
 function vftFit(){const p=$('#vft p');if(!p||!p.offsetWidth)return;p.style.fontSize='';
  if(p.scrollWidth>p.clientWidth+1){const base=parseFloat(getComputedStyle(p).fontSize)||14.72,ratio=Math.max(.001,p.clientWidth/p.scrollWidth);p.style.fontSize=(base*ratio*.98)+'px'}}
 const tab=t=>{if(S.tab==t&&MOB()){if(t=='songs')S.hide=false;else S.lvm=0;S.ctx=null}S.tab=t;asc(0);R();scrollTo(0,0)};
@@ -187,7 +187,7 @@ function cfgD(){const A=!S.band;try{if(window.d2&&d2.open)d2.close()}catch(e){}
  const cad=A?[tg('mblk','Ao incluir medley, criar os blocos automaticamente','','#5E5CE6',PMUS),tg('msav','Ao incluir medley em música cadastrada, salvar como nova versão','','#5E5CE6',PMUS)]:[];
  const ges=A?[nv('Aprovações da liderança','Histórico do que foi enviado e respondido',"apvD()",'#BF5AF2','<path d="M5 13l5 5L19 7"/>'),nv('Pendências','O que falta nos próximos cultos',"dlg.close();pendD()",'#FF9F0A','<path d="M12 3 2 20h20L12 3zM12 9v5M12 17h.01"/>'),nv('Recados','Avisos que aparecem ao abrir a plataforma','recM()','#FF453A','<path d="M4 10v4h3l6 4V6L7 10H4zM17 9a4 4 0 0 1 0 6"/>'),nv('Acesso da banda','Login e senha, membros e disponibilidade','acD()','#0A84FF',PUSR)]:[];const dat=A?[nv('Verificar dados','Corrige etiquetas, grafia e sobras; mostra o que falta preencher','verD()','#34C759','<path d="M5 13l5 5L19 7"/>'),nv('Segurança e backup','Backup automático, lixeira e restauração','secD()','#30B0C7','<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/>'),window.__SB?nv('Erros dos aparelhos','Falhas que aconteceram nos celulares e computadores da equipe','errD()','#8E8E93','<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16h.01"/>'):'']:[];
  const not=S.band&&window.__B6SITE?[`<div class="cfr" id="cfpush"${ds('Avisos no celular','Receba um aviso quando um repertório for publicado')}>${ic('#FF453A','<path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 0 0 4 0"/>')}${tx('Avisos no celular','Receba um aviso quando um repertório for publicado')}<button class="sm pri" onclick="pushOn()">Ativar</button></div>`]:[];
- const con=[typeof chEnabled=='function'?nv('Chat da banda',chEnabled()?'Conversa com toda a banda':'Desligado pela liderança',"dlg.close();tab('chat')",'#30D158','<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>'):'',ME_M?nv('Meu perfil','Foto, contatos e disponibilidade',"dlg.close();tab('perf')",'#0A84FF',PUSR):'',window.__B6SB?nv('Minha conta','Senha, verificação em duas etapas e saída','b6Conta()','#8E8E93',PLCK):''];const aju=[S.band?nv('Instalar o app','Ícone na tela inicial e uso sem internet',"dlg.close();instD()",'#34C759','<path d="M12 4v10M7.5 9.5 12 14l4.5-4.5M5 19h14"/>'):'',nv('Primeiros passos','Rever o tour de apresentação',"dlg.close();tourStart(1)",'#FF9F0A','<path d="M7 4.5v15l13-7.5z"/>'),nv('Privacidade e seus dados','O que guardamos e como pedir a exclusão','privD()','#30B0C7',PLCK)];const apar=[S.band&&window.__SBB?nv('Sair da conta','Desconectar deste aparelho','fvSair()','#FF453A','<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>','cfd'):''];
+ const con=[typeof chEnabled=='function'?nv('Chat B6 (Lugar do Encontro)',chEnabled()?'Conversa com toda a banda':'Desligado pela liderança',"dlg.close();tab('chat')",'#30D158','<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>'):'',ME_M?nv('Meu perfil','Foto, contatos e disponibilidade',"dlg.close();tab('perf')",'#0A84FF',PUSR):'',window.__B6SB?nv('Minha conta','Senha, verificação em duas etapas e saída','b6Conta()','#8E8E93',PLCK):''];const aju=[S.band?nv('Instalar o app','Ícone na tela inicial e uso sem internet',"dlg.close();instD()",'#34C759','<path d="M12 4v10M7.5 9.5 12 14l4.5-4.5M5 19h14"/>'):'',nv('Primeiros passos','Rever o tour de apresentação',"dlg.close();tourStart(1)",'#FF9F0A','<path d="M7 4.5v15l13-7.5z"/>'),nv('Privacidade e seus dados','O que guardamos e como pedir a exclusão','privD()','#30B0C7',PLCK)];const apar=[S.band&&window.__SBB?nv('Sair da conta','Desconectar deste aparelho','fvSair()','#FF453A','<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>','cfd'):''];
  dlg.innerHTML=`<div id="cfgRoot"><h2 class="cfT">Ajustes</h2><input class="cfq" type="search" placeholder="Buscar nos Ajustes" aria-label="Buscar nos Ajustes" oninput="cfQ(this.value)" autocomplete="off">${prof}${G('Leitura',lei,'Como a cifra e os mapas aparecem para você.')}${G('Aparência',apa)}${G('Minha função',fn)}${G('Cadastro de músicas',cad)}${G('Liderança',ges)}${G('Dados e segurança',[...atu,...dat])}${G('Notificações',not)}${G('Conta',con)}${G('Ajuda',aju)}${G('Este aparelho',[...apar,nv('Apagar dados deste aparelho','Apaga o repertório, a cópia da banda, as anotações e os áudios salvos neste aparelho','sairDev()','#FF453A','<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>','cfd')],'Estas ações afetam só este aparelho.')}
  ${G('Sobre',[`<div class="cfr"${ds('Versão',VER)}>${ic('#8E8E93','<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>')}${tx('Versão','')}<em class="cfm">${esc(VER)}</em></div>`,`<div class="cfr"${ds('Chat',typeof chDiag=='function'?chDiag():'')}>${ic('#8E8E93','<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>')}${tx('Chat','')}<em class="cfm" style="white-space:normal;text-align:right">${esc(typeof chDiag=='function'?chDiag():'')}</em></div>`])}<p class="cfno" id="cfno" hidden>Nenhum ajuste encontrado. Tente outra palavra, como “tema”, “senha” ou “backup”.</p></div>`;
  if(!dlg.open)dlg.showModal();try{document.activeElement&&document.activeElement.blur&&document.activeElement.blur()}catch(e){}CFB=1;cfgPush()}
@@ -2015,7 +2015,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='09/11/2026 · 390';
+const VER='09/11/2026 · 391';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2684,7 +2684,7 @@ async function chPoll(force){if(!(CH.anon||CH.u)||CH.live||CH.ld||CH.pl||documen
  const full=on&&CH.pn%6==0,last=chLastId();CH.pl=1;
  try{let fresh=[],chg=0;
   if(!full&&CH.ok&&last){const rows=(await chRows(0,last)).slice().reverse();const have=new Set(CH.msgs.map(x=>x.id));fresh=rows.filter(x=>!have.has(x.id));if(fresh.length){const tmp=CH.msgs.filter(x=>x.tmp);CH.msgs=CH.msgs.filter(x=>!x.tmp).concat(fresh,tmp);chg=1}}
-  else{const rows=(await chRows()).slice().reverse(),sig=a=>a.map(x=>x.id).join(','),mn=rows.length?rows[0].id:0;
+  else{const rows=(await chRows()).slice().reverse(),sig=a=>a.map(x=>x.id+(x.editado_em||'')).join(','),mn=rows.length?rows[0].id:0;
    const cur=CH.msgs.filter(x=>typeof x.id=='number'&&x.id>=mn);
    if(!CH.ok||sig(cur)!=sig(rows)){const have=new Set(CH.msgs.map(x=>x.id));fresh=CH.ok?rows.filter(x=>!have.has(x.id)):[];CH.msgs=CH.msgs.filter(x=>typeof x.id=='number'&&x.id<mn).concat(rows,CH.msgs.filter(x=>x.tmp));chg=1}}
   CH.ok=1;CH.err='';fresh=fresh.filter(x=>!chMe(x));
@@ -2717,7 +2717,7 @@ function chEmo(on){const p=$('#chp');if(!p)return;p.hidden=on===0?true:on===1?fa
 function chPut(e){const t=$('#chi');if(!t)return;const s=t.selectionStart==null?t.value.length:t.selectionStart,f=t.selectionEnd==null?s:t.selectionEnd;t.value=t.value.slice(0,s)+e+t.value.slice(f);const p=s+e.length;try{t.setSelectionRange(p,p)}catch(x){}t.focus();chGrow(t)}
 function chGrow(t){t.style.height='auto';t.style.height=Math.min(120,t.scrollHeight)+'px'}
 function chKey(ev){if(ev.key=='Enter'&&!ev.shiftKey&&!MOB()){ev.preventDefault();chSend()}}
-function vChat(){const hd='<div class="dbh"><div><h1>Chat da banda</h1><p class="mut">'+(CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.')+'</p></div></div>';
+function vChat(){const hd='<div class="dbh"><div><h1>Chat B6 (Lugar do Encontro)</h1><p class="mut">'+(CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.')+'</p></div></div>';
  if(!chEnabled())return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">O chat está desligado no momento. A liderança pode ligar em Ajustes &rsaquo; Acesso da banda.</p></div></div>`;
  if(!CH.u&&!CH.anon)return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">Conectando ao chat…</p></div></div>`;
  if(!chOn()){const N=CH.fx||[];return`<div class="dbw chw">${hd}<div class="dbc"><h3 style="margin:0 0 6px">Quem é você?</h3><p class="mut" style="margin:0 0 10px">Toque no seu nome (integrantes da banda fixa) para entrar na conversa.</p><div class="chwho">${N.map((n,i)=>`<button type="button" class="sm" onclick="chWho(${i})">${esc(n)}</button>`).join('')||'<span class="mut">'+(CH.fx?'Nenhum integrante da banda fixa encontrado. A liderança confere em Acesso da banda se os nomes estão marcados como “Banda fixa” e “Ativo”.':'Carregando a lista…')+'</span>'}</div></div></div>`}
@@ -2736,13 +2736,13 @@ function chAfter(){document.body.classList.toggle('chaton',S.tab=='chat');chShow
 {const _db=doBack;doBack=function(){if((S.tab=='chat'||S.tab=='perf')&&!dlg.open&&!(window.d2&&d2.open)&&!FS){bkGo();return}return _db.apply(this,arguments)}}
 /* ===== Chat completo: responder citando, reações, visto por, fixar, @música/@culto, enquetes, áudio,
    moderação (bloqueio, silenciar, denúncias), números, fila sem internet e avisos no celular ===== */
-CH.ex={r:{},v:{},l:[],f:null,d:null};CH.cols='id,autor,texto,criado_em,user_id,membro_id,resp_id,tipo,extra';CH.v2=1;CH.refs={};
+CH.ex={r:{},v:{},l:[],f:null,d:null};CH.colsL=['id,autor,texto,criado_em,user_id,membro_id,resp_id,tipo,extra,editado_em','id,autor,texto,criado_em,user_id,membro_id,resp_id,tipo,extra','id,autor,texto,criado_em,user_id,membro_id'];CH.ci=0;CH.cols=CH.colsL[0];CH.v2=1;CH.v3=1;CH.refs={};
 const CHR=['👍','🙏','🔥','❤️','😂','👏'];
 /* --- leitura: usa as colunas novas; se o banco ainda não tem (SQL 20 não rodado), volta ao básico --- */
 chRows=async function(older,gt){const lt=older&&CH.msgs.length&&typeof CH.msgs[0].id=='number'?CH.msgs[0].id:0;
  const go=async cols=>{if(CH.u){const c=FVC();let q=c.from('chat_mensagens').select(cols).order('id',{ascending:false}).limit(60);if(lt)q=q.lt('id',lt);if(gt)q=q.gt('id',gt);const r=await q;if(r.error)throw r.error;return r.data||[]}
   return (await chRest('chat_mensagens?select='+cols+'&order=id.desc&limit=60'+(lt?'&id=lt.'+lt:'')+(gt?'&id=gt.'+gt:'')))||[]};
- try{return await go(CH.cols)}catch(e){if(CH.v2&&/column|coluna|resp_id|tipo|extra|42703/i.test(String(e&&(e.message||e.code)||e))){CH.v2=0;CH.cols='id,autor,texto,criado_em,user_id,membro_id';return go(CH.cols)}throw e}}
+ for(;;){try{return await go(CH.cols)}catch(e){if(CH.ci<2&&/column|coluna|editado_em|resp_id|tipo|extra|42703|PGRST204/i.test(String(e&&(e.message||e.code)||e))){CH.ci++;CH.cols=CH.colsL[CH.ci];CH.v3=CH.ci==0;CH.v2=CH.ci<=1;continue}throw e}}}
 function chRpc(fn,args){if(CH.u){return FVC().rpc(fn,args).then(r=>{if(r.error)throw r.error;return r.data})}return chRest('rpc/'+fn,{method:'POST',body:JSON.stringify(args||{})})}
 function chErr(e){const m=String(e&&e.message||e||'');return m.replace(/^.*?exception:?\s*/i,'').replace(/^P\d{4}:\s*/,'')}
 /* --- extras (reações, votos, quem leu, fixada, denúncias) numa consulta só --- */
@@ -2761,24 +2761,25 @@ setInterval(()=>{if(CH.live&&S.tab=='chat'&&!document.hidden)chEx()},12000);
 {const _r=chR;chR=function(){const a=[...document.querySelectorAll('.chm audio')].some(x=>!x.paused);if(a||CH.sh||CH.rec){CH.pend=1;return}CH.pend=0;_r.apply(this,arguments)}}
 document.addEventListener('pause',e=>{if(e.target&&e.target.tagName=='AUDIO'&&CH.pend&&S.tab=='chat'){CH.pend=0;setTimeout(chR,50)}},true);
 /* --- referências @música e @culto --- */
-function chRefTxt(t){return t.replace(/\[\[(m|c):([\w-]{1,80})\|([^\]\[]{1,80})\]\]/g,(x,k,id,nm)=>`<button type="button" class="chref" onclick="event.stopPropagation();chRef('${k}','${id}')">${k=='m'?'🎵':'📅'} ${nm}</button>`)}
+function chRefTxt(t){return t.replace(/\[\[p:([\w-]{0,80})\|([^\]\[]{1,80})\]\]/g,(x,id,nm)=>`<span class="chmen${chEsMeu(nm)?' eu':''}">@${nm}</span>`).replace(/\[\[(m|c):([\w-]{1,80})\|([^\]\[]{1,80})\]\]/g,(x,k,id,nm)=>`<button type="button" class="chref" onclick="event.stopPropagation();chRef('${k}','${id}')">${k=='m'?'🎵':'📅'} ${nm}</button>`)}
 chTxt=(function(_t){return function(t){return chRefTxt(_t(t))}})(chTxt);
 function chRef(k,id){if(k=='m'){if(!S.songs.some(s=>s.id==id))return say('Essa música não está no repertório deste aparelho.');S.tab='songs';S.sel=id}else{if(!S.lists.some(l=>l.id==id))return say('Esse culto não está mais na lista.');S.tab='lists';S.lv=id;S.lvm=1}R();scrollTo(0,0)}
 function chRefNm(k,x){return k=='m'?x.title+(x.artist?' · '+x.artist:''):(typeof lttl=='function'?String(lttl(x)).replace(/<[^>]+>/g,''):(x.place||x.id))+' · '+chDt(x.date)}
 function chDt(d){try{return new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}catch(e){return d}}
 function chAtOpts(q){q=nz(q||'');const a=[];const td0=td();
+ chPessoas().forEach(n=>{if(nz(n)==nz(chNome()))return;if(!q||nz(n).includes(q))a.push({k:'p',id:'',n:n})});
  S.lists.filter(l=>l.date>=td0).sort((x,y)=>x.date<y.date?-1:1).slice(0,12).forEach(l=>{const n=chRefNm('c',l);if(!q||nz(n).includes(q))a.push({k:'c',id:l.id,n:n})});
  S.songs.forEach(s=>{const n=chRefNm('m',s);if(q&&nz(n).includes(q))a.push({k:'m',id:s.id,n:n})});
  return a.slice(0,8)}
 function chAtChk(t){const m=t.value.slice(0,t.selectionStart).match(/(^|\s)@([^@\n]{0,30})$/);const box=$('#chat');if(!box)return;
  if(!m||!CH.v2){box.hidden=true;return}const o=chAtOpts(m[2]);CH.ato=o;
- box.innerHTML=o.length?o.map((x,i)=>`<button type="button" onmousedown="event.preventDefault()" onclick="chAtPick(${i})">${x.k=='m'?'🎵':'📅'} ${esc(x.n)}</button>`).join(''):'<span class="mut">Digite o nome de uma música ou culto…</span>';box.hidden=false}
+ box.innerHTML=o.length?o.map((x,i)=>`<button type="button" onmousedown="event.preventDefault()" onclick="chAtPick(${i})">${x.k=='m'?'🎵':x.k=='p'?'👤':'📅'} ${esc(x.n)}</button>`).join(''):'<span class="mut">Digite o nome de uma pessoa, música ou culto…</span>';box.hidden=false}
 function chAtPick(i){const t=$('#chi'),x=(CH.ato||[])[i];if(!t||!x)return;const p=t.selectionStart,a=t.value.slice(0,p).replace(/@([^@\n]{0,30})$/,''),lb='@'+x.n.split(' · ')[0];
  CH.refs[lb]='[['+x.k+':'+x.id+'|'+x.n.split(' · ')[0].replace(/[\[\]|]/g,'').slice(0,60)+']]';t.value=a+lb+' '+t.value.slice(p);const box=$('#chat');if(box)box.hidden=true;t.focus();chGrow(t)}
 function chRefApply(v){Object.keys(CH.refs).sort((a,b)=>b.length-a.length).forEach(k=>{v=v.split(k).join(CH.refs[k])});return v}
 /* --- responder citando --- */
 function chReply(id){const m=CH.msgs.find(x=>x.id===id);if(!m||!CH.v2)return;CH.rep={id:m.id,a:m.autor,t:chPlain(m)};chSheetX();const t=$('#chi');CH.draft=t?t.value:CH.draft;CH.foc=1;R()}
-function chPlain(m){return m.tipo=='audio'?'🎤 Mensagem de voz':m.tipo=='enquete'?'📊 '+m.texto:String(m.texto||'').replace(/\[\[(m|c):[\w-]+\|([^\]\[]+)\]\]/g,'$2')}
+function chPlain(m){return m.tipo=='audio'?'🎤 Mensagem de voz':m.tipo=='enquete'?'📊 '+m.texto:String(m.texto||'').replace(/\[\[p:[\w-]*\|([^\]\[]+)\]\]/g,'@$1').replace(/\[\[(m|c):[\w-]+\|([^\]\[]+)\]\]/g,'$2')}
 function chGoto(id){const e=document.getElementById('cm'+id);if(!e)return say('Essa mensagem é antiga. Toque em “Ver mensagens anteriores”.');e.scrollIntoView({block:'center',behavior:'smooth'});e.classList.add('hl');setTimeout(()=>e.classList.remove('hl'),1600)}
 /* --- reações --- */
 async function chReact(id,e){if(!chOn())return;const cur=(CH.ex.r[id]||[]).find(x=>x.me),L=CH.ex.r[id]=(CH.ex.r[id]||[]).filter(x=>!x.me);if(!cur||cur.e!==e)L.push({e:e,n:chNome(),me:true});chSheetX();chR();hap(6);
@@ -2847,12 +2848,12 @@ async function chPin(id,on){try{await chRpc('chat_fixar',{p_id:id,p_on:on});toas
 async function chReport(id){const mo=prompt('Por que você está denunciando esta mensagem? (opcional)','');if(mo===null)return;chSheetX();try{await chRpc('chat_denunciar',{p_msg:id,p_motivo:mo,p_device:chDev(),p_nome:chNome()});toast('Denúncia enviada para a liderança')}catch(e){say('Não consegui enviar a denúncia: '+chErr(e))}}
 /* --- menu da mensagem (toque) --- */
 function chSheet(id,ev){if(ev){const t=ev.target;if(t.closest&&t.closest('a,button,audio,.chpo'))return}const m=CH.msgs.find(x=>x.id===id);if(!m||m.tmp)return;CH.sh=id;
- const me=chMe(m),can=me||chAdm(),vs=me||chAdm()?chVistos(m):[],pin=CH.ex.f&&CH.ex.f.id===id;
+ const me=chMe(m),can=me||chAdm(),vs=me||chAdm()?chVistos(m):[],pin=CH.ex.f&&CH.ex.f.id===id,age=Date.now()-new Date(m.criado_em).getTime(),undo=me&&age<120000,edit=me&&CH.v3&&m.tipo=='txt'&&age<900000;
  const el=document.getElementById('chsh');if(!el)return;
- el.innerHTML=`<div class="chshb" onclick="chSheetX()"></div><div class="chshc" role="dialog" aria-label="Opções da mensagem">${CH.v2?`<div class="chrx">${CHR.map(e=>`<button type="button" onclick="chReact(${id},'${e}')">${e}</button>`).join('')}</div>`:''}
+ el.innerHTML=`<div class="chshb" onclick="chSheetX()"></div><div class="chshc" role="dialog" aria-modal="true" aria-label="Opções da mensagem"><div class="chshp${me?' me':''}">${me?'':`<b>${esc(m.autor)}</b>`}${esc(chPlain(m).slice(0,300))}</div>${CH.v2?`<div class="chrx">${CHR.map(e=>`<button type="button" aria-label="Reagir com ${e}" onclick="chReact(${id},'${e}')">${e}</button>`).join('')}</div>`:''}
  ${CH.v2?`<button type="button" onclick="chReply(${id})">↩️ Responder</button>`:''}${m.tipo!='audio'?`<button type="button" onclick="chCopy(${id})">📋 Copiar texto</button>`:''}${chAdm()&&CH.v2?`<button type="button" onclick="chPin(${id},${pin?'false':'true'})">📌 ${pin?'Desafixar':'Fixar no topo'}</button>`:''}
- ${!me&&CH.v2?`<button type="button" onclick="chReport(${id})">🚩 Denunciar</button>`:''}${can?`<button type="button" class="dan" onclick="chSheetX();chDel(${id});chDel(${id})">🗑️ Apagar</button>`:''}
- ${CH.v2&&(me||chAdm())?`<p class="mut chvs">${vs.length?'Visto por '+esc(vs.map(x=>x.n).join(', ')):'Ninguém viu ainda'}</p>`:''}<button type="button" onclick="chSheetX()">Fechar</button></div>`;el.hidden=false;hap(6)}
+ ${edit?`<button type="button" onclick="chEdit(${id})">✏️ Editar</button>`:''}${!me&&CH.v2?`<button type="button" onclick="chReport(${id})">🚩 Denunciar</button>`:''}${undo?`<button type="button" class="dan" onclick="chUndo(${id})">↶ Desfazer envio</button>`:can?`<button type="button" class="dan" onclick="chSheetX();chDel(${id});chDel(${id})">🗑️ Apagar</button>`:''}
+ ${CH.v2&&(me||chAdm())&&chRR()?`<p class="mut chvs">${vs.length?'Visto por '+esc(vs.map(x=>x.n).join(', ')):'Ninguém viu ainda'}</p>`:''}<button type="button" onclick="chSheetX()">Fechar</button></div>`;el.hidden=false;hap(6)}
 function chSheetX(){const el=document.getElementById('chsh');if(el){el.hidden=true;el.innerHTML=''}CH.sh=0;if(CH.pend&&S.tab=='chat')setTimeout(chR,0)}
 function chCopy(id){const m=CH.msgs.find(x=>x.id===id);chSheetX();if(!m)return;try{navigator.clipboard.writeText(chPlain(m));toast('Texto copiado')}catch(e){say(chPlain(m))}}
 /* --- arrastar para a direita = responder --- */
@@ -2888,16 +2889,16 @@ function chBody(m){if(m.tipo=='audio'){const x=m.extra||{};return x.url?`<audio 
  if(m.tipo=='enquete')return chPoll_(m);return`<div class="chtx">${chTxt(m.texto)}</div>`}
 function chQuote(m){if(!m.resp_id&&!(m.extra&&m.extra.rq))return'';const o=CH.msgs.find(x=>x.id===m.resp_id),a=o?o.autor:(m.extra&&m.extra.rq&&m.extra.rq.a)||'',t=o?chPlain(o):(m.extra&&m.extra.rq&&m.extra.rq.t)||'Mensagem apagada';
  return`<button type="button" class="chq" onclick="event.stopPropagation();chGoto(${m.resp_id||0})"><b>${esc(a)}</b><span>${esc(String(t).slice(0,120))}</span></button>`}
-vChat=function(){const av=chAvLoc(),hd=`<div class="dbh"><div><h1>Chat da banda</h1><p class="mut">${CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.'}</p></div>${chOn()?`<div class="chtb">${CH.v2?`<button type="button" class="sm" onclick="${av?'chAvOff()':'chAvOn()'}" title="Avisos no celular">${av?'🔔 Avisos ligados':'🔕 Ativar avisos'}</button>`:''}${chAdm()?`<button type="button" class="sm" onclick="chMod()">🛡️ Moderação${CH.ex.d?` <i class="chdb">${CH.ex.d}</i>`:''}</button>`:''}</div>`:''}</div>`;
+vChat=function(){const av=chAvLoc(),hd=`<div class="dbh"><div><h1>Chat B6 (Lugar do Encontro)</h1><p class="mut">${CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.'}</p></div>${chOn()?`<div class="chtb">${CH.v2?`<button type="button" class="sm" onclick="${av?'chAvOff()':'chAvOn()'}" title="Avisos no celular">${av?'🔔 Avisos ligados':'🔕 Ativar avisos'}</button>`:''}${chAdm()?`<button type="button" class="sm" onclick="chMod()">🛡️ Moderação${CH.ex.d?` <i class="chdb">${CH.ex.d}</i>`:''}</button>`:''}</div>`:''}</div>`;
  if(!chEnabled())return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">O chat está desligado no momento. A liderança pode ligar em Ajustes &rsaquo; Acesso da banda.</p></div></div>`;
  if(!CH.u&&!CH.anon)return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">Conectando ao chat…</p></div></div>`;
  if(!chOn()){const N=CH.fx||[];return`<div class="dbw chw">${hd}<div class="dbc"><h3 style="margin:0 0 6px">Quem é você?</h3><p class="mut" style="margin:0 0 10px">Toque no seu nome (integrantes da banda fixa) para entrar na conversa.</p><div class="chwho">${N.map((n,i)=>`<button type="button" class="sm" onclick="chWho(${i})">${esc(n)}</button>`).join('')||'<span class="mut">'+(CH.fx?'Nenhum integrante da banda fixa encontrado. A liderança confere em Acesso da banda se os nomes estão marcados como “Banda fixa” e “Ativo”.':'Carregando a lista…')+'</span>'}</div></div></div>`}
  let h='',dy='',pa='';const L=CH.msgs,f=CH.ex.f;
  for(const m of L){const d=chDay(m.criado_em);if(d!=dy){dy=d;pa='';h+=`<div class="chd">${esc(d)}</div>`}const me=chMe(m),ak=(me?'\u0001':'')+m.autor,seq=ak==pa;pa=ak;
-  const vs=me&&!m.tmp&&CH.v2?chVistos(m).length:0,num=typeof m.id=='number';
-  h+=`<div class="chb${me?' me':''}${seq?' seq':''}${m.tmp?' tmp':''}${m.fail?' fail':''}${m.tipo=='enquete'?' poll':''}" id="cm${esc(String(m.id))}"${num?` onclick="chSheet(${m.id},event)"`:''}>${me||seq?'':`<small class="chau">${esc(m.autor)}</small>`}${chQuote(m)}${chBody(m)}${chReacts(m)}<time>${m.fail?`<button type="button" class="chrt" onclick="event.stopPropagation();chRetry('${m.id}')">Não enviou · tocar para tentar de novo</button>`:m.q?'🕓 na fila (sem internet)':m.tmp?'enviando…':(f&&f.id===m.id?'📌 ':'')+chHm(m.criado_em)+(me&&CH.v2&&num?` <span class="chvi${vs?' on':''}" title="Visto por">✓${vs?'✓ '+vs:''}</span>`:'')}</time></div>`}
+  const vs=me&&!m.tmp&&CH.v2&&chRR()?chVistos(m).length:0,num=typeof m.id=='number',mm=!me&&chMencionaMe(m);
+  h+=`<div class="chb${me?' me':''}${seq?' seq':''}${m.tmp?' tmp':''}${m.fail?' fail':''}${m.tipo=='enquete'?' poll':''}${mm?' meu':''}" id="cm${esc(String(m.id))}"${num?` data-id="${m.id}" tabindex="0" role="article" aria-label="${esc((me?'Você':m.autor)+', '+chHm(m.criado_em)+': '+chPlain(m).slice(0,200))}"`:''}>${me||seq?'':`<small class="chau">${esc(m.autor)}</small>`}${chQuote(m)}${chBody(m)}${chReacts(m)}<time>${m.fail?`<button type="button" class="chrt" onclick="event.stopPropagation();chRetry('${m.id}')">Não enviou · tocar para tentar de novo</button>`:m.q?'🕓 na fila (sem internet)':m.tmp?'enviando…':(f&&f.id===m.id?'📌 ':'')+(m.editado_em?'<span class="ched">editada</span> ':'')+`<span class="chhm">${chHm(m.criado_em)}</span>`+(me&&CH.v2&&num&&chRR()?` <span class="chvi${vs?' on':''}" aria-label="${vs?'Visto por '+vs:'Enviada'}">✓${vs?'✓ '+vs:''}</span>`:'')}</time></div>`}
  const pin=f?`<button type="button" class="chpin" onclick="chGoto(${f.id})"><span>📌</span><span><b>${esc(f.autor)}</b> ${esc(chPlain(f).slice(0,90))}</span>${chAdm()?`<i onclick="event.stopPropagation();chPin(${f.id},false)" aria-label="Desafixar">✕</i>`:''}</button>`:'';
- const rp=CH.rep?`<div class="chrp"><div><b>Respondendo ${esc(CH.rep.a)}</b><span>${esc(String(CH.rep.t).slice(0,90))}</span></div><button type="button" onclick="CH.rep=null;chR()" aria-label="Cancelar resposta">✕</button></div>`:'';
+ const rp=CH.ed?`<div class="chrp ed"><div><b>Editando mensagem</b><span>Corrija o texto e toque em enviar</span></div><button type="button" onclick="chEditX()" aria-label="Cancelar edição">✕</button></div>`:CH.rep?`<div class="chrp"><div><b>Respondendo ${esc(CH.rep.a)}</b><span>${esc(String(CH.rep.t).slice(0,90))}</span></div><button type="button" onclick="CH.rep=null;chR()" aria-label="Cancelar resposta">✕</button></div>`:'';
  const mic=CH.v2&&chRecOk();
  return`<div class="dbw chw">${hd}${pin}${CH.err?`<div class="dbc"><p class="mut">Não foi possível carregar o chat (${esc(CH.err)}). Se o banco ainda não foi preparado, rode o 16_chat.sql e o 17_chat_publico.sql no Supabase.</p><button class="sm" onclick="chLoad()">Tentar de novo</button></div>`:''}
  ${CH.more&&L.length?`<button type="button" class="sm chmo" onclick="chLoad(1)">Ver mensagens anteriores</button>`:''}
@@ -2906,10 +2907,88 @@ vChat=function(){const av=chAvLoc(),hd=`<div class="dbh"><div><h1>Chat da banda<
  <div class="chc">${rp}<div id="chat" class="chat" hidden></div><div id="chp" class="chp" hidden>${CHE.map(e=>`<button type="button" onclick="chPut('${e}')">${e}</button>`).join('')}</div>
  <div id="chpl" class="chpl" hidden><button type="button" onclick="chPollD()">📊 Enquete</button><button type="button" onclick="chPlus(0);chAtStart('@')">🎵 Citar música ou culto</button></div>
  <div class="chr${CH.rec?' rec':''}"><div id="chrz" class="chrz"${CH.rec?'':' hidden'}><span class="chrd"></span><span id="chrt">0:00</span><span class="mut">Gravando…</span><button type="button" class="sm" onclick="chRecStop(0)">Cancelar</button><button type="button" class="sm pri" onclick="chRecStop(1)">Enviar</button></div>
- <button type="button" class="che" onclick="chEmo()" aria-label="Emojis">😊</button>${CH.v2?`<button type="button" class="che" onclick="chPlus()" aria-label="Mais opções">＋</button>`:''}<textarea id="chi" rows="1" aria-label="Escreva sua mensagem" maxlength="2000" placeholder="${CH.v2?'Mensagem · @ cita música ou culto':'Mensagem'}" enterkeyhint="send" oninput="chGrow(this);chAtChk(this);chMicUi()" onkeydown="chKey(event)"></textarea>
+ <button type="button" class="che" onclick="chEmo()" aria-label="Emojis">😊</button>${CH.v2?`<button type="button" class="che" onclick="chPlus()" aria-label="Mais opções">＋</button>`:''}<textarea id="chi" rows="1" aria-label="Escreva sua mensagem" maxlength="2000" placeholder="Mensagem" enterkeyhint="send" oninput="chGrow(this);chAtChk(this);chMicUi()" onkeydown="chKey(event)"></textarea>
  ${mic?`<button type="button" class="chs chmic" onclick="chRec()" aria-label="Gravar áudio"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg></button>`:''}<button type="button" class="chs chsnd" onclick="chSend()" aria-label="Enviar"${mic?' hidden':''}><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7z"/></svg></button></div></div>`};
 function chMicUi(){const t=$('#chi'),m=$('.chmic'),s=$('.chsnd');if(!t||!m||!s)return;const has=!!t.value.trim();m.hidden=has;s.hidden=!has}
 function chPlus(on){const p=$('#chpl');if(!p)return;p.hidden=on===0?true:!p.hidden;if(!p.hidden)chEmo(0)}
 function chAtStart(s){const t=$('#chi');if(!t)return;t.value=(t.value&&!/\s$/.test(t.value)?t.value+' ':t.value)+s;t.focus();t.selectionStart=t.selectionEnd=t.value.length;chAtChk(t);chMicUi()}
 {const _a=chAfter;chAfter=function(){_a.apply(this,arguments);if(S.tab=='chat'){chMicUi();CH.sh=0;chLi()}else{CH.sh=0;if(CH.rec)chRecStop(0)}}}
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&CH.sh){chSheetX();e.stopPropagation()}},true);
+/* ===== Chat no jeito Apple: segurar para abrir o menu, desfazer envio e editar, arrastar para ver horários,
+   resumo do que você perdeu, menções a pessoas, privacidade (leitura e prévia do aviso), tamanho do texto,
+   acessibilidade e número de não lidas no ícone do app ===== */
+function chOpt(k,d){try{const v=localStorage.getItem('rep.chat.'+k);return v==null?d:v}catch(e){return d}}
+function chOptSet(k,v){try{localStorage.setItem('rep.chat.'+k,String(v))}catch(e){}}
+function chRR(){return chOpt('rr','1')!='0'}
+/* --- pessoas para @menção --- */
+function chPessoas(){return (CH.fx&&CH.fx.length?CH.fx:CH.pp||[]).slice()}
+async function chPessoasLoad(){if(CH.ppl||(CH.fx&&CH.fx.length))return;CH.ppl=1;try{CH.pp=(await chRpc('chat_membros',{})||[]).map(x=>x.nome).filter(Boolean)}catch(e){CH.pp=[]}}
+function chEsMeu(nm){const me=chNome();return !!me&&nz(String(nm).replace(/&amp;/g,'&'))==nz(me)}
+function chMencionaMe(m){const me=chNome();if(!me||!m||!m.texto)return false;const rx=/\[\[p:[\w-]*\|([^\]\[]+)\]\]/g;let x;while((x=rx.exec(m.texto)))if(nz(x[1])==nz(me))return true;return false}
+/* --- desfazer envio (até 2 min) --- */
+async function chUndo(id){chSheetX();const m=CH.msgs.find(x=>x.id===id);if(!m)return;
+ try{if(CH.u){const r=await FVC().from('chat_mensagens').delete().eq('id',id);if(r.error)throw r.error}else{const r=await chRpc('chat_apagar',{p_id:id,p_device:chDev()});if(r!==true)throw new Error('não foi possível')}
+  chOut(id);toast('Envio desfeito');hap(8)}catch(e){say('Não consegui desfazer: '+chErr(e))}}
+/* --- editar (até 15 min) --- */
+function chEdit(id){const m=CH.msgs.find(x=>x.id===id);chSheetX();if(!m)return;CH.ed={id:id};CH.rep=null;CH.refs={};
+ const tx=String(m.texto||'').replace(/\[\[(m|c|p):([\w-]*)\|([^\]\[]+)\]\]/g,(x,k,i,n)=>{const lb='@'+n;CH.refs[lb]=x;return lb});CH.draft=tx;CH.foc=1;R()}
+function chEditX(){CH.ed=null;CH.draft='';R()}
+async function chEditGo(v){const id=CH.ed.id;CH.ed=null;const m=CH.msgs.find(x=>x.id===id);if(!m){R();return}const old=m.texto;
+ if(old===v){R();return}m.texto=v;m.editado_em=new Date().toISOString();R();
+ try{const d=await chRpc('chat_editar',{p_id:id,p_texto:v,p_device:chDev()});if(d&&d.texto!=null){m.texto=d.texto;m.editado_em=d.editado_em}chR()}
+ catch(e){m.texto=old;m.editado_em=null;chR();say('Não consegui editar: '+chErr(e)+(/function|404|chat_editar/i.test(chErr(e))?' (rode o 21_chat_jeito_apple.sql no Supabase)':''))}}
+{const _s=chSend;chSend=async function(){if(CH.ed){const t=$('#chi');if(!t)return;let v=t.value.trim();if(!v)return;v=chRefApply(v);CH.refs={};t.value='';CH.draft=null;return chEditGo(v)}return _s.apply(this,arguments)}}
+/* edições de outras pessoas chegando ao vivo (quem tem conta) */
+function chUpd(n){if(!n||!n.id)return;const m=CH.msgs.find(x=>x.id===n.id);if(!m)return;let ch=0;['texto','editado_em','fixada'].forEach(k=>{if(k in n&&m[k]!==n[k]){m[k]=n[k];ch=1}});if(ch&&S.tab=='chat')chR()}
+function chSubUp(){if(CH.sub2||!CH.u||!CH.v3)return;const c=FVC();if(!c||!c.channel)return;try{CH.sub2=c.channel('chat-banda-ed').on('postgres_changes',{event:'UPDATE',schema:'public',table:'chat_mensagens'},p=>chUpd(p.new)).subscribe()}catch(e){}}
+/* --- segurar para abrir o menu (com vibração); toque simples não faz nada --- */
+(function(){let tm=0,x0=0,y0=0,b=null,fired=0;
+ const cancel=()=>{clearTimeout(tm);tm=0;if(b)b.classList.remove('press');b=null};
+ document.addEventListener('pointerdown',e=>{const el=e.target.closest&&e.target.closest('.chm .chb[data-id]');if(!el||e.button>0||e.target.closest('a,button,audio,.chpo,.chq'))return;
+  b=el;x0=e.clientX;y0=e.clientY;fired=0;el.classList.add('press');tm=setTimeout(()=>{const id=+el.dataset.id;cancel();fired=1;hap(12);chSheet(id)},430)},{passive:true});
+ document.addEventListener('pointermove',e=>{if(b&&(Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10))cancel()},{passive:true});
+ ['pointerup','pointercancel','scroll'].forEach(k=>document.addEventListener(k,cancel,{passive:true,capture:true}));
+ document.addEventListener('contextmenu',e=>{const el=e.target.closest&&e.target.closest('.chm .chb[data-id]');if(!el)return;e.preventDefault();if(fired){fired=0;return}cancel();chSheet(+el.dataset.id)});
+ document.addEventListener('click',e=>{if(fired&&e.target.closest&&e.target.closest('.chm .chb')){e.preventDefault();e.stopPropagation();fired=0}},true);
+ /* teclado / leitor de tela: Enter ou Espaço na mensagem abre o menu */
+ document.addEventListener('keydown',e=>{const el=e.target&&e.target.closest&&e.target.closest('.chm .chb[data-id]');if(!el||e.target!==el)return;if(e.key=='Enter'||e.key==' '||e.key=='ContextMenu'){e.preventDefault();chSheet(+el.dataset.id)}})})();
+/* --- arrastar para a esquerda mostra os horários --- */
+(function(){let x0=0,y0=0,on=0,box=null;
+ document.addEventListener('touchstart',e=>{const m=e.target.closest&&e.target.closest('.chm');if(!m||e.target.closest('audio,.chpo'))return;box=m;x0=e.touches[0].clientX;y0=e.touches[0].clientY;on=0},{passive:true});
+ document.addEventListener('touchmove',e=>{if(!box)return;const dx=e.touches[0].clientX-x0,dy=Math.abs(e.touches[0].clientY-y0);if(!on&&dy>24){box=null;return}
+  if(dx<-18){on=1;box.classList.add('chtm');box.style.setProperty('--chsl',Math.max(dx,-64)+'px')}},{passive:true});
+ document.addEventListener('touchend',()=>{if(!box)return;const m=box;box=null;m.style.setProperty('--chsl','0px');setTimeout(()=>m.classList.remove('chtm'),220)},{passive:true})})();
+/* --- resumo do que você perdeu --- */
+function chResumo(){const s0=CH.s0;if(!s0)return null;const N=CH.msgs.filter(m=>typeof m.id=='number'&&m.id>s0&&!chMe(m));if(N.length<6)return null;
+ const pes=new Set(N.map(m=>m.autor)).size,enq=N.filter(m=>m.tipo=='enquete').length,aud=N.filter(m=>m.tipo=='audio').length,men=N.filter(chMencionaMe).length;
+ const p=[N.length+' mensagens de '+pes+(pes>1?' pessoas':' pessoa')];if(men)p.push('📣 você foi mencionado'+(men>1?' '+men+' vezes':''));if(enq)p.push('📊 '+enq+(enq>1?' enquetes':' enquete'));if(aud)p.push('🎤 '+aud+(aud>1?' áudios':' áudio'));
+ return{id:N[0].id,txt:p.join(' · ')}}
+{const _v=vChat;vChat=function(){if(!CH.in)CH.s0=CH.seen||0;let h=_v.apply(this,arguments);const r=chResumo();
+ if(r){const k='id="cm'+r.id+'"',i=h.indexOf(k);if(i>0){const j=h.lastIndexOf('<div class="chb',i);if(j>0)h=h.slice(0,j)+`<div class="chsum" id="chsum" role="note"><b>Novas mensagens</b><span>${esc(r.txt)}</span></div>`+h.slice(j)}}
+ const fs=+chOpt('fs','1')||1;h=h.replace('<div class="dbw chw">','<div class="dbw chw" style="--chfs:'+fs+'">');
+ return h.replace('<div class="chtb">','<div class="chtb"><button type="button" class="sm" onclick="chOpts()" aria-label="Opções do chat">⚙︎ Opções</button>')}}
+/* o botão de avisos sai do topo (vai para Opções) */
+{const _v=vChat;vChat=function(){return _v.apply(this,arguments).replace(/<button type="button" class="sm" onclick="chAv(On|Off)\(\)" title="Avisos no celular">[^<]*<\/button>/,'')}}
+/* --- opções do chat (privacidade, avisos, tamanho do texto) --- */
+async function chOpts(){const av=chAvLoc(),pv=chOpt('pv','1')!='0',rr=chRR(),fs=+chOpt('fs','1')||1;
+ dlg.innerHTML=`<h2>Opções do chat</h2>
+ <label class="tg cft"><input type="checkbox"${av?' checked':''} onchange="this.checked?chAvOn():chAvOff()"><span></span><div><b>Avisos no celular</b><small class="mut" style="display:block">Receber um aviso quando chegar mensagem com o app fechado.</small></div></label>
+ <label class="tg cft"><input type="checkbox"${pv?' checked':''} onchange="chPv(this.checked)"><span></span><div><b>Mostrar o texto nos avisos</b><small class="mut" style="display:block">Desligado, o aviso diz só “Nova mensagem no chat”, sem mostrar o conteúdo na tela bloqueada.</small></div></label>
+ <label class="tg cft"><input type="checkbox"${rr?' checked':''} onchange="chRrSet(this.checked)"><span></span><div><b>Confirmação de leitura</b><small class="mut" style="display:block">Ligada, você aparece no “Visto por” e vê quem leu as suas mensagens. Desligada, nenhum dos dois.</small></div></label>
+ <div class="chfsz"><b>Tamanho do texto</b><div><button type="button" class="sm" onclick="chFs(-1)" aria-label="Diminuir texto">A−</button><span id="chfsv">${Math.round(fs*100)}%</span><button type="button" class="sm" onclick="chFs(1)" aria-label="Aumentar texto">A+</button></div></div>
+ <div class="ac"><button class="pri" onclick="dlg.close()">Pronto</button></div>`;if(!dlg.open)dlg.showModal()}
+function chFs(d){let v=+chOpt('fs','1')||1;v=Math.min(1.5,Math.max(.85,Math.round((v+d*.1)*100)/100));chOptSet('fs',v);const e=$('#chfsv');if(e)e.textContent=Math.round(v*100)+'%';const w=$('.chw');if(w)w.style.setProperty('--chfs',v)}
+async function chRrSet(on){chOptSet('rr',on?'1':'0');if(!on){try{await chRpc('chat_li_ocultar',{p_device:chDev()})}catch(e){}}else{CH.lis=0;chLi()}CH.exk='';chEx();chR()}
+async function chPv(on){chOptSet('pv',on?'1':'0');try{const reg=await navigator.serviceWorker.getRegistration();const s=reg&&await reg.pushManager.getSubscription();if(s)await chRpc('chat_aviso_pref',{ep:s.endpoint,p_previa:on})}catch(e){say('Não consegui salvar: '+chErr(e)+(/function|404/i.test(chErr(e))?' (rode o 21_chat_jeito_apple.sql)':''))}}
+{const _o=chAvOn;chAvOn=async function(){await _o.apply(this,arguments);if(chOpt('pv','1')=='0')chPv(false);if(dlg.open&&$('.chfsz'))chOpts()}}
+{const _o=chAvOff;chAvOff=async function(){await _o.apply(this,arguments);if(dlg.open&&$('.chfsz'))chOpts()}}
+/* quem desligou a confirmação de leitura não informa que leu */
+{const _l=chLi;chLi=async function(){if(!chRR())return;return _l.apply(this,arguments)}}
+/* --- número de não lidas no ícone do app instalado --- */
+function chIcon(n){try{if(!('setAppBadge' in navigator))return;if(n>0)navigator.setAppBadge(n).catch(()=>{});else navigator.clearAppBadge().catch(()=>{})}catch(e){}
+ if(!n){try{caches.open('fv-badge').then(c=>c.put('n',new Response('0'))).catch(()=>{})}catch(e){}}}
+{const _b=chBadge;chBadge=function(){const r=_b.apply(this,arguments);try{chIcon(chOn()?chUnread():0)}catch(e){}return r}}
+/* --- ao entrar no chat: guarda o ponto onde você parou (para o resumo) e vai até lá --- */
+{const _a=chAfter;chAfter=function(){const was=CH.in;_a.apply(this,arguments);
+ if(S.tab!='chat'){CH.s0=0;CH.ed=null;return}chPessoasLoad();chSubUp();
+ if(!was&&$('#chsum'))setTimeout(()=>{const e=$('#chsum');if(e)e.scrollIntoView({block:'start'});window.scrollBy(0,-90)},80)}}
