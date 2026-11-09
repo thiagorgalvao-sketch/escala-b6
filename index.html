@@ -802,7 +802,7 @@ header .sm,header>button{min-height:40px}
 footer a,.ft a,#m>p a,#m a[href*=privac]{display:inline-flex;align-items:center;min-height:40px}
 .az{width:32px}
 .apvh{padding:8px 0;border-top:1px solid #2C2C2E}.apvh b{display:block}.apvh small{color:#98989F}.apvh p{margin:4px 0 0;white-space:pre-wrap}.ind i:not(.y){display:none}.ind{min-height:0}
-.az{top:calc(var(--hh,56px) + 76px)!important;max-height:calc(100vh - var(--hh,56px) - 170px)!important}
+.az{top:calc(var(--hh,56px) + 112px)!important;max-height:calc(100vh - var(--hh,56px) - 210px)!important}
 .chip{min-height:36px;display:inline-flex;align-items:center}
 .fvs,.fv{min-width:40px;min-height:40px}
 .az a,.az button,.az span{min-width:30px;min-height:20px;display:flex;align-items:center;justify-content:center}
@@ -939,6 +939,13 @@ body.tbon.chaton.chfoc #tbb{display:none}body.tbon.chfoc .chc{bottom:0;padding-b
 #chfsv{min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
 @supports (font:-apple-system-body){.chw{font:-apple-system-body;font-family:inherit}}
 @media (prefers-reduced-motion:reduce){.chb,.chpb{transition:none}.chrd{animation:none}}
+/* Varredura de UX (VER 398) */
+.lt .lsel{flex:1 1 120px;min-width:112px;padding-right:22px;text-overflow:ellipsis}
+.lt .hl .gl,.lt .hl .icl{display:none}
+@media (max-width:600px){#vft p{white-space:normal;text-wrap:balance}}
+dialog.hasback h2,dialog.hasback>h3:first-of-type:not(h2~h3),dialog.hasback .dbar+h3,dialog.hasback .dbar+h2{padding-left:100px}
+@media (min-width:601px) and (max-width:1000px){header .hb .icl{display:none}header .hb{width:44px;height:44px;padding:0;justify-content:center;align-items:center;border-radius:12px}header .hb svg{width:22px;height:22px}}
+@media (max-width:700px){.eft.ac{flex-wrap:wrap}.eft.ac>span{display:none}.eft.ac>button{flex:1 1 40%;justify-content:center}.eft.ac #lvt{order:1}.eft.ac #lnx{order:2}.eft.ac>button:not(#lvt):not(#lnx):not(.pri){order:3}.eft.ac .pri{order:4}.eft.ac .emn{order:5}}
 </style></head><body>
 <header><button type="button" id="nvb" class="nvb" hidden onclick="bkGo()" aria-label="Voltar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span></span></button><svg class="lg" height="30" viewBox="0 0 720 160" preserveAspectRatio="xMinYMid slice" role="img" aria-label="Escala B6"><g transform="scale(.3125)"><circle cx="256" cy="256" r="256" fill="#000"/><circle cx="256" cy="256" r="226" fill="none" stroke="#fff" stroke-width="14"/><text x="256" y="338" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="232" font-weight="800" letter-spacing="-6" fill="#fff">B6</text></g><text x="190" y="112" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif" font-size="92" font-weight="700" letter-spacing="-2" fill="currentColor">Escala</text></svg><span id="hti" aria-hidden="true"></span><div class="tabs"><button data-t="chat" class="tch" onclick="tab('chat')">Chat<i class="chbg" hidden></i></button> <button data-t="hoje" onclick="tab('hoje')">Hoje</button> <button data-t="lists" onclick="tab('lists')">Repertórios</button> <button data-t="songs" onclick="tab('songs')">Músicas</button> <button data-t="dash" onclick="tab('dash')">Painel</button> <button data-t="esp" onclick="tab('esp')">Espiritual</button></div>
 <input id="q" placeholder="Buscar por artista ou nome da música" oninput="qin(this.value)">
@@ -1007,6 +1014,6 @@ const db={collection:coll,doc:p=>{const i=p.lastIndexOf('/');return coll(p.slice
 const user={isOwner:async()=>false,canEdit:async()=>false,id:async()=>(window.__FVME&&window.__FVME.user_id)||'banda',profiles:async()=>({})};
 window.__B6SITE=1;window.claude={use:async n=>{await ready;return n=='db'?db:n=='user'?user:null}};})();
 </script>
-<script src="app.js?v=397"></script></body></html>
+<script src="app.js?v=398"></script></body></html>
 
 </body></html>

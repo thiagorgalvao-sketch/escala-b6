@@ -145,8 +145,8 @@ const fd=d=>d?new Date(d+'T00:00').toLocaleDateString('pt-BR'):'';
 function orphN(prune){let n=0;(S.lists||[]).forEach(l=>{const ids=l.songIds||[];['ord','cant','keys'].forEach(k=>{const o=l[k];if(o&&typeof o=='object'&&!Array.isArray(o))Object.keys(o).forEach(s=>{if(!ids.includes(s)){n++;if(prune)delete o[s]}})})});return n}
 function fixAuto(){if(!S.songs||fixAuto.b)return;const g=fixGn(),o=orphN();if(!g&&!o)return;fixAuto.b=1;try{if(g)S.songs.forEach(s=>(s.vmap||[]).forEach(r=>{if(r&&typeof r.t=='string')r.t=fixGt(r.t)}));if(o)orphN(1);if(!S.band)save()}finally{fixAuto.b=0}}
 function R(){try{fixAuto()}catch(e){}try{if(S.band&&!lembIni.on)lembIni()}catch(e){}if(S.tab=='esc')S.tab='hoje';if(S.band&&S.tab=='dash')S.tab='lists';document.body.classList.toggle('dash',S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='chat'||S.tab=='hoje');document.body.classList.toggle('bvocal',!!S.band&&S.vw=='vocal');document.body.classList.toggle('vv',S.vw=='vocal');document.body.classList.toggle('bsongs',S.tab=='songs');document.body.classList.toggle('vblk',S.tab=='songs'&&S.vw!='vocal'&&S.vw!='cifra');document.body.classList.toggle('nofh',!PF.fh);document.body.classList.toggle('noblk',!PF.blk);setTimeout(stg,0);setTimeout(offAud,50);document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab));$('#q').style.display=(S.tab=='songs'&&S.hide)||S.tab=='hoje'||S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='chat'?'none':'';$('#q').value=S.tab=='songs'?S.q:S.ql;$('#q').placeholder=S.tab=='songs'?'Buscar por nome, artista ou trecho da letra':'Buscar repertório, local, pregador, músico ou música';{const t=S.tab=='songs'?'Incluir música':'Novo repertório';$('#add').title=t;$('#add').setAttribute('aria-label',t)}{const h=$('#hti');if(h)h.textContent={hoje:'Hoje',lists:'Repertórios',songs:'Músicas',esc:'Escala',dash:'Painel',esp:'Espiritual',perf:'Meu perfil',chat:'Chat B6 (Lugar do Encontro)'}[S.tab]||''}$('#m').innerHTML=(S.tab=='hoje'?vHoje():S.tab=='perf'?vPerf():S.tab=='chat'?vChat():S.tab=='esp'?vEspi():S.tab=='dash'?vDash():S.tab=='songs'?vSongs():vLists())+VFT;dkr();uiPost();if((S.tab=='songs'?S.q:S.ql))document.body.classList.add('qo');setTimeout(hhU,0);setTimeout(vftFit,0)}
-function vftFit(){const p=$('#vft p');if(!p||!p.offsetWidth)return;p.style.fontSize='';
- if(p.scrollWidth>p.clientWidth+1){const base=parseFloat(getComputedStyle(p).fontSize)||14.72,ratio=Math.max(.001,p.clientWidth/p.scrollWidth);p.style.fontSize=(base*ratio*.98)+'px'}}
+function vftFit(){const p=$('#vft p');if(!p||!p.offsetWidth)return;p.style.removeProperty('font-size');
+ if(p.scrollWidth>p.clientWidth+1){const base=parseFloat(getComputedStyle(p).fontSize)||14.72,ratio=Math.max(.001,p.clientWidth/p.scrollWidth);p.style.setProperty('font-size',(base*ratio*.98)+'px','important')}}
 const tab=t=>{if(S.tab==t&&MOB()){if(t=='songs')S.hide=false;else S.lvm=0;S.ctx=null}S.tab=t;asc(0);R();scrollTo(0,0)};
 const rl=()=>{const l=$('#ls');if(l)l.innerHTML=lh();const z=$('#az');if(z)z.innerHTML=azh()},bpr=s=>{const b=s.bpm;return b?S.bp=='l'?b<80:S.bp=='m'?b>=80&&b<=110:b>110:false};
 const itm=(s,j,A,bs)=>`<button${azA(A,j)} class="it${s.id==S.sel&&!S.bm?' on':''}${S.bm&&bs.includes(s.id)?' bsel':''}" onclick="${S.bm?`bmTg('${s.id}')`:`pick('${s.id}')`}">${S.bm?`<span class="bck">${bs.includes(s.id)?'☑':'☐'}</span> `:''}${s.fav?'<span class="stf">'+ICN.star(1)+'</span>':''}${esc(s.title)}${md1(s)}<small>${[esc(s.artist),s.key&&'Tom '+fk(s.key),tcs(s)].filter(Boolean).join(' · ')}</small>${ind(s)}</button>`;
@@ -2004,7 +2004,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='09/11/2026 · 397';
+const VER='09/11/2026 · 398';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2452,6 +2452,8 @@ const GI=[
 [/^metrônomo$/i,'M8 21h8l-2-16h-4zM12 14l5-6'],
 [/^anotar$/i,'M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3'],
 [/^backup$/i,'M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 7v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7M4 12v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5'],
+[/^chat$/i,'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z'],
+[/^hoje$/i,'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'],
 [/^repertórios$/i,'M4 6h12M4 11h12M4 16h7M18 14v5M18 14a2 2 0 1 0 0 5'],
 [/^escala$/i,'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4'],
 [/^painel$/i,'M4 20h16M7 16v-5M12 16V5M17 16v-8'],
