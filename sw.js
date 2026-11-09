@@ -12,7 +12,9 @@ self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET')return;c
   .catch(()=>caches.match(key,{ignoreSearch:true}).then(m=>m||(r.mode==='navigate'?caches.match('index.html',{ignoreSearch:true}).then(x=>x||caches.match('./')):undefined)||Response.error())))});
 
 // avisos no celular (notificações de repertório publicado)
+// (chat: se o app estiver aberto e na frente, não mostra o aviso — a mensagem já aparece na tela)
 self.addEventListener('push',e=>{let d={};try{d=e.data?e.data.json():{}}catch(x){d={title:'Escala B6',body:e.data?e.data.text():''}}
- e.waitUntil(self.registration.showNotification(d.title||'Escala B6',{body:d.body||'',icon:'icon-192.png',badge:'icon-192.png',tag:d.tag||'escala-b6',renotify:true,data:{url:d.url||self.registration.scope}}))});
+ const show=()=>self.registration.showNotification(d.title||'Escala B6',{body:d.body||'',icon:'icon-192.png',badge:'icon-192.png',tag:d.tag||'escala-b6',renotify:true,data:{url:d.url||self.registration.scope}});
+ e.waitUntil(d.tag==='chat'?clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>cs.some(c=>c.focused&&c.visibilityState==='visible')?null:show()):show())});
 self.addEventListener('notificationclick',e=>{e.notification.close();const u=(e.notification.data&&e.notification.data.url)||self.registration.scope;
- e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>{for(const c of cs){if(c.url.startsWith(self.registration.scope)&&!c.url.includes('/admin/')&&'focus' in c){return c.focus()}}return clients.openWindow(u)}))});
+ e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>{const chat=u.includes('#chat');for(const c of cs){if(c.url.startsWith(self.registration.scope)&&(chat||!c.url.includes('/admin/'))&&'focus' in c){if(chat)c.postMessage({fervor:'chat'});return c.focus()}}return clients.openWindow(u)}))});

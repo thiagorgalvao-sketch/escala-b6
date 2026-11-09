@@ -449,6 +449,18 @@ with sync_playwright() as p:
      cfg={};chShow();a.push(document.body.classList.contains('chon'));
      window.__SBB=o[0];window.__SB=o[1];window.__FVREST=o[2];window.fetch=o[3];ME_M=o[4];CH.msgs=o[5];CH.sub=o[6];CH.anon=o[7];CH.u=o[8];CH.seen=o[9];if(o[10]==null)localStorage.removeItem('rep.me');else localStorage.setItem('rep.me',o[10]);window.__FVCFG=cfgO;document.body.classList.toggle('chon',o[11]);S.band=false;S.tab='lists';R();const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on');return a}""")
     ok(r == [True]*7, 'chat sem login: escolhe o nome na lista, envia, recebe por consulta, apaga a própria; liga/desliga pelas configurações', str(r))
+    r = pg.evaluate("""()=>{const a=[],o={msgs:CH.msgs,ex:CH.ex,v2:CH.v2,u:CH.u,anon:CH.anon,tab:S.tab};
+     a.push(/class="chref"/.test(chTxt('Ensaiar [[m:s1|Gratidão]] hoje'))&&!chTxt('Ensaiar [[m:s1|Gratidão]] hoje').includes('[['));                  // @música vira botão
+     a.push(!/<script/.test(chTxt('[[m:x|<script>]]')));                                                                                                // sem injeção
+     CH.v2=1;CH.ex={r:{5:[{e:'👍',n:'Ana',me:true},{e:'👍',n:'Bia',me:false}]},v:{6:[{o:1,n:'Ana',me:true}]},l:[{n:'Bia',u:9,me:false},{n:'Ana',u:9,me:true}],f:{id:5,autor:'Bia',texto:'Fixa',tipo:'txt'},d:null};
+     a.push(/👍 2/.test(chReacts({id:5}))&&/class="me"/.test(chReacts({id:5})));                                                                       // reações agrupadas
+     const p=chPoll_({id:6,texto:'Quinta?',extra:{o:['Sim','Não']}});a.push(/✓ Não/.test(p)&&/1 voto/.test(p));                                        // enquete com meu voto
+     a.push(chVistos({id:7,autor:'Ana'}).length==1);                                                                                                   // visto por (sem contar eu)
+     CH.msgs=[{id:4,autor:'Bia',texto:'oi',criado_em:new Date().toISOString()}];a.push(/Bia/.test(chQuote({resp_id:4}))&&/apagada/.test(chQuote({resp_id:99,extra:{rq:{a:'X',t:''}}})));
+     a.push(chPlain({tipo:'audio'}).includes('voz')&&chPlain({texto:'a [[c:e1|Culto]] b'})=='a Culto b');
+     CH.u=null;CH.anon=1;a.push(chErr({message:'P0001: Mensagem bloqueada pela moderação.'})=='Mensagem bloqueada pela moderação.');
+     CH.msgs=o.msgs;CH.ex=o.ex;CH.v2=o.v2;CH.u=o.u;CH.anon=o.anon;S.tab=o.tab;R();return a}""")
+    ok(r == [True]*8, 'chat completo: @música, reações, enquete, visto por, resposta citada, mensagens de erro', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
      ltG('ev');ltS(1);a.push(LTB=='ev');const sy=dlg.querySelector('.ltb .tb[data-lt="ev"]');Object.assign(P,{name:'Culto',date:'2099-05-05',place:'Mauá',turno:'Noite'});ltS(1);a.push(LTB=='eq'&&!document.querySelector('#lvt').hidden&&/Passo 2 de 7/.test(document.querySelector('#lsh').textContent)&&document.querySelector('.ltb .tb[data-lt="ev"]').classList.contains('ok'));ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
      ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")
