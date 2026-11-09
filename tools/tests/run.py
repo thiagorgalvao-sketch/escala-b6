@@ -450,6 +450,26 @@ with sync_playwright() as p:
      CH.u=null;CH.anon=1;a.push(chErr({message:'P0001: Mensagem bloqueada pela moderação.'})=='Mensagem bloqueada pela moderação.');
      CH.msgs=o.msgs;CH.ex=o.ex;CH.v2=o.v2;CH.u=o.u;CH.anon=o.anon;S.tab=o.tab;R();return a}""")
     ok(r == [True]*8, 'chat completo: @música, reações, enquete, visto por, resposta citada, mensagens de erro', str(r))
+    r = pg.evaluate("""async()=>{const a=[],o={msgs:CH.msgs,fx:CH.fx,anon:CH.anon,u:CH.u,v2:CH.v2,fl:CH.fl,ferst:window.__FVREST,fetch:window.fetch,fila:localStorage.getItem('rep.chat.fila'),me:localStorage.getItem('rep.chat.me')};
+     CH.msgs=[];CH.fx=['Ana Teste'];CH.anon=1;CH.u=null;CH.v2=1;CH.fl=0;localStorage.setItem('rep.chat.me','Ana Teste');localStorage.removeItem('rep.chat.fila');
+     window.__FVREST={url:'https://x.test',key:'k'};const rows=[];let posts=0;
+     window.fetch=async(u,op)=>{op=op||{};u=String(u);if(op.method=='POST'&&/chat_mensagens/.test(u)){posts++;const b=JSON.parse(op.body);const row={id:50+posts,user_id:null,autor:b.autor,texto:b.texto,extra:b.extra||null,criado_em:new Date().toISOString()};rows.push(row);throw new TypeError('Failed to fetch')}
+       return{ok:true,text:async()=>JSON.stringify(rows.slice())}};
+     await chSendX({texto:'mensagem perdida'});                                                                                 // ack se perde depois do POST ter sido feito de verdade
+     a.push(posts==1&&chFilaGet().length==1&&CH.msgs.some(m=>m.q&&m.texto=='mensagem perdida'));
+     CH.msgs.push(Object.assign({},rows[0]));                                                                                    // a consulta periódica já teria trazido a linha real do servidor
+     await chFila();
+     a.push(posts==1&&chFilaGet().length==0&&CH.msgs.filter(m=>m.texto=='mensagem perdida').length==1);                         // não manda de novo nem duplica aviso
+     CH.msgs=[];localStorage.removeItem('rep.chat.fila');posts=0;
+     window.fetch=async(u,op)=>{op=op||{};if(op.method=='POST'&&/chat_mensagens/.test(String(u))){posts++;throw new TypeError('Failed to fetch')}return{ok:true,text:async()=>'[]'}};
+     chFilaSet([{k:'t1',p:{texto:'nunca vai',cid:'c1'},a:'Ana Teste',c:new Date().toISOString(),n:19}]);
+     const tt0=document.querySelector('#tt')?document.querySelector('#tt').textContent:'';
+     await chFila();
+     a.push(posts==1&&chFilaGet().length==0&&/não pôde ser enviada/.test(document.querySelector('#tt').textContent));           // desiste depois do limite de tentativas, sem ficar repetindo pra sempre
+     CH.msgs=o.msgs;CH.fx=o.fx;CH.anon=o.anon;CH.u=o.u;CH.v2=o.v2;CH.fl=o.fl;window.__FVREST=o.ferst;window.fetch=o.fetch;if(o.fila==null)localStorage.removeItem('rep.chat.fila');else localStorage.setItem('rep.chat.fila',o.fila);if(o.me==null)localStorage.removeItem('rep.chat.me');else localStorage.setItem('rep.chat.me',o.me);
+     const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on','act');
+     return a}""")
+    ok(r == [True]*3, 'chat: mensagem não duplica nem reenvia para sempre se a confirmação do envio se perde (fila offline)', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
      ltG('ev');ltS(1);a.push(LTB=='ev');const sy=dlg.querySelector('.ltb .tb[data-lt="ev"]');Object.assign(P,{name:'Culto',date:'2099-05-05',place:'Mauá',turno:'Noite'});ltS(1);a.push(LTB=='eq'&&!document.querySelector('#lvt').hidden&&/Passo 2 de 7/.test(document.querySelector('#lsh').textContent)&&document.querySelector('.ltb .tb[data-lt="ev"]').classList.contains('ok'));ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
      ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")

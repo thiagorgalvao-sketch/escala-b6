@@ -80,10 +80,12 @@ async function chRecUp(b,dur){if(dur<1||b.size<500)return say('Áudio muito curt
 function chFilaGet(){try{return JSON.parse(localStorage.getItem('rep.chat.fila')||'[]')}catch(e){return[]}}
 function chFilaSet(a){try{localStorage.setItem('rep.chat.fila',JSON.stringify(a.slice(-30)))}catch(e){}}
 function chNet(e){const m=String(e&&e.message||e||'');return !navigator.onLine||/failed to fetch|networkerror|load failed|network|timeout|fetch/i.test(m)&&!/policy|exception|viola|bloquead|silenciad|calma|escolha/i.test(m)}
+function chExCid(p){const ex=p.extra?Object.assign({},p.extra):{};if(p.cid)ex._cid=p.cid;return Object.keys(ex).length?ex:null}
 async function chPost(p){const c=FVC();let d;
- if(CH.u){const row={texto:p.texto,membro_id:ME_M?ME_M.id:null,autor:chNome()};if(CH.v2){row.tipo=p.tipo||'txt';if(p.extra)row.extra=p.extra;if(p.resp_id)row.resp_id=p.resp_id}
+ if(CH.v2&&p.cid&&CH.msgs.some(m=>m.extra&&m.extra._cid===p.cid))throw{__dup:1,message:'duplicado'};
+ if(CH.u){const row={texto:p.texto,membro_id:ME_M?ME_M.id:null,autor:chNome()};if(CH.v2){row.tipo=p.tipo||'txt';const ex=chExCid(p);if(ex)row.extra=ex;if(p.resp_id)row.resp_id=p.resp_id}
   const r=await c.from('chat_mensagens').insert(row).select(CH.cols).single();if(r.error)throw r.error;d=r.data}
- else{const row={texto:p.texto,autor:chNome(),device:chDev()};if(CH.v2){row.tipo=p.tipo||'txt';if(p.extra)row.extra=p.extra;if(p.resp_id)row.resp_id=p.resp_id}
+ else{const row={texto:p.texto,autor:chNome(),device:chDev()};if(CH.v2){row.tipo=p.tipo||'txt';const ex=chExCid(p);if(ex)row.extra=ex;if(p.resp_id)row.resp_id=p.resp_id}
   const r=await chRest('chat_mensagens?select='+CH.cols,{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify(row)});d=r&&r[0];if(!d)throw new Error('sem resposta');chMineAdd(d.id)}
  chAviso(d.id);return d}
 function chAviso(id){if(!CH.v2||!id)return;try{const R0=window.__FVREST,u=(R0?R0.url:'https://hofrthndlstofytlapzk.supabase.co')+'/functions/v1/chat-aviso',k=R0?R0.key:(typeof SBK!='undefined'?SBK:'');
@@ -91,9 +93,10 @@ function chAviso(id){if(!CH.v2||!id)return;try{const R0=window.__FVREST,u=(R0?R0
 async function chSendX(p){if(!chEnabled())return say('O chat está desligado pela liderança.');if(!chOn())return say(CH.anon?'Escolha quem você é para escrever.':'Entre na sua conta para usar o chat.');
  if(!CH.v2&&p.tipo&&p.tipo!='txt')return say('Esta função precisa do 20_chat_completo.sql rodado no Supabase.');
  const tmp={id:'t'+Date.now()+Math.random().toString(36).slice(2,5),autor:chNome(),texto:p.texto,tipo:p.tipo||'txt',extra:p.extra||null,resp_id:p.resp_id||null,criado_em:new Date().toISOString(),user_id:CH.u?CH.u.id:null,tmp:1};
+ p.cid=p.cid||tmp.id;
  CH.msgs.push(tmp);CH.stick=1;chR();
  try{const d=await chPost(p);CH.msgs=CH.msgs.filter(x=>x!==tmp);if(!CH.msgs.some(x=>x.id===d.id))CH.msgs.push(d);chSeenSet(chLastId());chLi()}
- catch(e){if(chNet(e)){tmp.q=1;tmp.p=p;const f=chFilaGet();f.push({k:tmp.id,p:p,a:tmp.autor,c:tmp.criado_em});chFilaSet(f)}else{tmp.fail=1;say('Não consegui enviar: '+chErr(e))}}
+ catch(e){if(e&&e.__dup){CH.msgs=CH.msgs.filter(x=>x!==tmp)}else if(chNet(e)){tmp.q=1;tmp.p=p;const f=chFilaGet();f.push({k:tmp.id,p:p,a:tmp.autor,c:tmp.criado_em,n:0});chFilaSet(f)}else{tmp.fail=1;say('Não consegui enviar: '+chErr(e))}}
  if(S.tab=='chat')chR()}
 chSend=async function(){const t=$('#chi');if(!t)return;let v=t.value.trim();if(!v)return;if(v.length>2000)return say('A mensagem é grande demais (máximo de 2000 letras).');
  const n=performance.now();if(n-CH.last<500)return;CH.last=n;v=chRefApply(v);CH.refs={};
@@ -101,7 +104,8 @@ chSend=async function(){const t=$('#chi');if(!t)return;let v=t.value.trim();if(!
  t.value='';CH.draft=null;chEmo(0);const box=$('#chat');if(box)box.hidden=true;hap(6);await chSendX(p)};
 async function chFila(){if(CH.fl||!navigator.onLine||!chOn())return;const f=chFilaGet();if(!f.length)return;CH.fl=1;
  f.forEach(x=>{if(!CH.msgs.some(m=>m.id===x.k))CH.msgs.push({id:x.k,autor:x.a,texto:x.p.texto,tipo:x.p.tipo||'txt',extra:x.p.extra||null,criado_em:x.c,tmp:1,q:1,p:x.p})});
- const rest=[];for(const x of f){try{const d=await chPost(x.p);CH.msgs=CH.msgs.filter(m=>m.id!==x.k);if(!CH.msgs.some(m=>m.id===d.id))CH.msgs.push(d)}catch(e){if(chNet(e))rest.push(x);else{const m=CH.msgs.find(m=>m.id===x.k);if(m){m.q=0;m.fail=1}}}}
+ const rest=[];for(const x of f){try{const d=await chPost(x.p);CH.msgs=CH.msgs.filter(m=>m.id!==x.k);if(!CH.msgs.some(m=>m.id===d.id))CH.msgs.push(d)}
+  catch(e){if(e&&e.__dup){CH.msgs=CH.msgs.filter(m=>m.id!==x.k)}else if(chNet(e)){x.n=(x.n||0)+1;if(x.n<20)rest.push(x);else{const m=CH.msgs.find(m=>m.id===x.k);if(m){m.q=0;m.fail=1}toast('Uma mensagem não pôde ser enviada depois de várias tentativas. Toque nela para tentar de novo.')}}else{const m=CH.msgs.find(m=>m.id===x.k);if(m){m.q=0;m.fail=1}}}}
  chFilaSet(rest);CH.fl=0;CH.msgs.sort((a,b)=>(typeof a.id=='number'?0:1)-(typeof b.id=='number'?0:1)||(typeof a.id=='number'&&typeof b.id=='number'?a.id-b.id:0));if(S.tab=='chat')chR();else chBadge()}
 window.addEventListener('online',()=>setTimeout(chFila,800));
 chRetry=function(id){const m=CH.msgs.find(x=>x.id===id);if(!m)return;CH.msgs=CH.msgs.filter(x=>x!==m);if(m.tipo&&m.tipo!='txt'){chSendX({tipo:m.tipo,texto:m.texto,extra:m.extra});return}CH.draft=chPlain(m);CH.foc=1;R()};
@@ -124,7 +128,8 @@ function chCopy(id){const m=CH.msgs.find(x=>x.id===id);chSheetX();if(!m)return;t
 (function(){let x0=0,y0=0,el=null,dx=0;
  document.addEventListener('touchstart',e=>{const b=e.target.closest&&e.target.closest('.chm .chb');if(!b||!CH.v2||e.target.closest('audio,.chpo'))return;el=b;x0=e.touches[0].clientX;y0=e.touches[0].clientY;dx=0},{passive:true});
  document.addEventListener('touchmove',e=>{if(!el)return;dx=e.touches[0].clientX-x0;const dy=Math.abs(e.touches[0].clientY-y0);if(dy>30){el.style.transform='';el=null;return}if(dx>0)el.style.transform='translateX('+Math.min(dx,80)+'px)'},{passive:true});
- document.addEventListener('touchend',()=>{if(!el)return;const b=el;el=null;b.style.transform='';if(dx>60){const id=+String(b.id).slice(2);if(id)chReply(id)}},{passive:true})})();
+ document.addEventListener('touchend',()=>{if(!el)return;const b=el;el=null;b.style.transform='';if(dx>60){const id=+String(b.id).slice(2);if(id)chReply(id)}},{passive:true});
+ document.addEventListener('touchcancel',()=>{if(!el)return;el.style.transform='';el=null},{passive:true})})();
 /* --- avisos no celular para o chat --- */
 function chAvLoc(){try{return localStorage.getItem('rep.chat.av')=='1'}catch(e){return false}}
 async function chAvOn(){if(!pushOk())return say(/iphone|ipad/i.test(navigator.userAgent)?'No iPhone e iPad, os avisos só funcionam com o app instalado: no Safari, toque em Compartilhar → Adicionar à Tela de Início, abra o Fervor por esse ícone e ative aqui de novo.':'Este navegador não recebe avisos.');

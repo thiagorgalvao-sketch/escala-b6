@@ -41,7 +41,8 @@ function chSubUp(){if(CH.sub2||!CH.u||!CH.v3)return;const c=FVC();if(!c||!c.chan
  document.addEventListener('touchstart',e=>{const m=e.target.closest&&e.target.closest('.chm');if(!m||e.target.closest('audio,.chpo'))return;box=m;x0=e.touches[0].clientX;y0=e.touches[0].clientY;on=0},{passive:true});
  document.addEventListener('touchmove',e=>{if(!box)return;const dx=e.touches[0].clientX-x0,dy=Math.abs(e.touches[0].clientY-y0);if(!on&&dy>24){box=null;return}
   if(dx<-18){on=1;box.classList.add('chtm');box.style.setProperty('--chsl',Math.max(dx,-64)+'px')}},{passive:true});
- document.addEventListener('touchend',()=>{if(!box)return;const m=box;box=null;m.style.setProperty('--chsl','0px');setTimeout(()=>m.classList.remove('chtm'),220)},{passive:true})})();
+ document.addEventListener('touchend',()=>{if(!box)return;const m=box;box=null;m.style.setProperty('--chsl','0px');setTimeout(()=>m.classList.remove('chtm'),220)},{passive:true});
+ document.addEventListener('touchcancel',()=>{if(!box)return;const m=box;box=null;m.style.setProperty('--chsl','0px');setTimeout(()=>m.classList.remove('chtm'),220)},{passive:true})})();
 /* --- resumo do que você perdeu --- */
 function chResumo(){const s0=CH.s0;if(!s0)return null;const N=CH.msgs.filter(m=>typeof m.id=='number'&&m.id>s0&&!chMe(m));if(N.length<6)return null;
  const pes=new Set(N.map(m=>m.autor)).size,enq=N.filter(m=>m.tipo=='enquete').length,aud=N.filter(m=>m.tipo=='audio').length,men=N.filter(chMencionaMe).length;
