@@ -3,6 +3,7 @@ var CH={msgs:[],seen:0,sub:null,more:true,ok:0,err:'',del:'',stick:1,last:0,ld:0
 const CHE=['😀','😄','😁','😂','🥰','😍','😎','🤗','😇','🙂','😉','😅','🤔','😮','😢','😭','🙏','🙌','👏','💪','👍','👎','✌️','🤝','❤️','💙','💚','🧡','💛','🔥','✨','🎉','🥳','🎶','🎵','🎸','🥁','🎹','🎤','🎧','📖','✝️','🕊️','⛪','☀️','🌙','⭐','💯','✅','❌','⚠️','⏰','📍','📅','🚗','🍕','☕','😴','🤞','👀','🙈'];
 const CHK='rep.chat.seen';
 function chEnabled(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{};return c.chat_ativo!==false&&f.chat_ativo!==false}
+function chDiag(){const c=(window.__FVCFG&&__FVCFG())||{};return (chEnabled()?'ligado':'desligado')+' · config='+String(c.chat_ativo)+' · '+(FVC()?'conta':'')+(window.__FVREST?' aberto':'')+' · botão='+(document.getElementById('chb')?(getComputedStyle(document.getElementById('chb')).display):'não existe')}
 function chShow(){document.body.classList.toggle('chon',chEnabled()&&!!(FVC()||window.__FVREST))}
 function chIn_(n){return !!n&&(CH.fx||[]).some(x=>nz(x)==nz(n))}
 function chEu(){let v='';try{v=localStorage.getItem('rep.chat.me')||''}catch(e){}if(!v)v=meG();return chIn_(v)?(CH.fx.find(x=>nz(x)==nz(v))):''}
