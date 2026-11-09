@@ -837,7 +837,7 @@ header:has(#nvb:not([hidden])) #hti{display:none}
 .qks .qkr{display:flex;flex-direction:column;gap:6px}.qks .qkb{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;padding:10px 14px;min-height:52px;border-radius:12px}.qks .qkb b{font-size:1rem}.qks .qkb span{color:#98989D;font-size:.85rem}
 .p.pcur{box-shadow:0 0 0 3px #fff,0 0 24px rgba(255,255,255,.35);position:relative;z-index:1}body.fs.hascur .p:not(.pcur){opacity:.42}
 #stg .plb{position:absolute;left:8px;top:-34px;height:34px;padding:0 14px;border:0;border-radius:12px 12px 0 0;background:rgba(28,28,30,.92);color:#E5E5EA;font-weight:700;font-size:.82rem}#stg .plb.on{background:#00CDD3;color:#000}
-body:not(.fvon) #chb{display:none}#chb{position:relative}#chbd{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#FF453A;color:#fff;font-size:.68rem;font-style:normal;font-weight:700;display:grid;place-items:center}#chbd[hidden]{display:none}
+body:not(.chon) #chb{display:none}#chb{position:relative}#chbd{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#FF453A;color:#fff;font-size:.68rem;font-style:normal;font-weight:700;display:grid;place-items:center}#chbd[hidden]{display:none}
 .chw{max-width:720px;margin:0 auto;padding-bottom:150px}.chm{display:flex;flex-direction:column;gap:4px;padding:0 4px}
 .chb{position:relative;max-width:84%;align-self:flex-start;padding:7px 12px 5px;border-radius:16px 16px 16px 4px;background:#1C1C1E;word-break:break-word}.chb.me{align-self:flex-end;border-radius:16px 16px 4px 16px;background:#0B5C60}.chb.tmp{opacity:.65}.chb.fail{background:#4a1d1d}
 .chb .chau{display:block;font-weight:700;color:#00CDD3;font-size:.78rem;margin-bottom:1px}.chb .chtx{white-space:pre-wrap;font-size:1rem;line-height:1.35}.chb .chtx a{color:#7BD8FF;text-decoration:underline}.chb time{display:block;text-align:right;font-size:.68rem;color:#98989D;margin-top:2px}
@@ -916,6 +916,6 @@ const db={collection:coll,doc:p=>{const i=p.lastIndexOf('/');return coll(p.slice
 const user={isOwner:async()=>false,canEdit:async()=>false,id:async()=>(window.__FVME&&window.__FVME.user_id)||'banda',profiles:async()=>({})};
 window.__B6SITE=1;window.claude={use:async n=>{await ready;return n=='db'?db:n=='user'?user:null}};})();
 </script>
-<script src="app.js?v=380"></script></body></html>
+<script src="app.js?v=381"></script></body></html>
 
 </body></html>

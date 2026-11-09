@@ -2011,7 +2011,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='08/11/2026 · 380';
+const VER='08/11/2026 · 381';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2645,8 +2645,9 @@ document.addEventListener('click',e=>{if(!FS||!e.target.closest)return;const c=e
 var CH={msgs:[],seen:0,sub:null,more:true,ok:0,err:'',del:'',stick:1,last:0,ld:0};
 const CHE=['😀','😄','😁','😂','🥰','😍','😎','🤗','😇','🙂','😉','😅','🤔','😮','😢','😭','🙏','🙌','👏','💪','👍','👎','✌️','🤝','❤️','💙','💚','🧡','💛','🔥','✨','🎉','🥳','🎶','🎵','🎸','🥁','🎹','🎤','🎧','📖','✝️','🕊️','⛪','☀️','🌙','⭐','💯','✅','❌','⚠️','⏰','📍','📅','🚗','🍕','☕','😴','🤞','👀','🙈'];
 const CHK='rep.chat.seen';
-function chOn(){return !!(FVC()&&ME_M)}
-function chMe(m){return !!(ME_M&&m&&m.user_id&&m.user_id==ME_M.user_id)}
+function chOn(){return !!(FVC()&&CH.u)}
+function chNome(){const u=CH.u||{},md=u.user_metadata||{};return (ME_M&&ME_M.nome)||md.full_name||md.name||'Liderança'}
+function chMe(m){return !!(CH.u&&m&&m.user_id&&m.user_id==CH.u.id)}
 function chSeenGet(){try{return +localStorage.getItem(CHK)||0}catch(e){return 0}}
 function chSeenSet(n){CH.seen=n;try{localStorage.setItem(CHK,String(n))}catch(e){}}
 function chLastId(){for(let i=CH.msgs.length-1;i>=0;i--){const x=CH.msgs[i];if(typeof x.id=='number')return x.id}return 0}
@@ -2661,12 +2662,12 @@ async function chLoad(older){const c=FVC();if(!c||CH.ld)return;CH.ld=1;try{let q
  if(S.tab=='chat')R();chBadge()}
 function chIn(m){if(!m||CH.msgs.some(x=>x.id===m.id))return;CH.msgs.push(m);if(S.tab=='chat'){chSeenSet(chLastId());CH.stick=1;R()}else{chBadge();if(!chMe(m)&&!FS)toastA('💬 '+m.autor+': '+String(m.texto).slice(0,60),'Abrir',()=>tab('chat'),6000)}}
 function chOut(id){const n=CH.msgs.length;CH.msgs=CH.msgs.filter(x=>x.id!==id);if(CH.msgs.length!=n&&S.tab=='chat'){CH.stick=0;R()}chBadge()}
-function chInit(){if(!chOn()||CH.sub)return;const c=FVC();CH.seen=chSeenGet();chLoad();
+async function chInit(){const c=FVC();if(!c||CH.sub||CH.start)return;CH.start=1;try{const r=await c.auth.getUser();CH.u=r&&r.data&&r.data.user||null}catch(e){CH.u=null}CH.start=0;document.body.classList.toggle('chon',!!CH.u);if(!CH.u)return;CH.seen=chSeenGet();chLoad();
  try{if(!c.channel)return;CH.sub=c.channel('chat-banda').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_mensagens'},p=>chIn(p.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'chat_mensagens'},p=>chOut(p.old&&p.old.id)).subscribe()}catch(e){}}
 async function chSend(){const t=$('#chi');if(!t)return;const v=t.value.trim();if(!v)return;if(v.length>2000)return say('A mensagem é grande demais (máximo de 2000 letras).');if(!chOn())return say('Entre na sua conta para usar o chat.');
- const n=performance.now();if(n-CH.last<500)return;CH.last=n;const c=FVC(),tmp={id:'t'+Date.now(),autor:ME_M.nome,texto:v,criado_em:new Date().toISOString(),user_id:ME_M.user_id,tmp:1};
+ const n=performance.now();if(n-CH.last<500)return;CH.last=n;const c=FVC(),tmp={id:'t'+Date.now(),autor:chNome(),texto:v,criado_em:new Date().toISOString(),user_id:CH.u.id,tmp:1};
  CH.msgs.push(tmp);t.value='';CH.stick=1;chEmo(0);R();hap(6);
- try{const r=await c.from('chat_mensagens').insert({texto:v,membro_id:ME_M.id,autor:ME_M.nome}).select('id,autor,texto,criado_em,user_id,membro_id').single();if(r.error)throw r.error;
+ try{const r=await c.from('chat_mensagens').insert({texto:v,membro_id:ME_M?ME_M.id:null,autor:chNome()}).select('id,autor,texto,criado_em,user_id,membro_id').single();if(r.error)throw r.error;
   CH.msgs=CH.msgs.filter(x=>x!==tmp);if(!CH.msgs.some(x=>x.id===r.data.id))CH.msgs.push(r.data);chSeenSet(chLastId())}catch(e){tmp.fail=1;say('Não consegui enviar: '+String(e&&e.message||e))}
  if(S.tab=='chat')R()}
 function chRetry(id){const m=CH.msgs.find(x=>x.id===id);if(!m)return;CH.msgs=CH.msgs.filter(x=>x!==m);const t=$('#chi');if(t)t.value=m.texto;R()}
