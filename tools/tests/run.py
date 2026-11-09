@@ -486,6 +486,35 @@ with sync_playwright() as p:
      B.classList.add('choff');a.push(getComputedStyle(document.getElementById('chb')).display=='none');                                   // some só se a liderança desligar
      B.classList.toggle('chon',on);B.classList.toggle('choff',off);return a}""")
     ok(r == [True]*3, 'chat: botão fixo e em primeiro no topo, nas abas e na barra de baixo, sem esperar carregar', str(r))
+    # --- leitores de texto: WhatsApp, YouTube, músicas duplicadas (varredura de qualidade, VER 398) ---
+    r = pg.evaluate("""()=>{const a=[];
+     const o=wParse('*Data:* 08/11\\nHorário: Noite\\nLocal: Mauá\\nPregador: Wallace Butler\\nBateria: Ana (dm)\\nLíder: Manu e Thiago\\nBacks: Elaine, Rosangela\\n1. Gratidão - Tom: Bb\\n2) Vida aos Sepulcros + Rei Jesus (Manu)\\n✅ Teu Toque\\nTom: G\\n▪️ Pós-Palavra: Aleluia\\nhttps://youtu.be/abcdefghijk');
+     a.push(o.date&&o.date[0]=='08'&&o.date[1]=='11'&&o.turno=='Noite'&&o.place=='Mauá'&&o.preg=='Wallace Butler');           // cabeçalho
+     a.push(o.b.bt=='Ana'&&o.dm=='bt'&&o.ld.length==2&&o.bk.length==2);                                                            // banda, (dm), líderes e backs
+     a.push(o.songs.length==4&&o.songs[0].title=='Gratidão'&&o.songs[0].key=='Bb');                                                  // numeradas e tom no fim da linha
+     a.push(o.songs[1].title=='Vida aos Sepulcros'&&o.songs[1].med[0]=='Rei Jesus'&&o.songs[1].sing=='Manu');                       // medley + quem canta
+     a.push(o.songs[2].key=='G'&&o.songs[3].ord=='Pós-Palavra'&&o.songs[3].title=='Aleluia');                                        // tom em linha separada; seção nomeada
+     a.push(wParse('Sem nada reconhecível aqui').songs.length==0&&wParse('').songs.length==0);                                      // texto sem repertório não quebra
+     const old=S.songs;S.songs=[{id:'a',title:'Gratidão',medleys:[]},{id:'b',title:'Vida aos Sepulcros',medleys:['Rei Jesus']},{id:'c',title:'Vida aos Sepulcros',medleys:[]}];
+     a.push(wMatch({title:'gratidao',med:[]}).id=='a'&&wMatch({title:'Vida aos Sepulcros',med:['Rei Jesus']}).id=='b'&&wMatch({title:'Vida aos Sepulcros',med:[]}).id=='c'&&wMatch({title:'Não existe',med:[]})===null);  // acento/maiúscula e medley certo
+     S.songs=old;return a}""")
+    ok(r == [True]*7, 'importar do WhatsApp: lê data, banda, líderes, músicas, medley, tom e acha a música certa no cadastro', str(r))
+    r = pg.evaluate("""()=>{const a=[];
+     a.push(ytId('https://youtu.be/abcdefghijk?t=5')=='abcdefghijk'&&ytId('https://www.youtube.com/watch?feature=x&v=abcdefghijk')=='abcdefghijk'&&ytId('https://youtube.com/shorts/abcdefghijk')=='abcdefghijk'&&ytId('https://www.youtube.com/live/abcdefghijk')=='abcdefghijk');
+     a.push(ytId('https://example.com/watch?v=abcdefghijk')==''&&ytId('')==''&&ytId(null)=='');                                      // outros sites e vazio
+     const p=ytParse('Gratidão (Ao Vivo) | Brandon Lake','Brandon Lake - Topic');a.push(p.artist=='Brandon Lake'&&/gratid/i.test(p.title)&&!/vivo/i.test(p.title));
+     const q=ytParse('Ministério Zoe - Vem Espírito [Clipe Oficial] #louvor','Zoe');a.push(!/oficial|clipe|#/i.test(q.title+q.artist)&&q.artist.length>0&&q.title.length>0);
+     a.push(ytClean('Música (official video) [HD]')=='Música');return a}""")
+    ok(r == [True]*5, 'YouTube: reconhece os formatos de link e limpa o título (ao vivo, clipe oficial, #tags)', str(r))
+    r = pg.evaluate("""()=>{const a=[],old=S.songs,mk=(id,t,x)=>Object.assign({id,title:t,medleys:[],parts:[],vmap:[],cifra:'',nd:[]},x||{});
+     S.songs=[mk('1','Gratidão'),mk('2','Gratidão (Ao Vivo)'),mk('3','Gratidao'),mk('4','Vida aos Sepulcros'),mk('5','Vida aos Sepulcros',{medleys:['Rei Jesus']}),mk('6','Grandioso és Tu'),mk('7','Grandioso es Tu',{nd:['6']})];
+     const g=dupG().map(x=>x.map(s=>s.id).sort().join(','));
+     a.push(g.includes('1,2,3'));                              // acento, "ao vivo" e maiúscula: mesma música
+     a.push(!g.some(x=>x.includes('4')&&x.includes('5')));     // com e sem medley NÃO se misturam
+     a.push(!g.some(x=>x=='6,7'));                             // "não é duplicada" marcado pelo usuário é respeitado
+     a.push(lev('abc','abc',2)==0&&lev('abc','abd',2)==1&&lev('abc','xyz',1)>1);
+     S.songs=old;return a}""")
+    ok(r == [True]*4, 'músicas duplicadas: acha as repetidas, não junta com/sem medley e respeita "não é duplicada"', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
      ltG('ev');ltS(1);a.push(LTB=='ev');const sy=dlg.querySelector('.ltb .tb[data-lt="ev"]');Object.assign(P,{name:'Culto',date:'2099-05-05',place:'Mauá',turno:'Noite'});ltS(1);a.push(LTB=='eq'&&!document.querySelector('#lvt').hidden&&/Passo 2 de 7/.test(document.querySelector('#lsh').textContent)&&document.querySelector('.ltb .tb[data-lt="ev"]').classList.contains('ok'));ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
      ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")
