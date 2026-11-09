@@ -8,6 +8,8 @@ alter table public.chat_mensagens add column if not exists tipo text not null de
 alter table public.chat_mensagens add column if not exists extra jsonb;
 alter table public.chat_mensagens add column if not exists fixada boolean not null default false;
 alter table public.chat_mensagens add column if not exists avisado boolean not null default false;
+alter table public.push_subs add column if not exists chat boolean not null default false;
+alter table public.push_subs add column if not exists quem text;
 alter table public.chat_mensagens drop constraint if exists chat_tipo_ok;
 alter table public.chat_mensagens add constraint chat_tipo_ok check (tipo in ('txt','audio','enquete'));
 
@@ -256,8 +258,6 @@ revoke all on function public.chat_denuncia_limpar(bigint) from public;
 grant execute on function public.chat_denuncia_limpar(bigint) to authenticated;
 
 -- 7) Avisos no celular para o chat (usa a mesma lista de celulares dos avisos de repertório)
-alter table public.push_subs add column if not exists chat boolean not null default false;
-alter table public.push_subs add column if not exists quem text;
 
 create or replace function public.chat_aviso_salvar(ep text, p256dh text, au text, p_device text, p_on boolean)
 returns void language plpgsql security definer set search_path = public as $$
