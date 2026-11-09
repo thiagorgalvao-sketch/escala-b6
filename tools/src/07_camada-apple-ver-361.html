@@ -389,13 +389,15 @@ function fxHeadDown(e){e.preventDefault();const wrap=$('#fxrowswrap');if(!wrap||
  document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);move(e)}
 
 /* ---- cache local dos arquivos de stems em IndexedDB (evita rebaixar o mesmo áudio) ---- */
-const FXDB_CAP=24;
+const FXDB_CAP=400;
 let FXDBP=null;
 function fxDbOpen(){if(FXDBP)return FXDBP;FXDBP=new Promise(res=>{try{const rq=indexedDB.open('fv-stems',1);rq.onupgradeneeded=()=>{try{rq.result.createObjectStore('buf')}catch(e){}};rq.onsuccess=()=>res(rq.result);rq.onerror=()=>res(null);rq.onblocked=()=>res(null)}catch(e){res(null)}});return FXDBP}
-async function fxDbGet(key){try{const db=await fxDbOpen();if(!db)return null;return await new Promise(res=>{try{const rq=db.transaction('buf','readonly').objectStore('buf').get(key);rq.onsuccess=()=>res(rq.result?rq.result.ab:null);rq.onerror=()=>res(null)}catch(e){res(null)}})}catch(e){return null}}
+async function fxDbGet(key){try{const db=await fxDbOpen();if(!db)return null;return await new Promise(res=>{try{const os=db.transaction('buf','readwrite').objectStore('buf'),rq=os.get(key);rq.onsuccess=()=>{const v=rq.result;if(v){try{os.put({ab:v.ab,t:Date.now()},key)}catch(e){}}res(v?v.ab:null)};rq.onerror=()=>res(null)}catch(e){res(null)}})}catch(e){return null}}
+function fxLim(){return window.__FXLIM||600*1024*1024}
 async function fxDbSet(key,ab){try{const db=await fxDbOpen();if(!db)return;const tx=db.transaction('buf','readwrite'),os=tx.objectStore('buf');os.put({ab,t:Date.now()},key);
- const all=await new Promise(res=>{const a=[];try{const rq=os.openCursor();rq.onsuccess=()=>{const c=rq.result;if(c){a.push({k:c.primaryKey,t:(c.value&&c.value.t)||0});c.continue()}else res(a)};rq.onerror=()=>res(a)}catch(e){res(a)}});
- if(all.length>FXDB_CAP){all.sort((a,b)=>a.t-b.t);for(const x of all.slice(0,all.length-FXDB_CAP))try{os.delete(x.k)}catch(e){}}
+ const all=await new Promise(res=>{const a=[];try{const rq=os.openCursor();rq.onsuccess=()=>{const c=rq.result;if(c){a.push({k:c.primaryKey,t:(c.value&&c.value.t)||0,b:(c.value&&c.value.ab&&c.value.ab.byteLength)||0});c.continue()}else res(a)};rq.onerror=()=>res(a)}catch(e){res(a)}});
+ /* guarda as faixas no aparelho até ~600 MB (antes eram só 24 arquivos = 4 músicas, e cada troca de música baixava tudo de novo do servidor) */
+ let tot=all.reduce((s,x)=>s+x.b,0),n=all.length;if(tot>fxLim()||n>FXDB_CAP){all.sort((a,b)=>a.t-b.t);for(const x of all){if(tot<=fxLim()&&n<=FXDB_CAP)break;if(x.k===key)continue;try{os.delete(x.k)}catch(e){}tot-=x.b;n--}}
 }catch(e){}}
 /* ---- decodificação e waveform ---- */
 async function fxDecodeTrack(t){try{const ctx=fxEnsureCtx(),key=t.url+'|'+(t.ver||'');

@@ -611,13 +611,15 @@ function fxHeadDown(e){e.preventDefault();const wrap=$('#fxrowswrap');if(!wrap||
  document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);move(e)}
 
 /* ---- cache local dos arquivos de stems em IndexedDB (evita rebaixar o mesmo áudio) ---- */
-const FXDB_CAP=24;
+const FXDB_CAP=400;
 let FXDBP=null;
 function fxDbOpen(){if(FXDBP)return FXDBP;FXDBP=new Promise(res=>{try{const rq=indexedDB.open('fv-stems',1);rq.onupgradeneeded=()=>{try{rq.result.createObjectStore('buf')}catch(e){}};rq.onsuccess=()=>res(rq.result);rq.onerror=()=>res(null);rq.onblocked=()=>res(null)}catch(e){res(null)}});return FXDBP}
-async function fxDbGet(key){try{const db=await fxDbOpen();if(!db)return null;return await new Promise(res=>{try{const rq=db.transaction('buf','readonly').objectStore('buf').get(key);rq.onsuccess=()=>res(rq.result?rq.result.ab:null);rq.onerror=()=>res(null)}catch(e){res(null)}})}catch(e){return null}}
+async function fxDbGet(key){try{const db=await fxDbOpen();if(!db)return null;return await new Promise(res=>{try{const os=db.transaction('buf','readwrite').objectStore('buf'),rq=os.get(key);rq.onsuccess=()=>{const v=rq.result;if(v){try{os.put({ab:v.ab,t:Date.now()},key)}catch(e){}}res(v?v.ab:null)};rq.onerror=()=>res(null)}catch(e){res(null)}})}catch(e){return null}}
+function fxLim(){return window.__FXLIM||600*1024*1024}
 async function fxDbSet(key,ab){try{const db=await fxDbOpen();if(!db)return;const tx=db.transaction('buf','readwrite'),os=tx.objectStore('buf');os.put({ab,t:Date.now()},key);
- const all=await new Promise(res=>{const a=[];try{const rq=os.openCursor();rq.onsuccess=()=>{const c=rq.result;if(c){a.push({k:c.primaryKey,t:(c.value&&c.value.t)||0});c.continue()}else res(a)};rq.onerror=()=>res(a)}catch(e){res(a)}});
- if(all.length>FXDB_CAP){all.sort((a,b)=>a.t-b.t);for(const x of all.slice(0,all.length-FXDB_CAP))try{os.delete(x.k)}catch(e){}}
+ const all=await new Promise(res=>{const a=[];try{const rq=os.openCursor();rq.onsuccess=()=>{const c=rq.result;if(c){a.push({k:c.primaryKey,t:(c.value&&c.value.t)||0,b:(c.value&&c.value.ab&&c.value.ab.byteLength)||0});c.continue()}else res(a)};rq.onerror=()=>res(a)}catch(e){res(a)}});
+ /* guarda as faixas no aparelho até ~600 MB (antes eram só 24 arquivos = 4 músicas, e cada troca de música baixava tudo de novo do servidor) */
+ let tot=all.reduce((s,x)=>s+x.b,0),n=all.length;if(tot>fxLim()||n>FXDB_CAP){all.sort((a,b)=>a.t-b.t);for(const x of all){if(tot<=fxLim()&&n<=FXDB_CAP)break;if(x.k===key)continue;try{os.delete(x.k)}catch(e){}tot-=x.b;n--}}
 }catch(e){}}
 /* ---- decodificação e waveform ---- */
 async function fxDecodeTrack(t){try{const ctx=fxEnsureCtx(),key=t.url+'|'+(t.ver||'');
@@ -2013,7 +2015,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='09/11/2026 · 389';
+const VER='09/11/2026 · 390';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
