@@ -2004,7 +2004,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='09/11/2026 · 395';
+const VER='09/11/2026 · 396';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2696,13 +2696,22 @@ function chEmo(on){const p=$('#chp');if(!p)return;p.hidden=on===0?true:on===1?fa
 function chPut(e){const t=$('#chi');if(!t)return;const s=t.selectionStart==null?t.value.length:t.selectionStart,f=t.selectionEnd==null?s:t.selectionEnd;t.value=t.value.slice(0,s)+e+t.value.slice(f);const p=s+e.length;try{t.setSelectionRange(p,p)}catch(x){}t.focus();chGrow(t)}
 function chGrow(t){t.style.height='auto';t.style.height=Math.min(120,t.scrollHeight)+'px'}
 function chKey(ev){if(ev.key=='Enter'&&!ev.shiftKey&&!MOB()){ev.preventDefault();chSend()}}
+/* cor por pessoa no chat: roxo/rosa para elas, azul/verde para eles (nada gritante) */
+function chColor(autor){const n=String(autor||'').toLowerCase();
+ const W=['#5C4A80','#7A4A63','#6B4A78','#4F3D6B','#7A5A8F'],M=['#2E6B4F','#2F5A7A','#35608A','#2A4F70','#3C7A5E','#24566B','#3F8068'],B=['#2F5A7A','#35608A','#2A4F70','#24566B'];
+ const hash=s=>{let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h};
+ if(/t(hi|i)ago galv/.test(n))return'#2E6B4F';
+ if(/t(hi|i)ago garcia/.test(n))return B[hash(n)%B.length];
+ if(/\blucas\b/.test(n))return B[hash(n)%B.length];
+ if(/\b(manu|rosangela|elaine)\b/.test(n))return W[hash(n)%W.length];
+ return M[hash(n)%M.length]}
 function vChat(){const hd='<div class="dbh"><div><h1>Chat B6 (Lugar do Encontro)</h1><p class="mut">'+(CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.')+'</p></div></div>';
  if(!chEnabled())return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">O chat está desligado no momento. A liderança pode ligar em Ajustes &rsaquo; Acesso da banda.</p></div></div>`;
  if(!CH.u&&!CH.anon)return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">Conectando ao chat…</p></div></div>`;
  if(!chOn()){const N=CH.fx||[];return`<div class="dbw chw">${hd}<div class="dbc"><h3 style="margin:0 0 6px">Quem é você?</h3><p class="mut" style="margin:0 0 10px">Toque no seu nome (integrantes da banda fixa) para entrar na conversa.</p><div class="chwho">${N.map((n,i)=>`<button type="button" class="sm" onclick="chWho(${i})">${esc(n)}</button>`).join('')||'<span class="mut">'+(CH.fx?'Nenhum integrante da banda fixa encontrado. A liderança confere em Acesso da banda se os nomes estão marcados como “Banda fixa” e “Ativo”.':'Carregando a lista…')+'</span>'}</div></div></div>`}
  let h='',dy='',pa='';const L=CH.msgs;
  for(const m of L){const d=chDay(m.criado_em);if(d!=dy){dy=d;pa='';h+=`<div class="chd">${esc(d)}</div>`}const me=chMe(m),ak=(me?'\u0001':'')+m.autor,seq=ak==pa;pa=ak;const can=!m.tmp&&typeof m.id=='number'&&(me||(!!CH.u&&!S.band));
-  h+=`<div class="chb${me?' me':''}${seq?' seq':''}${m.tmp?' tmp':''}${m.fail?' fail':''}">${me||seq?'':`<small class="chau">${esc(m.autor)}</small>`}<div class="chtx">${chTxt(m.texto)}</div><time>${m.fail?`<button type="button" class="chrt" onclick="chRetry('${m.id}')">Não enviou · tocar para editar</button>`:m.tmp?'enviando…':chHm(m.criado_em)}</time>${can?`<button type="button" class="chx${CH.del===m.id?' on':''}" onclick="chDel(${m.id})" aria-label="Apagar mensagem">${CH.del===m.id?'Apagar?':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M8 7l1 12h6l1-12"/></svg>'}</button>`:''}</div>`}
+  h+=`<div class="chb${me?' me':''}${seq?' seq':''}${m.tmp?' tmp':''}${m.fail?' fail':''}" style="--pc:${chColor(m.autor)}">${me||seq?'':`<small class="chau">${esc(m.autor)}</small>`}<div class="chtx">${chTxt(m.texto)}</div><time>${m.fail?`<button type="button" class="chrt" onclick="chRetry('${m.id}')">Não enviou · tocar para editar</button>`:m.tmp?'enviando…':chHm(m.criado_em)}</time>${can?`<button type="button" class="chx${CH.del===m.id?' on':''}" onclick="chDel(${m.id})" aria-label="Apagar mensagem">${CH.del===m.id?'Apagar?':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M8 7l1 12h6l1-12"/></svg>'}</button>`:''}</div>`}
  return`<div class="dbw chw">${hd}${CH.err?`<div class="dbc"><p class="mut">Não foi possível carregar o chat (${esc(CH.err)}). Se o banco ainda não foi preparado, rode o 16_chat.sql e o 17_chat_publico.sql no Supabase.</p><button class="sm" onclick="chLoad()">Tentar de novo</button></div>`:''}
  ${CH.more&&L.length?`<button type="button" class="sm chmo" onclick="chLoad(1)">Ver mensagens anteriores</button>`:''}
  <div class="chm">${h||(CH.ok?'<p class="mut" style="text-align:center;margin:30px 0">Ainda não há mensagens. Escreva a primeira! 🙌</p>':'<p class="mut" style="text-align:center;margin:30px 0">Carregando…</p>')}</div></div>
@@ -2833,7 +2842,7 @@ async function chReport(id){const mo=prompt('Por que você está denunciando est
 function chSheet(id,ev){if(ev){const t=ev.target;if(t.closest&&t.closest('a,button,audio,.chpo'))return}const m=CH.msgs.find(x=>x.id===id);if(!m||m.tmp)return;CH.sh=id;
  const me=chMe(m),can=me||chAdm(),vs=me||chAdm()?chVistos(m):[],pin=CH.ex.f&&CH.ex.f.id===id,age=Date.now()-new Date(m.criado_em).getTime(),undo=me&&age<120000,edit=me&&CH.v3&&m.tipo=='txt'&&age<900000;
  const el=document.getElementById('chsh');if(!el)return;
- el.innerHTML=`<div class="chshb" onclick="chSheetX()"></div><div class="chshc" role="dialog" aria-modal="true" aria-label="Opções da mensagem"><div class="chshp${me?' me':''}">${me?'':`<b>${esc(m.autor)}</b>`}${esc(chPlain(m).slice(0,300))}</div>${CH.v2?`<div class="chrx">${CHR.map(e=>`<button type="button" aria-label="Reagir com ${e}" onclick="chReact(${id},'${e}')">${e}</button>`).join('')}</div>`:''}
+ el.innerHTML=`<div class="chshb" onclick="chSheetX()"></div><div class="chshc" role="dialog" aria-modal="true" aria-label="Opções da mensagem"><div class="chshp${me?' me':''}" style="--pc:${chColor(m.autor)}">${me?'':`<b>${esc(m.autor)}</b>`}${esc(chPlain(m).slice(0,300))}</div>${CH.v2?`<div class="chrx">${CHR.map(e=>`<button type="button" aria-label="Reagir com ${e}" onclick="chReact(${id},'${e}')">${e}</button>`).join('')}</div>`:''}
  ${CH.v2?`<button type="button" onclick="chReply(${id})">↩️ Responder</button>`:''}${m.tipo!='audio'?`<button type="button" onclick="chCopy(${id})">📋 Copiar texto</button>`:''}${chAdm()&&CH.v2?`<button type="button" onclick="chPin(${id},${pin?'false':'true'})">📌 ${pin?'Desafixar':'Fixar no topo'}</button>`:''}
  ${edit?`<button type="button" onclick="chEdit(${id})">✏️ Editar</button>`:''}${!me&&CH.v2?`<button type="button" onclick="chReport(${id})">🚩 Denunciar</button>`:''}${undo?`<button type="button" class="dan" onclick="chUndo(${id})">↶ Desfazer envio</button>`:can?`<button type="button" class="dan" onclick="chSheetX();chDel(${id});chDel(${id})">🗑️ Apagar</button>`:''}
  ${CH.v2&&(me||chAdm())&&chRR()?`<p class="mut chvs">${vs.length?'Visto por '+esc(vs.map(x=>x.n).join(', ')):'Ninguém viu ainda'}</p>`:''}<button type="button" onclick="chSheetX()">Fechar</button></div>`;el.hidden=false;hap(6)}

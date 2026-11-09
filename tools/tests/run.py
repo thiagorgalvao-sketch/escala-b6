@@ -470,6 +470,15 @@ with sync_playwright() as p:
      const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on','act');
      return a}""")
     ok(r == [True]*3, 'chat: mensagem não duplica nem reenvia para sempre se a confirmação do envio se perde (fila offline)', str(r))
+    r = pg.evaluate("""()=>{const a=[],G=['#2E6B4F','#2F5A7A','#35608A','#2A4F70','#3C7A5E','#24566B','#3F8068'],B=['#2F5A7A','#35608A','#2A4F70','#24566B'],W=['#5C4A80','#7A4A63','#6B4A78','#4F3D6B','#7A5A8F'];
+     a.push(chColor('Thiago Galvão')=='#2E6B4F');                                         // verde fixo
+     a.push(B.includes(chColor('Thiago Garcia'))&&chColor('Thiago Garcia')!='#2E6B4F');   // sem verde
+     a.push(B.includes(chColor('Lucas Soller'))&&B.includes(chColor('Lucas (B2)')));      // sem verde, os dois Lucas
+     a.push(W.includes(chColor('Manu Bertolino'))&&W.includes(chColor('Rosangela Sousa'))&&W.includes(chColor('Elaine Ramos')));  // roxo/rosa
+     a.push(G.includes(chColor('Cesar Zerbini'))&&!W.includes(chColor('Cesar Zerbini')));  // outro homem: azul/verde
+     a.push(chColor('Manu Bertolino')==chColor('Manu Bertolino')&&chColor('Cesar Zerbini')==chColor('Cesar Zerbini'));  // determinístico
+     return a}""")
+    ok(r == [True]*6, 'chat: cor por pessoa (roxo/rosa para elas, azul/verde para eles, verde só para Thiago Galvão)', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
      ltG('ev');ltS(1);a.push(LTB=='ev');const sy=dlg.querySelector('.ltb .tb[data-lt="ev"]');Object.assign(P,{name:'Culto',date:'2099-05-05',place:'Mauá',turno:'Noite'});ltS(1);a.push(LTB=='eq'&&!document.querySelector('#lvt').hidden&&/Passo 2 de 7/.test(document.querySelector('#lsh').textContent)&&document.querySelector('.ltb .tb[data-lt="ev"]').classList.contains('ok'));ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
      ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")
