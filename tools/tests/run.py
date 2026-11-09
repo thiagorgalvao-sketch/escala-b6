@@ -433,13 +433,13 @@ with sync_playwright() as p:
      const now=Date.now(),rows=[{id:7,user_id:null,autor:'Zé',texto:'Oi sem login',criado_em:new Date(now-5000).toISOString()}],calls=[];
      window.__FVREST={url:'https://x.test',key:'k'};
      window.fetch=async(u,op)=>{op=op||{};calls.push([String(u),op.method||'GET',op.body||'']);const J=x=>({ok:true,text:async()=>JSON.stringify(x)});
-       if(/rpc.chat_apagar/.test(u)){const b=JSON.parse(op.body);const n=rows.length;const k=rows.findIndex(x=>x.id==b.p_id);if(k>=0)rows.splice(k,1);return J(k>=0)}
+       if(/rpc.chat_membros/.test(u))return J([{nome:'Ana Teste'},{nome:'Bia'}]);if(/rpc.chat_apagar/.test(u)){const b=JSON.parse(op.body);const n=rows.length;const k=rows.findIndex(x=>x.id==b.p_id);if(k>=0)rows.splice(k,1);return J(k>=0)}
        if(op.method=='POST'){const b=JSON.parse(op.body);const r={id:20,user_id:null,autor:b.autor,texto:b.texto,criado_em:new Date().toISOString()};rows.unshift(r);return J([r])}
        return J(rows.slice())};
      const cfgO=window.__FVCFG;let cfg={};window.__FVCFG=()=>cfg;
-     S.tab='chat';R();chInit();await new Promise(r=>setTimeout(r,250));
-     a.push(document.body.classList.contains('chon')&&/Quem é você/.test(document.querySelector('#m').textContent));      // sem login: escolhe quem é
-     localStorage.setItem('rep.me','Ana Teste');R();a.push(!!document.querySelector('#chi')&&/Ana Teste/.test(document.querySelector('#m').textContent)&&CH.msgs.length==1);
+     localStorage.removeItem('rep.chat.me');CH.fx=null;S.tab='chat';R();chInit();await new Promise(r=>setTimeout(r,250));
+     a.push(document.body.classList.contains('chon')&&/Quem é você/.test(document.querySelector('#m').textContent)&&document.querySelectorAll('.chwho button').length==2&&!/Fulano/.test(document.querySelector('.chwho').textContent));      // sem login: escolhe quem é
+     chWho(0);a.push(!!document.querySelector('#chi')&&/Ana Teste/.test(document.querySelector('#m').textContent)&&CH.msgs.length==1);
      CH.last=0;document.querySelector("#chi").value="Olá do app aberto";await chSend();
      const post=calls.find(c=>c[1]=='POST'&&/chat_mensagens/.test(c[0]));a.push(!!post&&JSON.parse(post[2]).autor=='Ana Teste'&&!!JSON.parse(post[2]).device&&CH.msgs.some(x=>x.id===20)&&chMe(CH.msgs.find(x=>x.id===20))&&!chMe(CH.msgs.find(x=>x.id===7)));
      rows.push({id:30,user_id:null,autor:'Bia',texto:'Chegou por consulta',criado_em:new Date().toISOString()});CH.pn=0;

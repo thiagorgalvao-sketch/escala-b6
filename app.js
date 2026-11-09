@@ -2013,7 +2013,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='08/11/2026 · 384';
+const VER='08/11/2026 · 385';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2649,8 +2649,11 @@ const CHE=['😀','😄','😁','😂','🥰','😍','😎','🤗','😇','🙂'
 const CHK='rep.chat.seen';
 function chEnabled(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{};return c.chat_ativo!==false&&f.chat_ativo!==false}
 function chShow(){document.body.classList.toggle('chon',chEnabled()&&!!(FVC()||window.__FVREST))}
-function chOn(){return chEnabled()&&!!(CH.u||(CH.anon&&meG()))}
-function chNome(){if(!CH.u)return meG();const u=CH.u,md=u.user_metadata||{};return (ME_M&&ME_M.nome)||md.full_name||md.name||'Liderança'}
+function chIn_(n){return !!n&&(CH.fx||[]).some(x=>nz(x)==nz(n))}
+function chEu(){let v='';try{v=localStorage.getItem('rep.chat.me')||''}catch(e){}if(!v)v=meG();return chIn_(v)?(CH.fx.find(x=>nz(x)==nz(v))):''}
+async function chFixos(){let a=null;try{const r=await chRest('rpc/chat_membros',{method:'POST',body:'{}'});if(Array.isArray(r)&&r.length)a=r.map(x=>x.nome).filter(Boolean)}catch(e){}if(a)try{localStorage.setItem('rep.chat.fx',JSON.stringify(a))}catch(e){}else{try{a=JSON.parse(localStorage.getItem('rep.chat.fx')||'null')}catch(e){}}CH.fx=a||[];CH.fxe=!a;if(S.tab=='chat')chR()}
+function chOn(){return chEnabled()&&!!(CH.u||(CH.anon&&chEu()))}
+function chNome(){if(!CH.u)return chEu();const u=CH.u,md=u.user_metadata||{};return (ME_M&&ME_M.nome)||md.full_name||md.name||'Liderança'}
 function chDev(){let v='';try{v=localStorage.getItem('rep.chat.dev')||''}catch(e){}if(!v){v=(window.crypto&&crypto.randomUUID?crypto.randomUUID():'d'+Date.now()+Math.random().toString(36).slice(2,10));try{localStorage.setItem('rep.chat.dev',v)}catch(e){}}return v}
 function chMine(){try{return JSON.parse(localStorage.getItem('rep.chat.mine')||'[]')}catch(e){return[]}}
 function chMineAdd(id){const a=chMine();a.push(id);try{localStorage.setItem('rep.chat.mine',JSON.stringify(a.slice(-300)))}catch(e){}}
@@ -2660,7 +2663,7 @@ async function chRows(older){const lt=older&&CH.msgs.length&&typeof CH.msgs[0].i
  if(CH.u){const c=FVC();let q=c.from('chat_mensagens').select('id,autor,texto,criado_em,user_id,membro_id').order('id',{ascending:false}).limit(60);if(lt)q=q.lt('id',lt);const r=await q;if(r.error)throw r.error;return r.data||[]}
  return (await chRest('chat_mensagens?select=id,autor,texto,criado_em,user_id,membro_id&order=id.desc&limit=60'+(lt?'&id=lt.'+lt:'')))||[]}
 function chR(){const t=$('#chi');CH.draft=t?t.value:null;CH.foc=!!(t&&document.activeElement===t);R()}
-function chWho(i){const N=meNames();try{if(i<0)localStorage.removeItem('rep.me');else localStorage.setItem('rep.me',N[i])}catch(e){}CH.stick=1;R()}
+function chWho(i){try{if(i<0){localStorage.setItem('rep.chat.me','');localStorage.removeItem('rep.me')}else localStorage.setItem('rep.chat.me',(CH.fx||[])[i]||'')}catch(e){}CH.stick=1;R()}
 function chSeenGet(){try{return +localStorage.getItem(CHK)||0}catch(e){return 0}}
 function chSeenSet(n){CH.seen=n;try{localStorage.setItem(CHK,String(n))}catch(e){}}
 function chLastId(){for(let i=CH.msgs.length-1;i>=0;i--){const x=CH.msgs[i];if(typeof x.id=='number')return x.id}return 0}
@@ -2684,7 +2687,7 @@ function chOut(id){const n=CH.msgs.length;CH.msgs=CH.msgs.filter(x=>x.id!==id);i
 async function chInit(){if(CH.sub||CH.start||CH.anon)return;const c=FVC();if(!c&&!window.__FVREST)return;CH.start=1;chShow();
  if(c){try{let r=c.auth&&c.auth.getSession?await c.auth.getSession():null;CH.u=r&&r.data&&r.data.session&&r.data.session.user||null;if(!CH.u&&c.auth&&c.auth.getUser){r=await c.auth.getUser();CH.u=r&&r.data&&r.data.user||null}}catch(e){CH.u=null}}
  CH.start=0;CH.seen=chSeenGet();
- if(!CH.u){if(!window.__FVREST)return;CH.anon=1;chLoad();if(!CH.tm)CH.tm=setInterval(chPoll,5000);return}
+ if(!CH.u){if(!window.__FVREST)return;CH.anon=1;chFixos();chLoad();if(!CH.tm)CH.tm=setInterval(chPoll,5000);return}
  chLoad();
  try{if(!c.channel)return;CH.sub=c.channel('chat-banda').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_mensagens'},p=>chIn(p.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'chat_mensagens'},p=>chOut(p.old&&p.old.id)).subscribe()}catch(e){}}
 async function chSend(){const t=$('#chi');if(!t)return;const v=t.value.trim();if(!v)return;if(v.length>2000)return say('A mensagem é grande demais (máximo de 2000 letras).');if(!chEnabled())return say('O chat está desligado pela liderança.');if(!chOn())return say(CH.anon?'Escolha quem você é para escrever.':'Entre na sua conta para usar o chat.');
@@ -2701,10 +2704,10 @@ function chEmo(on){const p=$('#chp');if(!p)return;p.hidden=on===0?true:on===1?fa
 function chPut(e){const t=$('#chi');if(!t)return;const s=t.selectionStart==null?t.value.length:t.selectionStart,f=t.selectionEnd==null?s:t.selectionEnd;t.value=t.value.slice(0,s)+e+t.value.slice(f);const p=s+e.length;try{t.setSelectionRange(p,p)}catch(x){}t.focus();chGrow(t)}
 function chGrow(t){t.style.height='auto';t.style.height=Math.min(120,t.scrollHeight)+'px'}
 function chKey(ev){if(ev.key=='Enter'&&!ev.shiftKey&&!MOB()){ev.preventDefault();chSend()}}
-function vChat(){const hd='<div class="dbh"><div><h1>Chat da banda</h1><p class="mut">'+(CH.anon&&meG()?'Você escreve como <b>'+esc(meG())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.')+'</p></div></div>';
+function vChat(){const hd='<div class="dbh"><div><h1>Chat da banda</h1><p class="mut">'+(CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.')+'</p></div></div>';
  if(!chEnabled())return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">O chat está desligado no momento. A liderança pode ligar em Ajustes &rsaquo; Acesso da banda.</p></div></div>`;
  if(!CH.u&&!CH.anon)return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">Conectando ao chat…</p></div></div>`;
- if(!chOn()){const N=meNames();return`<div class="dbw chw">${hd}<div class="dbc"><h3 style="margin:0 0 6px">Quem é você?</h3><p class="mut" style="margin:0 0 10px">Toque no seu nome para entrar na conversa.</p><div class="chwho">${N.map((n,i)=>`<button type="button" class="sm" onclick="chWho(${i})">${esc(n)}</button>`).join('')||'<span class="mut">Ainda não há nomes na escala.</span>'}</div></div></div>`}
+ if(!chOn()){const N=CH.fx||[];return`<div class="dbw chw">${hd}<div class="dbc"><h3 style="margin:0 0 6px">Quem é você?</h3><p class="mut" style="margin:0 0 10px">Toque no seu nome (integrantes da banda fixa) para entrar na conversa.</p><div class="chwho">${N.map((n,i)=>`<button type="button" class="sm" onclick="chWho(${i})">${esc(n)}</button>`).join('')||'<span class="mut">'+(CH.fx?'Não foi possível carregar a lista da banda. Rode o 18_chat_membros_fixos.sql no Supabase e tente de novo.':'Carregando a lista…')+'</span>'}</div></div></div>`}
  let h='',dy='';const L=CH.msgs;
  for(const m of L){const d=chDay(m.criado_em);if(d!=dy){dy=d;h+=`<div class="chd">${esc(d)}</div>`}const me=chMe(m),can=!m.tmp&&(me||!S.band);
   h+=`<div class="chb${me?' me':''}${m.tmp?' tmp':''}${m.fail?' fail':''}">${me?'':`<small class="chau">${esc(m.autor)}</small>`}<div class="chtx">${chTxt(m.texto)}</div><time>${m.fail?`<button type="button" class="chrt" onclick="chRetry('${m.id}')">Não enviou · tocar para editar</button>`:m.tmp?'enviando…':chHm(m.criado_em)}</time>${can?`<button type="button" class="chx${CH.del===m.id?' on':''}" onclick="chDel(${m.id})" aria-label="Apagar mensagem">${CH.del===m.id?'Apagar?':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M8 7l1 12h6l1-12"/></svg>'}</button>`:''}</div>`}
