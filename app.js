@@ -2011,7 +2011,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='08/11/2026 · 378';
+const VER='08/11/2026 · 379';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2622,3 +2622,22 @@ function atalhoIni(){let a='';try{a=new URLSearchParams(location.search).get('a'
  const t=setInterval(()=>{if(++n>50){clearInterval(t);return}if(!S.lists||!S.lists.length||dlg.open)return;clearInterval(t);try{history.replaceState(history.state,'',location.pathname+location.hash)}catch(e){}
   const l=(typeof myNxL=='function'&&myNxL(td()))||nextL();if(a=='palco'&&l&&l.songIds&&l.songIds.length)stage(l.id);else tab('hoje')},300)}
 atalhoIni();
+/* 35 · Palco: marcar a seção atual (toque) e o líder conduz a banda em tempo real (Supabase Realtime, sem tabela) */
+var PL={role:'',ch:null,lid:'',sel:'',cp:-1,sent:'',st:'off'};
+function plApply(){document.querySelectorAll('.p.pcur').forEach(e=>e.classList.remove('pcur'));const on=FS&&PL.cp>=0&&PL.sel==S.sel;document.body.classList.toggle('hascur',!!on);if(on){const e=document.getElementById('p'+PL.cp);if(e)e.classList.add('pcur')}}
+function plSend(f){if(PL.role!='lead'||!PL.ch||PL.st!='SUBSCRIBED')return;const k=S.sel+'|'+PL.cp;if(!f&&k==PL.sent)return;PL.sent=k;try{PL.ch.send({type:'broadcast',event:'p',payload:{s:S.sel,p:PL.cp}})}catch(e){}}
+function plSync(){if(!FS){PL.cp=-1;if(document.body.classList.contains('hascur'))plApply();return}if(PL.sel!=S.sel){PL.sel=S.sel;PL.cp=-1}plApply();plSend()}
+function plRecv(m){if(PL.role!='follow'||!FS||!m)return;const l=S.lists.find(x=>x.id==PL.lid);if(!l||!m.s||!l.songIds.includes(m.s))return;
+ if(m.s!=S.sel){S.vw=S.vw||'mapa';S.sel=m.s;PL.sel=m.s;PL.cp=typeof m.p=='number'?m.p:-1;asc(0);scrollTo(0,0);R();hap(8)}else{PL.cp=typeof m.p=='number'?m.p:-1;plApply()}}
+function plUi(){const b=document.querySelector('#stg .plb');if(!b)return;const lead=!S.band,on=!!PL.role&&PL.st=='SUBSCRIBED';b.classList.toggle('on',on);b.textContent=on?(lead?'● Conduzindo':'● Seguindo'):(PL.role&&PL.st!='CLOSED'?'Conectando…':(lead?'Conduzir a banda':'Seguir o líder'));b.setAttribute('aria-pressed',on?'true':'false')}
+function plStop(){try{if(PL.ch&&FVC()&&FVC().removeChannel)FVC().removeChannel(PL.ch)}catch(e){}PL.ch=null;PL.role='';PL.st='off';PL.sent='';plUi()}
+function plT(ev){if(ev)ev.stopPropagation();if(PL.role){plStop();toast('Desconectado');return}
+ const c=FVC(),l=S.lists.find(x=>x.id==S.ctx);if(!c||!c.channel||!l||navigator.onLine===false)return say('Para conduzir ou seguir, entre na sua conta e fique conectado à internet.');
+ PL.role=S.band?'follow':'lead';PL.lid=l.id;
+ try{const ch=c.channel('palco-'+l.id,{config:{broadcast:{self:false}}});ch.on('broadcast',{event:'p'},m=>plRecv((m&&m.payload)||{}));ch.subscribe(s=>{if(s=='CHANNEL_ERROR'||s=='TIMED_OUT'){plStop();say('Não consegui conectar com a banda. Confira a internet e tente de novo.');return}PL.st=s;plUi();if(s=='SUBSCRIBED'&&PL.role=='lead')plSend(1)});PL.ch=ch}catch(e){PL.role='';return say('Não consegui conectar agora.')}plUi()}
+/* toque numa seção marca onde a banda está */
+document.addEventListener('click',e=>{if(!FS||!e.target.closest)return;const c=e.target.closest('section.p');if(!c||e.target.closest('button,a,input,textarea,select,summary,#stg,#stz'))return;const i=+c.id.slice(1);if(isNaN(i))return;
+ if(PL.sel!=S.sel){PL.sel=S.sel;PL.cp=-1}PL.cp=PL.cp==i?-1:i;hap(6);plApply();plSend()});
+{const _u=uiPost;uiPost=function(){_u.apply(this,arguments);plSync()}}
+{const _fe=fsExit;fsExit=function(){plStop();PL.cp=-1;return _fe.apply(this,arguments)}}
+{const _s=stg;stg=function(){const r=_s.apply(this,arguments);const e=document.getElementById('stg');if(e&&!e.hidden&&FVC()&&!e.querySelector('.plb')){const b=document.createElement('button');b.type='button';b.className='plb';b.onclick=plT;e.appendChild(b)}plUi();return r}}

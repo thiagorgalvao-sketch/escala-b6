@@ -440,6 +440,20 @@ with sync_playwright() as p:
      toast('depois');a.push(!!document.querySelector('#tt.on'));    // 9: avisos voltam fora do Palco
      delete navigator.wakeLock;WL=null;S.tab='lists';S.lv=null;R();return a.concat([z])}""")
     ok(r[:10] == [True]*10, 'Palco: tela acesa, barra fixável/recolhível, toque duplo protegido, sem avisos por cima da cifra', str(r))
+    r = pg.evaluate("""async()=>{const a=[],o=window.__SBB;S.band=false;
+     const sent=[],h={};const ch={on(t,f,cb){h.cb=cb;return ch},subscribe(cb){setTimeout(()=>cb('SUBSCRIBED'),0);return ch},send(m){sent.push(m.payload)}};
+     window.__SBB={channel:()=>ch,removeChannel:()=>{h.rm=1}};
+     const l=S.lists.find(x=>x.songIds.length>2);stage(l.id);await new Promise(r=>setTimeout(r,400));
+     const c0=document.getElementById('p1');c0.click();a.push(c0.classList.contains('pcur')&&document.body.classList.contains('hascur'));         // toque marca a seção
+     c0.click();a.push(!c0.classList.contains('pcur'));                                                                                    // toque de novo desmarca
+     const b=document.querySelector('#stg .plb');a.push(!!b&&/Conduzir/.test(b.textContent));b.click();await new Promise(r=>setTimeout(r,100));a.push(PL.role=='lead'&&/Conduzindo/.test(b.textContent)&&sent.length>=1);
+     document.getElementById('p0').click();a.push(sent[sent.length-1].p==0&&sent[sent.length-1].s==S.sel);                                 // líder envia a seção
+     const n0=sent.length;nav(1);await new Promise(r=>setTimeout(r,200));a.push(sent.length>n0&&sent[sent.length-1].s==S.sel);               // e a troca de música
+     plStop();S.band=true;plT();await new Promise(r=>setTimeout(r,100));const alvo=l.songIds[0];h.cb({payload:{s:alvo,p:1}});await new Promise(r=>setTimeout(r,200));
+     const e1=document.getElementById('p1');a.push(PL.role=='follow'&&S.sel==alvo&&PL.cp==1&&(!e1||e1.classList.contains('pcur')));                           // seguidor acompanha
+     fsExit();await new Promise(r=>setTimeout(r,200));a.push(PL.role==''&&h.rm==1&&!document.body.classList.contains('hascur'));
+     S.band=false;window.__SBB=o;if(o===undefined)delete window.__SBB;S.tab='lists';S.lv=null;R();const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on');return a}""")
+    ok(r == [True]*8, 'Palco: toque marca a seção atual e o líder conduz quem segue (música e seção)', str(r))
     r = pg.evaluate("""async()=>{const a=[];S.band=false;Object.defineProperty(navigator,'wakeLock',{configurable:true,value:undefined});const l=S.lists.find(x=>x.songIds.length>3);stage(l.id);await new Promise(r=>setTimeout(r,300));
      a.push(!!NSV&&NSV.tagName=='VIDEO'&&NSV.muted);                          // sem wakeLock: vídeo mudo mantém a tela acesa
      const el=document.querySelector('#m')||document.body;const go=async(dx,ms)=>{await new Promise(r=>setTimeout(r,600));const el=document.querySelector('#m')||document.body;const i=l.songIds.indexOf(S.sel);const T=(x)=>new Touch({identifier:1,target:el,clientX:x,clientY:300});const f=(t,x)=>el.dispatchEvent(new TouchEvent(t,{touches:t=='touchend'?[]:[T(x)],changedTouches:[T(x)],bubbles:true,cancelable:true}));f('touchstart',300);return new Promise(r=>setTimeout(()=>{f('touchend',300+dx);r(l.songIds.indexOf(S.sel)-i)},ms))};
