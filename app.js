@@ -2013,7 +2013,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='08/11/2026 · 386';
+const VER='08/11/2026 · 387';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2648,10 +2648,10 @@ var CH={msgs:[],seen:0,sub:null,more:true,ok:0,err:'',del:'',stick:1,last:0,ld:0
 const CHE=['😀','😄','😁','😂','🥰','😍','😎','🤗','😇','🙂','😉','😅','🤔','😮','😢','😭','🙏','🙌','👏','💪','👍','👎','✌️','🤝','❤️','💙','💚','🧡','💛','🔥','✨','🎉','🥳','🎶','🎵','🎸','🥁','🎹','🎤','🎧','📖','✝️','🕊️','⛪','☀️','🌙','⭐','💯','✅','❌','⚠️','⏰','📍','📅','🚗','🍕','☕','😴','🤞','👀','🙈'];
 const CHK='rep.chat.seen';
 function chEnabled(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{};return c.chat_ativo!==false&&f.chat_ativo!==false}
-function chDiag(){const c=(window.__FVCFG&&__FVCFG())||{};return (chEnabled()?'ligado':'desligado')+' · config='+String(c.chat_ativo)+' · '+(FVC()?'conta':'')+(window.__FVREST?' aberto':'')+' · botão='+(document.getElementById('chb')?(getComputedStyle(document.getElementById('chb')).display):'não existe')}
+function chDiag(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{},b=document.getElementById('chb');return (chEnabled()?'ligado':'desligado')+' · '+String(c.chat_ativo)+'/'+String(f.chat_ativo)+' · '+(CH.u?'conta':CH.anon?'sem login':FVC()?'conectando':window.__FVREST?'aberto':'sem servidor')+(CH.live?' · ao vivo':'')+' · botão '+(b?getComputedStyle(b).display:'ausente')}
 function chShow(){document.body.classList.toggle('chon',chEnabled()&&!!(FVC()||window.__FVREST))}
 function chIn_(n){return !!n&&(CH.fx||[]).some(x=>nz(x)==nz(n))}
-function chEu(){let v='';try{v=localStorage.getItem('rep.chat.me')||''}catch(e){}if(!v)v=meG();return chIn_(v)?(CH.fx.find(x=>nz(x)==nz(v))):''}
+function chEu(){let v='';try{v=localStorage.getItem('rep.chat.me')||''}catch(e){}if(v=='-')return'';if(!v)v=meG();return chIn_(v)?(CH.fx.find(x=>nz(x)==nz(v))):''}
 async function chFixos(){let a=null;try{const r=await chRest('rpc/chat_membros',{method:'POST',body:'{}'});if(Array.isArray(r)&&r.length)a=r.map(x=>x.nome).filter(Boolean)}catch(e){}if(a)try{localStorage.setItem('rep.chat.fx',JSON.stringify(a))}catch(e){}else{try{a=JSON.parse(localStorage.getItem('rep.chat.fx')||'null')}catch(e){}}CH.fx=a||[];CH.fxe=!a;if(S.tab=='chat')chR()}
 function chOn(){return chEnabled()&&!!(CH.u||(CH.anon&&chEu()))}
 function chNome(){if(!CH.u)return chEu();const u=CH.u,md=u.user_metadata||{};return (ME_M&&ME_M.nome)||md.full_name||md.name||'Liderança'}
@@ -2664,7 +2664,7 @@ async function chRows(older){const lt=older&&CH.msgs.length&&typeof CH.msgs[0].i
  if(CH.u){const c=FVC();let q=c.from('chat_mensagens').select('id,autor,texto,criado_em,user_id,membro_id').order('id',{ascending:false}).limit(60);if(lt)q=q.lt('id',lt);const r=await q;if(r.error)throw r.error;return r.data||[]}
  return (await chRest('chat_mensagens?select=id,autor,texto,criado_em,user_id,membro_id&order=id.desc&limit=60'+(lt?'&id=lt.'+lt:'')))||[]}
 function chR(){const t=$('#chi');CH.draft=t?t.value:null;CH.foc=!!(t&&document.activeElement===t);R()}
-function chWho(i){try{if(i<0){localStorage.setItem('rep.chat.me','');localStorage.removeItem('rep.me')}else localStorage.setItem('rep.chat.me',(CH.fx||[])[i]||'')}catch(e){}CH.stick=1;R()}
+function chWho(i){try{if(i<0)localStorage.setItem('rep.chat.me','-');else localStorage.setItem('rep.chat.me',(CH.fx||[])[i]||'')}catch(e){}CH.stick=1;R()}
 function chSeenGet(){try{return +localStorage.getItem(CHK)||0}catch(e){return 0}}
 function chSeenSet(n){CH.seen=n;try{localStorage.setItem(CHK,String(n))}catch(e){}}
 function chLastId(){for(let i=CH.msgs.length-1;i>=0;i--){const x=CH.msgs[i];if(typeof x.id=='number')return x.id}return 0}
@@ -2674,9 +2674,9 @@ function chDay(iso){const d=new Date(iso),h=new Date(),y=new Date();y.setDate(h.
 function chHm(iso){return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
 function chTxt(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}
 async function chLoad(older){if(CH.ld)return;CH.ld=1;try{const all=await chRows(older);const rows=all.slice().reverse();CH.more=all.length>=60;CH.err='';CH.ok=1;
-  if(older){CH.stick=0;CH.msgs=rows.concat(CH.msgs)}else{const tmp=CH.msgs.filter(x=>x.tmp);CH.msgs=rows.concat(tmp);CH.stick=1}}catch(e){CH.err=String(e&&e.message||e);CH.ok=0}CH.ld=0;
+  if(older){CH.stick=0;CH.msgs=rows.concat(CH.msgs)}else{const tmp=CH.msgs.filter(x=>x.tmp);CH.msgs=rows.concat(tmp);CH.stick=1;if(!CH.seen&&!chSeenGet()&&!CH.msgs.some(x=>chMe(x)))chSeenSet(Math.max(0,chLastId()-3))}}catch(e){CH.err=String(e&&e.message||e);CH.ok=0}CH.ld=0;
  if(S.tab=='chat')chR();chBadge()}
-async function chPoll(){if(!CH.anon||CH.ld||document.hidden||CH.start)return;CH.pn=(CH.pn||0)+1;if(S.tab!='chat'&&CH.pn%6)return;
+async function chPoll(){if(!(CH.anon||CH.u)||CH.live||CH.ld||document.hidden||CH.start||!chEnabled())return;CH.pn=(CH.pn||0)+1;if(S.tab!='chat'&&CH.pn%6)return;
  try{const rows=(await chRows()).slice().reverse(),sig=a=>a.map(x=>x.id).join(','),mn=rows.length?rows[0].id:0;
   const cur=CH.msgs.filter(x=>typeof x.id=='number'&&x.id>=mn);if(CH.ok&&sig(cur)==sig(rows))return;
   const have=new Set(CH.msgs.map(x=>x.id)),fresh=CH.ok?rows.filter(x=>!have.has(x.id)&&!chMe(x)):[];
@@ -2689,8 +2689,8 @@ async function chInit(){if(CH.sub||CH.start||CH.anon)return;const c=FVC();if(!c&
  if(c){try{let r=c.auth&&c.auth.getSession?await c.auth.getSession():null;CH.u=r&&r.data&&r.data.session&&r.data.session.user||null;if(!CH.u&&c.auth&&c.auth.getUser){r=await c.auth.getUser();CH.u=r&&r.data&&r.data.user||null}}catch(e){CH.u=null}}
  CH.start=0;CH.seen=chSeenGet();
  if(!CH.u){if(!window.__FVREST)return;CH.anon=1;chFixos();chLoad();if(!CH.tm)CH.tm=setInterval(chPoll,5000);return}
- chLoad();
- try{if(!c.channel)return;CH.sub=c.channel('chat-banda').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_mensagens'},p=>chIn(p.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'chat_mensagens'},p=>chOut(p.old&&p.old.id)).subscribe()}catch(e){}}
+ chLoad();if(!CH.tm)CH.tm=setInterval(chPoll,5000);
+ try{if(!c.channel)return;CH.sub=c.channel('chat-banda').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_mensagens'},p=>chIn(p.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'chat_mensagens'},p=>chOut(p.old&&p.old.id)).subscribe(st=>{const was=CH.live;CH.live=st==='SUBSCRIBED';if(CH.live&&!was&&CH.ok)chLoad()})}catch(e){}}
 async function chSend(){const t=$('#chi');if(!t)return;const v=t.value.trim();if(!v)return;if(v.length>2000)return say('A mensagem é grande demais (máximo de 2000 letras).');if(!chEnabled())return say('O chat está desligado pela liderança.');if(!chOn())return say(CH.anon?'Escolha quem você é para escrever.':'Entre na sua conta para usar o chat.');
  const n=performance.now();if(n-CH.last<500)return;CH.last=n;const c=FVC(),tmp={id:'t'+Date.now(),autor:chNome(),texto:v,criado_em:new Date().toISOString(),user_id:CH.u?CH.u.id:null,tmp:1};
  CH.msgs.push(tmp);t.value='';CH.draft=null;CH.stick=1;chEmo(0);R();hap(6);
@@ -2698,7 +2698,7 @@ async function chSend(){const t=$('#chi');if(!t)return;const v=t.value.trim();if
   else{const r=await chRest('chat_mensagens?select=id,autor,texto,criado_em,user_id,membro_id',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({texto:v,autor:chNome(),device:chDev()})});d=r&&r[0];if(!d)throw new Error('sem resposta');chMineAdd(d.id)}
   CH.msgs=CH.msgs.filter(x=>x!==tmp);if(!CH.msgs.some(x=>x.id===d.id))CH.msgs.push(d);chSeenSet(chLastId())}catch(e){tmp.fail=1;say('Não consegui enviar: '+String(e&&e.message||e))}
  if(S.tab=='chat')chR()}
-function chRetry(id){const m=CH.msgs.find(x=>x.id===id);if(!m)return;CH.msgs=CH.msgs.filter(x=>x!==m);const t=$('#chi');if(t)t.value=m.texto;R()}
+function chRetry(id){const m=CH.msgs.find(x=>x.id===id);if(!m)return;CH.msgs=CH.msgs.filter(x=>x!==m);CH.draft=m.texto;CH.foc=1;R()}
 async function chDel(id){if(!CH.u&&!CH.anon)return;if(CH.del!==id){CH.del=id;chR();setTimeout(()=>{if(CH.del===id){CH.del='';if(S.tab=='chat')chR()}},3500);return}CH.del='';
  try{if(CH.u){const r=await FVC().from('chat_mensagens').delete().eq('id',id);if(r.error)throw r.error}else{const r=await chRest('rpc/chat_apagar',{method:'POST',body:JSON.stringify({p_id:id,p_device:chDev()})});if(r!==true)throw new Error('não foi possível apagar')}chOut(id)}catch(e){say('Não consegui apagar: '+String(e&&e.message||e))}}
 function chEmo(on){const p=$('#chp');if(!p)return;p.hidden=on===0?true:on===1?false:!p.hidden}
@@ -2708,10 +2708,10 @@ function chKey(ev){if(ev.key=='Enter'&&!ev.shiftKey&&!MOB()){ev.preventDefault()
 function vChat(){const hd='<div class="dbh"><div><h1>Chat da banda</h1><p class="mut">'+(CH.anon&&chEu()?'Você escreve como <b>'+esc(chEu())+'</b> · <a href="#" onclick="chWho(-1);return false">trocar</a>':'Conversa de toda a banda.')+'</p></div></div>';
  if(!chEnabled())return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">O chat está desligado no momento. A liderança pode ligar em Ajustes &rsaquo; Acesso da banda.</p></div></div>`;
  if(!CH.u&&!CH.anon)return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">Conectando ao chat…</p></div></div>`;
- if(!chOn()){const N=CH.fx||[];return`<div class="dbw chw">${hd}<div class="dbc"><h3 style="margin:0 0 6px">Quem é você?</h3><p class="mut" style="margin:0 0 10px">Toque no seu nome (integrantes da banda fixa) para entrar na conversa.</p><div class="chwho">${N.map((n,i)=>`<button type="button" class="sm" onclick="chWho(${i})">${esc(n)}</button>`).join('')||'<span class="mut">'+(CH.fx?'Não foi possível carregar a lista da banda. Rode o 18_chat_membros_fixos.sql no Supabase e tente de novo.':'Carregando a lista…')+'</span>'}</div></div></div>`}
- let h='',dy='';const L=CH.msgs;
- for(const m of L){const d=chDay(m.criado_em);if(d!=dy){dy=d;h+=`<div class="chd">${esc(d)}</div>`}const me=chMe(m),can=!m.tmp&&(me||!S.band);
-  h+=`<div class="chb${me?' me':''}${m.tmp?' tmp':''}${m.fail?' fail':''}">${me?'':`<small class="chau">${esc(m.autor)}</small>`}<div class="chtx">${chTxt(m.texto)}</div><time>${m.fail?`<button type="button" class="chrt" onclick="chRetry('${m.id}')">Não enviou · tocar para editar</button>`:m.tmp?'enviando…':chHm(m.criado_em)}</time>${can?`<button type="button" class="chx${CH.del===m.id?' on':''}" onclick="chDel(${m.id})" aria-label="Apagar mensagem">${CH.del===m.id?'Apagar?':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M8 7l1 12h6l1-12"/></svg>'}</button>`:''}</div>`}
+ if(!chOn()){const N=CH.fx||[];return`<div class="dbw chw">${hd}<div class="dbc"><h3 style="margin:0 0 6px">Quem é você?</h3><p class="mut" style="margin:0 0 10px">Toque no seu nome (integrantes da banda fixa) para entrar na conversa.</p><div class="chwho">${N.map((n,i)=>`<button type="button" class="sm" onclick="chWho(${i})">${esc(n)}</button>`).join('')||'<span class="mut">'+(CH.fx?'Nenhum integrante da banda fixa encontrado. A liderança confere em Acesso da banda se os nomes estão marcados como “Banda fixa” e “Ativo”.':'Carregando a lista…')+'</span>'}</div></div></div>`}
+ let h='',dy='',pa='';const L=CH.msgs;
+ for(const m of L){const d=chDay(m.criado_em);if(d!=dy){dy=d;pa='';h+=`<div class="chd">${esc(d)}</div>`}const me=chMe(m),ak=(me?'\u0001':'')+m.autor,seq=ak==pa;pa=ak;const can=!m.tmp&&typeof m.id=='number'&&(me||(!!CH.u&&!S.band));
+  h+=`<div class="chb${me?' me':''}${seq?' seq':''}${m.tmp?' tmp':''}${m.fail?' fail':''}">${me||seq?'':`<small class="chau">${esc(m.autor)}</small>`}<div class="chtx">${chTxt(m.texto)}</div><time>${m.fail?`<button type="button" class="chrt" onclick="chRetry('${m.id}')">Não enviou · tocar para editar</button>`:m.tmp?'enviando…':chHm(m.criado_em)}</time>${can?`<button type="button" class="chx${CH.del===m.id?' on':''}" onclick="chDel(${m.id})" aria-label="Apagar mensagem">${CH.del===m.id?'Apagar?':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M8 7l1 12h6l1-12"/></svg>'}</button>`:''}</div>`}
  return`<div class="dbw chw">${hd}${CH.err?`<div class="dbc"><p class="mut">Não foi possível carregar o chat (${esc(CH.err)}). Se o banco ainda não foi preparado, rode o 16_chat.sql e o 17_chat_publico.sql no Supabase.</p><button class="sm" onclick="chLoad()">Tentar de novo</button></div>`:''}
  ${CH.more&&L.length?`<button type="button" class="sm chmo" onclick="chLoad(1)">Ver mensagens anteriores</button>`:''}
  <div class="chm">${h||(CH.ok?'<p class="mut" style="text-align:center;margin:30px 0">Ainda não há mensagens. Escreva a primeira! 🙌</p>':'<p class="mut" style="text-align:center;margin:30px 0">Carregando…</p>')}</div></div>
