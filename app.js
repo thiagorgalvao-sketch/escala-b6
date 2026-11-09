@@ -2004,7 +2004,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='09/11/2026 · 394';
+const VER='09/11/2026 · 395';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2630,7 +2630,7 @@ const CHE=['😀','😄','😁','😂','🥰','😍','😎','🤗','😇','🙂'
 const CHK='rep.chat.seen';
 function chEnabled(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{};return c.chat_ativo!==false&&f.chat_ativo!==false}
 function chDiag(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{},b=document.getElementById('chb');return (chEnabled()?'ligado':'desligado')+' · '+String(c.chat_ativo)+'/'+String(f.chat_ativo)+' · '+(CH.u?'conta':CH.anon?'sem login':FVC()?'conectando':window.__FVREST?'aberto':'sem servidor')+(CH.live?' · ao vivo':'')+' · botão '+(b?getComputedStyle(b).display:'ausente')}
-function chShow(){document.body.classList.toggle('chon',chEnabled()&&!!(FVC()||window.__FVREST))}
+function chShow(){document.body.classList.toggle('chon',chEnabled())}
 function chIn_(n){return !!n&&(CH.fx||[]).some(x=>nz(x)==nz(n))}
 function chEu(){let v='';try{v=localStorage.getItem('rep.chat.me')||''}catch(e){}if(v=='-')return'';if(!v)v=meG();return chIn_(v)?(CH.fx.find(x=>nz(x)==nz(v))):''}
 async function chFixos(){let a=null;try{const r=await chRest('rpc/chat_membros',{method:'POST',body:'{}'});if(Array.isArray(r)&&r.length)a=r.map(x=>x.nome).filter(Boolean)}catch(e){}if(a)try{localStorage.setItem('rep.chat.fx',JSON.stringify(a))}catch(e){}else{try{a=JSON.parse(localStorage.getItem('rep.chat.fx')||'null')}catch(e){}}CH.fx=a||[];CH.fxe=!a;if(S.tab=='chat')chR()}
