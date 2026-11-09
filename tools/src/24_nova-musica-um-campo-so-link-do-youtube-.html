@@ -32,4 +32,3 @@ function cifImp(o,quiet){if(S.band)return;const c=cfClean(o.cifra);if(c.n.replac
  D.cifra=n;const P=cfParts(n),old=(D.parts||[]).some(q=>q.chords||q.lyric);if(P.length&&!old)D.parts=P;DT=P.length&&!old?'blocos':'cifra';sfR();dlg.scrollTop=0;
  if(quiet)return;toast('Cifra importada'+tr+(P.length&&!old?' · '+P.length+' blocos':''));if(P.length&&old)setTimeout(()=>ask('Cifra importada'+tr+'. Substituir os blocos atuais pelos '+P.length+' gerados da cifra?',()=>{D.parts=P;DT='blocos';sfR()},'Substituir'),400)}
 function cbHash(h){const m=/^#importar=(.+)$/.exec(h||'');if(!m||S.band)return;let d=null;try{d=JSON.parse(decodeURIComponent(m[1]))}catch(e){}if(!d||d.fv!==1||typeof d.cifra!='string')return say('Não consegui ler a cifra enviada.');cifImp(d)}
-function bIA(){gp()}

@@ -3,7 +3,6 @@ var CH={msgs:[],seen:0,sub:null,more:true,ok:0,err:'',del:'',stick:1,last:0,ld:0
 const CHE=['😀','😄','😁','😂','🥰','😍','😎','🤗','😇','🙂','😉','😅','🤔','😮','😢','😭','🙏','🙌','👏','💪','👍','👎','✌️','🤝','❤️','💙','💚','🧡','💛','🔥','✨','🎉','🥳','🎶','🎵','🎸','🥁','🎹','🎤','🎧','📖','✝️','🕊️','⛪','☀️','🌙','⭐','💯','✅','❌','⚠️','⏰','📍','📅','🚗','🍕','☕','😴','🤞','👀','🙈'];
 const CHK='rep.chat.seen';
 function chEnabled(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{};return c.chat_ativo!==false&&f.chat_ativo!==false}
-function chDiag(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{},b=document.getElementById('chb');return (chEnabled()?'ligado':'desligado')+' · '+String(c.chat_ativo)+'/'+String(f.chat_ativo)+' · '+(CH.u?'conta':CH.anon?'sem login':FVC()?'conectando':window.__FVREST?'aberto':'sem servidor')+(CH.live?' · ao vivo':'')+' · botão '+(b?getComputedStyle(b).display:'ausente')}
 function chShow(){const on=chEnabled();document.body.classList.toggle('chon',on);document.body.classList.toggle('choff',!on)}
 function chIn_(n){return !!n&&(CH.fx||[]).some(x=>nz(x)==nz(n))}
 function chEu(){let v='';try{v=localStorage.getItem('rep.chat.me')||''}catch(e){}if(v=='-')return'';if(!v)v=meG();return chIn_(v)?(CH.fx.find(x=>nz(x)==nz(v))):''}

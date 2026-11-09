@@ -2004,7 +2004,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='09/11/2026 · 398';
+const VER='09/11/2026 · 399';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2254,7 +2254,6 @@ wtlEnsure(CBD);new MutationObserver(()=>wtlEnsure(CBD)).observe(CBD,{childList:t
 CBD.addEventListener('click',e=>{if(e.target!==CBD)return;const r=CBD.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dClose(CBD)});
 const CCRX=/cifraclub\.com\.br\/([a-z0-9-]+)\/([a-z0-9-]+)/i;
 const cbQ=()=>[D&&D.title,D&&(D.artist||'').split(';')[0]].filter(Boolean).join(' ').trim();
-function ccBusca(){cbD()}
 function cbItem(x,oc){return`<button class="cbi" onclick="${oc}">${x.foto?`<img src="${esc(x.foto)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:'<i></i>'}<span><b>${esc(x.titulo)}</b><small>${esc(x.artista)}</small></span><em>›</em></button>`}
 async function cbCall(b){const sb=window.__SB;if(!sb||!sb.functions)throw new Error('sem conexão');const {data,error}=await sb.functions.invoke('buscar-cifra',{body:b});if(error){let m=error.message||'erro';try{const j=await error.context.json();m=j.erro||m}catch(e){}throw new Error(m)}if(data&&data.erro)throw new Error(data.erro);return data||{}}
 async function ccSearch(q){try{const r=await fetch('https://solr.sscdn.co/cc/c7/?q='+encodeURIComponent(q));if(!r.ok)throw new Error('busca '+r.status);const j=await r.json();
@@ -2311,7 +2310,6 @@ function cifImp(o,quiet){if(S.band)return;const c=cfClean(o.cifra);if(c.n.replac
  D.cifra=n;const P=cfParts(n),old=(D.parts||[]).some(q=>q.chords||q.lyric);if(P.length&&!old)D.parts=P;DT=P.length&&!old?'blocos':'cifra';sfR();dlg.scrollTop=0;
  if(quiet)return;toast('Cifra importada'+tr+(P.length&&!old?' · '+P.length+' blocos':''));if(P.length&&old)setTimeout(()=>ask('Cifra importada'+tr+'. Substituir os blocos atuais pelos '+P.length+' gerados da cifra?',()=>{D.parts=P;DT='blocos';sfR()},'Substituir'),400)}
 function cbHash(h){const m=/^#importar=(.+)$/.exec(h||'');if(!m||S.band)return;let d=null;try{d=JSON.parse(decodeURIComponent(m[1]))}catch(e){}if(!d||d.fv!==1||typeof d.cifra!='string')return say('Não consegui ler a cifra enviada.');cifImp(d)}
-function bIA(){gp()}
 /* ===== 6. ensaio com VS */
 var VAB={a:null,b:null};
 function vsRate(v){const a=$('#vsa');if(a){a.playbackRate=+v;a.preservesPitch=true;a.mozPreservesPitch=true;a.webkitPreservesPitch=true}}
@@ -2631,7 +2629,6 @@ var CH={msgs:[],seen:0,sub:null,more:true,ok:0,err:'',del:'',stick:1,last:0,ld:0
 const CHE=['😀','😄','😁','😂','🥰','😍','😎','🤗','😇','🙂','😉','😅','🤔','😮','😢','😭','🙏','🙌','👏','💪','👍','👎','✌️','🤝','❤️','💙','💚','🧡','💛','🔥','✨','🎉','🥳','🎶','🎵','🎸','🥁','🎹','🎤','🎧','📖','✝️','🕊️','⛪','☀️','🌙','⭐','💯','✅','❌','⚠️','⏰','📍','📅','🚗','🍕','☕','😴','🤞','👀','🙈'];
 const CHK='rep.chat.seen';
 function chEnabled(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{};return c.chat_ativo!==false&&f.chat_ativo!==false}
-function chDiag(){const c=(window.__FVCFG&&__FVCFG())||{},f=(typeof FV_CFG!='undefined'&&FV_CFG)||{},b=document.getElementById('chb');return (chEnabled()?'ligado':'desligado')+' · '+String(c.chat_ativo)+'/'+String(f.chat_ativo)+' · '+(CH.u?'conta':CH.anon?'sem login':FVC()?'conectando':window.__FVREST?'aberto':'sem servidor')+(CH.live?' · ao vivo':'')+' · botão '+(b?getComputedStyle(b).display:'ausente')}
 function chShow(){const on=chEnabled();document.body.classList.toggle('chon',on);document.body.classList.toggle('choff',!on)}
 function chIn_(n){return !!n&&(CH.fx||[]).some(x=>nz(x)==nz(n))}
 function chEu(){let v='';try{v=localStorage.getItem('rep.chat.me')||''}catch(e){}if(v=='-')return'';if(!v)v=meG();return chIn_(v)?(CH.fx.find(x=>nz(x)==nz(v))):''}
