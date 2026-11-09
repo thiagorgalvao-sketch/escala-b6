@@ -409,6 +409,12 @@ with sync_playwright() as p:
      FS=true;uiPost();a.push(b.hidden&&!document.body.classList.contains('tbon'));FS=false;                 // Palco: sem menu e sem Voltar
      [S.tab,S.lv,S.lvm,S.sel,S.hide,S.ctx,S.band]=o;R();return a}""")
     ok(r == [True]*7, 'navegação: menu fixo em todas as telas (menos no Palco) e botão Voltar no topo', str(r))
+    r = pg.evaluate("""()=>{const a=[],T=td();S.band=false;document.querySelectorAll('dialog[open]').forEach(d=>d.close());
+     const L=qkList();a.push(L.length>0&&L.every(x=>x.d>=T&&!S.lists.some(y=>y.date==x.d&&nz(y.place)==nz(x.src.place)&&nz(y.turno)==nz(x.src.turno))));
+     editList(null);a.push(!!document.querySelector('#qks .qkb'));
+     qkUse(0);a.push(P.date>=T&&!!P.name&&!!P.place&&!!P.turno&&LTB=='mu'&&Object.keys(P.banda||{}).length>0);
+     dlg.close();nsStart('');a.push(!!document.querySelector('button[onclick="nsPaste()"]'));dlg.close();const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on');return a}""")
+    ok(r == [True]*4, 'novo culto rápido: sugestões com a próxima data livre e equipe do último; nova música tem botão Colar', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
      ltG('ev');ltS(1);a.push(LTB=='ev');const sy=dlg.querySelector('.ltb .tb[data-lt="ev"]');Object.assign(P,{name:'Culto',date:'2099-05-05',place:'Mauá',turno:'Noite'});ltS(1);a.push(LTB=='eq'&&!document.querySelector('#lvt').hidden&&/Passo 2 de 7/.test(document.querySelector('#lsh').textContent)&&document.querySelector('.ltb .tb[data-lt="ev"]').classList.contains('ok'));ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
      ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")

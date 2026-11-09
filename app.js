@@ -2011,7 +2011,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='08/11/2026 · 377';
+const VER='08/11/2026 · 378';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2286,7 +2286,7 @@ async function cbPaste(){let t='';try{t=await navigator.clipboard.readText()}cat
  const r=$('#cbr');if(r)r.innerHTML=`<p class="mut" style="margin:0 0 6px">Cole aqui o texto da cifra (toque e segure › Colar):</p><textarea id="cbt" style="width:100%;min-height:160px"></textarea><div class="ac"><button class="pri" onclick="const v=$('#cbt').value;if(v.replace(/\\s/g,'').length<20)return say('Cole a cifra completa.');CBD.close();cifImp({cifra:v,link:CBH})">Importar</button><button onclick="cbGo()">← Resultados</button></div>`;setTimeout(()=>{const a=$('#cbt');if(a)a.focus()},50)}
 /* ===== nova música: um campo só (link do YouTube, Spotify, Cifra Club ou nome) */
 let NS={},NSM='';
-function nsStart(q,go){NS={};NSM='';dlg.innerHTML=`<div class="ehd"><h2>Nova música</h2></div><p class="mut nsh">Cole o link do <b>YouTube</b> ou do <b>Cifra Club</b>, ou digite o nome da música. O Fervor encontra a cifra e o tom e já monta os blocos.</p><div class="cbs"><input id="nsq" type="search" enterkeyhint="search" autocomplete="off" value="${esc(q||'')}" placeholder="Link ou nome da música" maxlength="300" onkeydown="if(event.key=='Enter'){event.preventDefault();nsGo()}" onpaste="setTimeout(()=>{if(/^https?:/i.test(this.value.trim()))nsGo()},30)"><button class="pri" onclick="nsGo()">Buscar</button></div><div id="nsr" class="cbr nsr"></div><div class="ac"><button onclick="nsManual()">Preencher manualmente</button><button onclick="dlg.close()">Cancelar</button></div>`;if(!dlg.open)dlg.showModal();if(go&&q)nsGo();else setTimeout(()=>{const e=$('#nsq');if(e)e.focus()},60)}
+function nsStart(q,go){NS={};NSM='';dlg.innerHTML=`<div class="ehd"><h2>Nova música</h2></div><p class="mut nsh">Cole o link do <b>YouTube</b> ou do <b>Cifra Club</b>, ou digite o nome da música. O Fervor encontra a cifra e o tom e já monta os blocos.</p><div class="cbs"><input id="nsq" type="search" enterkeyhint="search" autocomplete="off" value="${esc(q||'')}" placeholder="Link ou nome da música" maxlength="300" onkeydown="if(event.key=='Enter'){event.preventDefault();nsGo()}" onpaste="setTimeout(()=>{if(/^https?:/i.test(this.value.trim()))nsGo()},30)"><button type="button" onclick="nsPaste()">Colar</button><button class="pri" onclick="nsGo()">Buscar</button></div><div id="nsr" class="cbr nsr"></div><div class="ac"><button onclick="nsManual()">Preencher manualmente</button><button onclick="dlg.close()">Cancelar</button></div>`;if(!dlg.open)dlg.showModal();if(go&&q)nsGo();else setTimeout(()=>{const e=$('#nsq');if(e)e.focus()},60)}
 async function nsGo(){const e=$('#nsq'),r=$('#nsr');if(!e||!r)return;const v=e.value.trim();if(v.length<2)return say('Cole um link ou digite o nome da música.');const tk0=NS.tk=(NS.tk||0)+1,busy=t=>{r.innerHTML=`<div class="cbw"><span class="rps"></span>${t}</div>`};let q=v,head=NS.head||'';
  const cc=CCRX.exec(v);
  if(cc){busy('Trazendo a cifra do Cifra Club…');const x={dns:cc[1].toLowerCase(),url:cc[2].toLowerCase(),titulo:'',artista:'',foto:''};x.link=`https://www.cifraclub.com.br/${x.dns}/${x.url}/`;
@@ -2597,3 +2597,28 @@ function bkUp(){const b=$('#nvb');if(!b)return;if(S.tab!=TABC){TABP=TABC;TABC=S.
 dlg.addEventListener('close',bkUp);
 /* Agilidade: coisas caras que rodavam a cada troca de tela */
 {const _sy=sysUi;let c=null;sysUi=function(){if(c==null)c=_sy();return c};addEventListener('resize',()=>{c=null});document.addEventListener('visibilitychange',()=>{c=null})}
+/* 34 · Atalhos rápidos: novo culto em 2 toques, colar link de música e atalhos do ícone do app */
+var qkL=[];
+function qkAdd7(d,n){const x=new Date(d+'T12:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)}
+/* sugestões: os padrões mais recentes (tipo + local + horário), na próxima data livre */
+function qkList(){const T=td(),lim=qkAdd7(T,-60),A=S.lists.filter(l=>l.date&&l.name&&l.place&&l.turno).sort((a,b)=>b.date.localeCompare(a.date)),seen={},o=[];
+ for(const l of A){if(l.date<lim)break;const k=nz(l.name)+'|'+nz(l.place)+'|'+nz(l.turno);if(seen[k])continue;seen[k]=1;
+  let d=qkAdd7(l.date,7),g=0;while(d<T&&g++<200)d=qkAdd7(d,7);
+  while(g++<400&&S.lists.some(x=>x.date==d&&nz(x.place)==nz(l.place)&&nz(x.turno)==nz(l.turno)))d=qkAdd7(d,7);
+  o.push({src:l,d});if(o.length>=3)break}
+ return o}
+function qkR(){if(!P||P.id||P.ro||P.date||(P.name||'').trim())return;const pane=dlg.querySelector('.lpn[data-p="ev"]');if(!pane||pane.querySelector('#qks'))return;const L=qkList();if(!L.length)return;qkL=L;
+ const h=document.createElement('div');h.id='qks';h.className='qks';
+ h.innerHTML='<div class="qkt">⚡ Começar rápido <small>mesmo tipo, local, horário e equipe do último</small></div><div class="qkr">'+L.map((x,i)=>`<button type="button" class="qkb" onclick="qkUse(${i})"><b>${WD[new Date(x.d+'T12:00').getDay()]} ${ddm(x.d)}</b><span>${esc([x.src.name,x.src.place,x.src.turno].join(' · '))}</span></button>`).join('')+'</div>';
+ pane.insertBefore(h,pane.firstChild)}
+function qkUse(i){const x=qkL[i];if(!x||!P)return;const s=x.src;hap(10);
+ Object.assign(P,{name:s.name,place:s.place,turno:s.turno,date:x.d,pregador:''});P.banda=Object.assign({},s.banda||{});if(s.dm)P.dm=s.dm;
+ ensAuto();tecFill(P);lfR();ltG('mu');toast('Pronto: '+WD[new Date(x.d+'T12:00').getDay()]+' '+ddm(x.d)+'. Escolha as músicas.')}
+{const _l=lfR;lfR=function(){_l.apply(this,arguments);qkR()}}
+/* nova música: colar o link de uma vez */
+async function nsPaste(){try{const t=(await navigator.clipboard.readText()||'').trim();if(!t)return say('A área de transferência está vazia. Copie o link do YouTube ou do Cifra Club.');const e=$('#nsq');if(e){e.value=t;nsGo()}}catch(e){say('Não consegui ler o que você copiou. Segure no campo e toque em Colar.')}}
+/* atalhos do ícone (Android): ?a=hoje abre o próximo culto, ?a=palco abre direto o Modo Palco */
+function atalhoIni(){let a='';try{a=new URLSearchParams(location.search).get('a')||''}catch(e){}if(a!='hoje'&&a!='palco')return;let n=0;
+ const t=setInterval(()=>{if(++n>50){clearInterval(t);return}if(!S.lists||!S.lists.length||dlg.open)return;clearInterval(t);try{history.replaceState(history.state,'',location.pathname+location.hash)}catch(e){}
+  const l=(typeof myNxL=='function'&&myNxL(td()))||nextL();if(a=='palco'&&l&&l.songIds&&l.songIds.length)stage(l.id);else tab('hoje')},300)}
+atalhoIni();

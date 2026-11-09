@@ -1,0 +1,25 @@
+/* 34 · Atalhos rápidos: novo culto em 2 toques, colar link de música e atalhos do ícone do app */
+var qkL=[];
+function qkAdd7(d,n){const x=new Date(d+'T12:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)}
+/* sugestões: os padrões mais recentes (tipo + local + horário), na próxima data livre */
+function qkList(){const T=td(),lim=qkAdd7(T,-60),A=S.lists.filter(l=>l.date&&l.name&&l.place&&l.turno).sort((a,b)=>b.date.localeCompare(a.date)),seen={},o=[];
+ for(const l of A){if(l.date<lim)break;const k=nz(l.name)+'|'+nz(l.place)+'|'+nz(l.turno);if(seen[k])continue;seen[k]=1;
+  let d=qkAdd7(l.date,7),g=0;while(d<T&&g++<200)d=qkAdd7(d,7);
+  while(g++<400&&S.lists.some(x=>x.date==d&&nz(x.place)==nz(l.place)&&nz(x.turno)==nz(l.turno)))d=qkAdd7(d,7);
+  o.push({src:l,d});if(o.length>=3)break}
+ return o}
+function qkR(){if(!P||P.id||P.ro||P.date||(P.name||'').trim())return;const pane=dlg.querySelector('.lpn[data-p="ev"]');if(!pane||pane.querySelector('#qks'))return;const L=qkList();if(!L.length)return;qkL=L;
+ const h=document.createElement('div');h.id='qks';h.className='qks';
+ h.innerHTML='<div class="qkt">⚡ Começar rápido <small>mesmo tipo, local, horário e equipe do último</small></div><div class="qkr">'+L.map((x,i)=>`<button type="button" class="qkb" onclick="qkUse(${i})"><b>${WD[new Date(x.d+'T12:00').getDay()]} ${ddm(x.d)}</b><span>${esc([x.src.name,x.src.place,x.src.turno].join(' · '))}</span></button>`).join('')+'</div>';
+ pane.insertBefore(h,pane.firstChild)}
+function qkUse(i){const x=qkL[i];if(!x||!P)return;const s=x.src;hap(10);
+ Object.assign(P,{name:s.name,place:s.place,turno:s.turno,date:x.d,pregador:''});P.banda=Object.assign({},s.banda||{});if(s.dm)P.dm=s.dm;
+ ensAuto();tecFill(P);lfR();ltG('mu');toast('Pronto: '+WD[new Date(x.d+'T12:00').getDay()]+' '+ddm(x.d)+'. Escolha as músicas.')}
+{const _l=lfR;lfR=function(){_l.apply(this,arguments);qkR()}}
+/* nova música: colar o link de uma vez */
+async function nsPaste(){try{const t=(await navigator.clipboard.readText()||'').trim();if(!t)return say('A área de transferência está vazia. Copie o link do YouTube ou do Cifra Club.');const e=$('#nsq');if(e){e.value=t;nsGo()}}catch(e){say('Não consegui ler o que você copiou. Segure no campo e toque em Colar.')}}
+/* atalhos do ícone (Android): ?a=hoje abre o próximo culto, ?a=palco abre direto o Modo Palco */
+function atalhoIni(){let a='';try{a=new URLSearchParams(location.search).get('a')||''}catch(e){}if(a!='hoje'&&a!='palco')return;let n=0;
+ const t=setInterval(()=>{if(++n>50){clearInterval(t);return}if(!S.lists||!S.lists.length||dlg.open)return;clearInterval(t);try{history.replaceState(history.state,'',location.pathname+location.hash)}catch(e){}
+  const l=(typeof myNxL=='function'&&myNxL(td()))||nextL();if(a=='palco'&&l&&l.songIds&&l.songIds.length)stage(l.id);else tab('hoje')},300)}
+atalhoIni();
