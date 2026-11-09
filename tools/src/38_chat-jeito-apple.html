@@ -76,3 +76,6 @@ function chIcon(n){try{if(!('setAppBadge' in navigator))return;if(n>0)navigator.
 {const _a=chAfter;chAfter=function(){const was=CH.in;_a.apply(this,arguments);
  if(S.tab!='chat'){CH.s0=0;CH.ed=null;return}chPessoasLoad();chSubUp();
  if(!was&&$('#chsum'))setTimeout(()=>{const e=$('#chsum');if(e)e.scrollIntoView({block:'start'});window.scrollBy(0,-90)},80)}}
+
+/* liga/desliga o chat direto nos Ajustes (liderança) */
+async function chCfgOn(el){const on=el.checked;if(await acSet('chat_ativo',on)){FV_CFG.chat_ativo=on;chShow();toast(on?'Chat ligado para a banda':'Chat desligado para a banda');if(dlg.open)cfgD()}else el.checked=!on}
