@@ -416,10 +416,10 @@ with sync_playwright() as p:
      dlg.close();nsStart('');a.push(!!document.querySelector('button[onclick="nsPaste()"]'));dlg.close();const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on');return a}""")
     ok(r == [True]*4, 'novo culto rápido: sugestões com a próxima data livre e equipe do último; nova música tem botão Colar', str(r))
     r = pg.evaluate("""async()=>{const a=[],o=[window.__SBB,ME_M,CH.msgs,CH.sub,CH.seen,document.body.classList.contains('chon'),CH.u];S.band=false;document.querySelectorAll('dialog[open]').forEach(d=>d.close());
-     window.__SBB=undefined;ME_M=null;CH.u=null;S.tab='chat';R();a.push(/entre na sua conta/i.test(document.querySelector('#m').textContent));        // sem conta: avisa
+     window.__SBB=undefined;ME_M=null;CH.u=null;S.tab='chat';R();a.push(/conectando ao chat/i.test(document.querySelector('#m').textContent));        // sem conexão: avisa
      const now=Date.now(),mk=(i,u,t)=>({id:i,user_id:u,autor:'Fulano '+u,texto:t,criado_em:new Date(now-i*1000).toISOString()});const base=[mk(1,'u2','Oi, banda! 🙌'),mk(2,'u1','Olá <b>x</b> https://fervor.website')];
      const del=[],hs={};const q={select:()=>q,order:()=>q,limit:()=>q,lt:()=>q,eq:()=>q,delete:()=>{del.push(1);return q},insert:r=>({select:()=>({single:()=>Promise.resolve({data:{id:50,user_id:'u1',autor:'Eu',texto:r.texto,criado_em:new Date().toISOString(),membro_id:r.membro_id}})})}),then:f=>f({data:base.slice().reverse()})};
-     window.__SBB={from:()=>q,channel:()=>{const ch={on:(t,f,cb)=>{hs[f.event]=cb;return ch},subscribe:()=>ch};return ch},removeChannel(){},auth:{getUser:async()=>({data:{user:{id:'u1',user_metadata:{full_name:'Eu'}}}})}};ME_M=null;CH.u=null;CH.start=0;CH.msgs=[];CH.sub=null;CH.seen=0;localStorage.removeItem('rep.chat.seen');
+     window.__SBB={from:()=>q,channel:()=>{const ch={on:(t,f,cb)=>{hs[f.event]=cb;return ch},subscribe:()=>ch};return ch},removeChannel(){},auth:{getUser:async()=>({data:{user:{id:'u1',user_metadata:{full_name:'Eu'}}}})}};ME_M=null;CH.u=null;CH.anon=0;CH.start=0;CH.msgs=[];CH.sub=null;CH.seen=0;localStorage.removeItem('rep.chat.seen');
      S.tab='hoje';R();chInit();await new Promise(r=>setTimeout(r,200));a.push(document.body.classList.contains('chon')&&getComputedStyle(document.querySelector('#chb')).display!='none'&&CH.msgs.length==2&&!document.querySelector('#chbd').hidden&&document.querySelector('#chbd').textContent=='1');   // 1 não lida (a do Fulano u2)
      S.tab='chat';R();a.push(document.querySelectorAll('.chb').length==2&&document.querySelectorAll('.chb.me').length==1&&!document.querySelector('.chtx b')&&!!document.querySelector('.chtx a[href^="https://fervor"]')&&document.querySelector('#chbd').hidden);  // texto escapado, link e "minha"
      document.querySelector('#chi').value='Bom dia 😀';await chSend();a.push(CH.msgs.some(x=>x.id===50)&&!CH.msgs.some(x=>x.tmp)&&/Bom dia 😀/.test(document.querySelector('.chm').textContent));  // envia com emoji
@@ -428,6 +428,27 @@ with sync_playwright() as p:
      chDel(50);a.push(CH.del===50);await chDel(50);a.push(del.length==1&&!CH.msgs.some(x=>x.id===50));                // apagar em 2 toques
      window.__SBB=o[0];ME_M=o[1];CH.msgs=o[2];CH.sub=o[3];CH.seen=o[4];CH.u=o[6];document.body.classList.toggle('chon',o[5]);S.tab='lists';R();const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on');return a}""")
     ok(r == [True]*8, 'chat da banda (inclusive liderança sem perfil): carrega, envia texto e emoji, recebe em tempo real, conta não lidas e apaga', str(r))
+    r = pg.evaluate("""async()=>{const a=[],o=[window.__SBB,window.__SB,window.__FVREST,window.fetch,ME_M,CH.msgs,CH.sub,CH.anon,CH.u,CH.seen,localStorage.getItem('rep.me'),document.body.classList.contains('chon'),window.__FVCFG];S.band=true;document.querySelectorAll('dialog[open]').forEach(d=>d.close());
+     window.__SBB=undefined;window.__SB=undefined;ME_M=null;CH.u=null;CH.anon=0;CH.start=0;CH.sub=null;CH.msgs=[];CH.ok=0;CH.seen=0;localStorage.removeItem('rep.me');localStorage.removeItem('rep.chat.seen');localStorage.removeItem('rep.chat.mine');
+     const now=Date.now(),rows=[{id:7,user_id:null,autor:'Zé',texto:'Oi sem login',criado_em:new Date(now-5000).toISOString()}],calls=[];
+     window.__FVREST={url:'https://x.test',key:'k'};
+     window.fetch=async(u,op)=>{op=op||{};calls.push([String(u),op.method||'GET',op.body||'']);const J=x=>({ok:true,text:async()=>JSON.stringify(x)});
+       if(/rpc.chat_apagar/.test(u)){const b=JSON.parse(op.body);const n=rows.length;const k=rows.findIndex(x=>x.id==b.p_id);if(k>=0)rows.splice(k,1);return J(k>=0)}
+       if(op.method=='POST'){const b=JSON.parse(op.body);const r={id:20,user_id:null,autor:b.autor,texto:b.texto,criado_em:new Date().toISOString()};rows.unshift(r);return J([r])}
+       return J(rows.slice())};
+     const cfgO=window.__FVCFG;let cfg={};window.__FVCFG=()=>cfg;
+     S.tab='chat';R();chInit();await new Promise(r=>setTimeout(r,250));
+     a.push(document.body.classList.contains('chon')&&/Quem é você/.test(document.querySelector('#m').textContent));      // sem login: escolhe quem é
+     localStorage.setItem('rep.me','Ana Teste');R();a.push(!!document.querySelector('#chi')&&/Ana Teste/.test(document.querySelector('#m').textContent)&&CH.msgs.length==1);
+     CH.last=0;document.querySelector("#chi").value="Olá do app aberto";await chSend();
+     const post=calls.find(c=>c[1]=='POST'&&/chat_mensagens/.test(c[0]));a.push(!!post&&JSON.parse(post[2]).autor=='Ana Teste'&&!!JSON.parse(post[2]).device&&CH.msgs.some(x=>x.id===20)&&chMe(CH.msgs.find(x=>x.id===20))&&!chMe(CH.msgs.find(x=>x.id===7)));
+     rows.push({id:30,user_id:null,autor:'Bia',texto:'Chegou por consulta',criado_em:new Date().toISOString()});CH.pn=0;
+     const t0=document.querySelector('#chi');t0.value='rascunho';await chPoll();a.push(CH.msgs.some(x=>x.id===30)&&document.querySelector('#chi').value=='rascunho');   // consulta periódica mantém o rascunho
+     await chDel(20);await chDel(20);a.push(!CH.msgs.some(x=>x.id===20)&&!rows.some(x=>x.id==20));                    // apagar a própria
+     cfg={chat_ativo:false};chShow();R();a.push(!document.body.classList.contains('chon')&&/desligado/.test(document.querySelector('#m').textContent));   // liga/desliga
+     cfg={};chShow();a.push(document.body.classList.contains('chon'));
+     window.__SBB=o[0];window.__SB=o[1];window.__FVREST=o[2];window.fetch=o[3];ME_M=o[4];CH.msgs=o[5];CH.sub=o[6];CH.anon=o[7];CH.u=o[8];CH.seen=o[9];if(o[10]==null)localStorage.removeItem('rep.me');else localStorage.setItem('rep.me',o[10]);window.__FVCFG=cfgO;document.body.classList.toggle('chon',o[11]);S.band=false;S.tab='lists';R();const tt=document.querySelector('#tt');if(tt)tt.classList.remove('on');return a}""")
+    ok(r == [True]*7, 'chat sem login: escolhe o nome na lista, envia, recebe por consulta, apaga a própria; liga/desliga pelas configurações', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const o=S.lists;editList(null);a.push(!!document.querySelector('.ltb [data-lt="rs"]'));
      ltG('ev');ltS(1);a.push(LTB=='ev');const sy=dlg.querySelector('.ltb .tb[data-lt="ev"]');Object.assign(P,{name:'Culto',date:'2099-05-05',place:'Mauá',turno:'Noite'});ltS(1);a.push(LTB=='eq'&&!document.querySelector('#lvt').hidden&&/Passo 2 de 7/.test(document.querySelector('#lsh').textContent)&&document.querySelector('.ltb .tb[data-lt="ev"]').classList.contains('ok'));ltG('pa');a.push(document.querySelector('#lnx').hidden===false);ltS(1);a.push(LTB=='rs'&&document.querySelector('#lnx').hidden&&/Resumo antes de salvar/.test(document.querySelector('#rsw').textContent));
      ltG('ev');a.push(document.querySelector('#lvt').hidden);dlg.close();return a}""")

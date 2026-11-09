@@ -8,7 +8,7 @@ const snap=async()=>{const r=await fetch('pub.json?t='+Date.now(),{cache:'no-sto
 /* configuração pública: login obrigatório e contato da facilitadora */
 let CFG={};try{CFG=JSON.parse(lg('fv-cfg')||'{}')}catch(e){}
 async function cfgLoad(){try{const r=await fetch(SBU+'/rest/v1/config?select=chave,valor',{headers:{apikey:KEY,Accept:'application/json'},cache:'no-store'});if(r.ok){const a=await r.json();const o={};(a||[]).forEach(x=>o[x.chave]=x.valor);CFG=o;ls('fv-cfg',JSON.stringify(o))}}catch(e){}return CFG}
-window.__FVCFG=()=>CFG;
+window.__FVCFG=()=>CFG;window.__FVREST={url:SBU,key:KEY};
 /* modo com login */
 let sb=null,okRes;const ready=new Promise(r=>okRes=r);
 const keep=()=>lg('fv-keep')!=='0';
