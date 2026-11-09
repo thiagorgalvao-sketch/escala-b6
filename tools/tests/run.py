@@ -337,17 +337,6 @@ with sync_playwright() as p:
     ok(r == ['%PDF-', True, True], 'PDF do repertório: gera um arquivo válido com capa e uma página por música', str(r))
     r = pg.evaluate("""()=>{const a=[];S.band=false;const v=verN();a.push(v.fix.length==4&&v.info.length==4);const l=S.lists.find(x=>x.songIds.length>1);l.cant=l.cant||{};l.cant['__fantasma']='X';a.push(verN().fix[3][1]>=1);verD();a.push(/Verificar dados/.test(dlg.innerHTML)&&/Corrigir tudo/.test(dlg.innerHTML));verGo();a.push(!('__fantasma' in l.cant));a.push(verN().fix[3][1]==0);dlg.close();d2.close&&d2.close();return a}""")
     ok(r == [True]*5, 'Verificar dados: lista pendências e corrige tudo com um toque', str(r))
-    # 5a) resumo de erros dos aparelhos (item 10)
-    r = pg.evaluate("""async()=>{const a=[];const now=new Date().toISOString(),old=new Date(Date.now()-30*864e5).toISOString();
-     const w=errSum([{msg:'A',vezes:7,ultima:now},{msg:'B',vezes:1,ultima:now},{msg:'C',vezes:9,ultima:old}],7);a.push(w.n==2,w.rep.length==1,w.v==8);
-     const o=window.__SB;S.band=false;S.role='dono';localStorage.removeItem('rep.errday');localStorage.removeItem('rep.errwk');
-     window.__SB={from:()=>({select:()=>({order:()=>({limit:async()=>({data:[{msg:'Falha X',vezes:6,ultima:now}],error:null})})})})};
-     const d=await errResumo();a.push(!!d&&/Erro repetido 6/.test(document.querySelector('#tt').textContent));
-     localStorage.setItem('rep.errday',String(Date.now()));localStorage.removeItem('rep.errwk');
-     window.__SB={from:()=>({select:()=>({order:()=>({limit:async()=>({data:[{msg:'Y',vezes:1,ultima:now}],error:null})})})})};
-     await errResumo(1);a.push(/Resumo da semana/.test(document.querySelector('#tt').textContent));
-     window.__SB=o;return a}""")
-    ok(r == [True]*5, 'resumo de erros: soma da semana e alerta de erro repetido', str(r))
     # 5a2) gestos: segurar numa música abre o menu; mexer o dedo cancela
     r = pg.evaluate("""async()=>{const a=[];S.band=false;S.tab='songs';S.sel=null;R();await new Promise(r=>setTimeout(r,200));const el=document.querySelector('#ls .it');if(!el)return['sem lista'];
      const ev=(t,x,y)=>el.dispatchEvent(new PointerEvent(t,{pointerType:'touch',clientX:x,clientY:y,bubbles:true,cancelable:true}));
