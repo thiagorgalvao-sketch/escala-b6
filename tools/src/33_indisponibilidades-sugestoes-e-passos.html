@@ -63,7 +63,8 @@ function bkLbl(){if(FS||!MOB()||S.bandPrev||dlg.open||(window.d2&&d2.open))retur
  if(S.tab=='songs'&&S.ctx)return'Culto';
  if(S.tab=='songs'&&S.hide&&S.sel)return'Músicas';
  if(S.tab=='lists'&&S.lvm)return'Repertórios';
- if((S.tab=='perf'&&!S.band||S.tab=='chat')&&TABP&&TABP!='perf'&&TABP!='chat')return TABNM[TABP]||'Voltar';
+ if(S.tab=='chat')return TABP&&TABP!='perf'&&TABP!='chat'?(TABNM[TABP]||'Voltar'):'Hoje';/* o chat sempre tem saída, mesmo aberto direto (aviso, recarregar a página) */
+ if(S.tab=='perf'&&!S.band&&TABP&&TABP!='perf'&&TABP!='chat')return TABNM[TABP]||'Voltar';
  return''}
 function bkGo(){hap(8);if(S.tab=='perf'||S.tab=='chat'){S.tab=TABP&&TABP!='perf'&&TABP!='chat'?TABP:'hoje';R();scrollTo(0,0);return}doBack()}
 function bkUp(){const b=$('#nvb');if(!b)return;if(S.tab!=TABC){TABP=TABC;TABC=S.tab}const t=bkLbl();b.hidden=!t;if(t)b.querySelector('span').textContent=t}

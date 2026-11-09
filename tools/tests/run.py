@@ -486,6 +486,12 @@ with sync_playwright() as p:
      B.classList.add('choff');a.push(getComputedStyle(document.getElementById('chb')).display=='none');                                   // some só se a liderança desligar
      B.classList.toggle('chon',on);B.classList.toggle('choff',off);return a}""")
     ok(r == [True]*3, 'chat: botão fixo e em primeiro no topo, nas abas e na barra de baixo, sem esperar carregar', str(r))
+    r = pg.evaluate("""()=>{const a=[],t=S.tab,P0=TABP,C0=TABC;TABP='';TABC='';S.tab='chat';R();bkUp();const b=document.getElementById('nvb');
+     a.push(!b.hidden&&/Hoje/.test(b.textContent));                  // aberto direto no chat (sem tela anterior): Voltar aparece e leva a "Hoje"
+     document.body.classList.add('chfoc');bkUp();a.push(!b.hidden);   // com o teclado aberto também
+     document.body.classList.remove('chfoc');b.click();a.push(S.tab=='hoje');
+     TABP=P0;TABC=C0;S.tab=t;R();return a}""")
+    ok(r == [True]*3, 'chat: sempre tem botão Voltar, mesmo aberto direto ou com o teclado aberto', str(r))
     # --- leitores de texto: WhatsApp, YouTube, músicas duplicadas (varredura de qualidade, VER 398) ---
     r = pg.evaluate("""()=>{const a=[];
      const o=wParse('*Data:* 08/11\\nHorário: Noite\\nLocal: Mauá\\nPregador: Wallace Butler\\nBateria: Ana (dm)\\nLíder: Manu e Thiago\\nBacks: Elaine, Rosangela\\n1. Gratidão - Tom: Bb\\n2) Vida aos Sepulcros + Rei Jesus (Manu)\\n✅ Teu Toque\\nTom: G\\n▪️ Pós-Palavra: Aleluia\\nhttps://youtu.be/abcdefghijk');

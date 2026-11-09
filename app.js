@@ -2004,7 +2004,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='09/11/2026 · 400';
+const VER='09/11/2026 · 401';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2572,7 +2572,8 @@ function bkLbl(){if(FS||!MOB()||S.bandPrev||dlg.open||(window.d2&&d2.open))retur
  if(S.tab=='songs'&&S.ctx)return'Culto';
  if(S.tab=='songs'&&S.hide&&S.sel)return'Músicas';
  if(S.tab=='lists'&&S.lvm)return'Repertórios';
- if((S.tab=='perf'&&!S.band||S.tab=='chat')&&TABP&&TABP!='perf'&&TABP!='chat')return TABNM[TABP]||'Voltar';
+ if(S.tab=='chat')return TABP&&TABP!='perf'&&TABP!='chat'?(TABNM[TABP]||'Voltar'):'Hoje';/* o chat sempre tem saída, mesmo aberto direto (aviso, recarregar a página) */
+ if(S.tab=='perf'&&!S.band&&TABP&&TABP!='perf'&&TABP!='chat')return TABNM[TABP]||'Voltar';
  return''}
 function bkGo(){hap(8);if(S.tab=='perf'||S.tab=='chat'){S.tab=TABP&&TABP!='perf'&&TABP!='chat'?TABP:'hoje';R();scrollTo(0,0);return}doBack()}
 function bkUp(){const b=$('#nvb');if(!b)return;if(S.tab!=TABC){TABP=TABC;TABC=S.tab}const t=bkLbl();b.hidden=!t;if(t)b.querySelector('span').textContent=t}
