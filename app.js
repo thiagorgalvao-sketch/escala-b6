@@ -152,7 +152,7 @@ const fd=d=>d?new Date(d+'T00:00').toLocaleDateString('pt-BR'):'';
 /* telas */
 function orphN(prune){let n=0;(S.lists||[]).forEach(l=>{const ids=l.songIds||[];['ord','cant','keys'].forEach(k=>{const o=l[k];if(o&&typeof o=='object'&&!Array.isArray(o))Object.keys(o).forEach(s=>{if(!ids.includes(s)){n++;if(prune)delete o[s]}})})});return n}
 function fixAuto(){if(!S.songs||fixAuto.b)return;const g=fixGn(),o=orphN();if(!g&&!o)return;fixAuto.b=1;try{if(g)S.songs.forEach(s=>(s.vmap||[]).forEach(r=>{if(r&&typeof r.t=='string')r.t=fixGt(r.t)}));if(o)orphN(1);if(!S.band)save()}finally{fixAuto.b=0}}
-function R(){try{fixAuto()}catch(e){}try{if(S.band&&!lembIni.on)lembIni()}catch(e){}if(S.tab=='esc')S.tab='hoje';if(S.band&&S.tab=='dash')S.tab='lists';document.body.classList.toggle('dash',S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='hoje');document.body.classList.toggle('bvocal',!!S.band&&S.vw=='vocal');document.body.classList.toggle('vv',S.vw=='vocal');document.body.classList.toggle('bsongs',S.tab=='songs');document.body.classList.toggle('vblk',S.tab=='songs'&&S.vw!='vocal'&&S.vw!='cifra');document.body.classList.toggle('nofh',!PF.fh);document.body.classList.toggle('noblk',!PF.blk);setTimeout(stg,0);setTimeout(offAud,50);document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab));$('#q').style.display=(S.tab=='songs'&&S.hide)||S.tab=='hoje'||S.tab=='dash'||S.tab=='esp'||S.tab=='perf'?'none':'';$('#q').value=S.tab=='songs'?S.q:S.ql;$('#q').placeholder=S.tab=='songs'?'Buscar por nome, artista ou trecho da letra':'Buscar repertório, local, pregador, músico ou música';{const t=S.tab=='songs'?'Incluir música':'Novo repertório';$('#add').title=t;$('#add').setAttribute('aria-label',t)}{const h=$('#hti');if(h)h.textContent={hoje:'Hoje',lists:'Repertórios',songs:'Músicas',esc:'Escala',dash:'Painel',esp:'Espiritual',perf:'Meu perfil'}[S.tab]||''}$('#m').innerHTML=(S.tab=='hoje'?vHoje():S.tab=='perf'?vPerf():S.tab=='esp'?vEspi():S.tab=='dash'?vDash():S.tab=='songs'?vSongs():vLists())+VFT;dkr();uiPost();if((S.tab=='songs'?S.q:S.ql))document.body.classList.add('qo');setTimeout(hhU,0);setTimeout(vftFit,0)}
+function R(){try{fixAuto()}catch(e){}try{if(S.band&&!lembIni.on)lembIni()}catch(e){}if(S.tab=='esc')S.tab='hoje';if(S.band&&S.tab=='dash')S.tab='lists';document.body.classList.toggle('dash',S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='chat'||S.tab=='hoje');document.body.classList.toggle('bvocal',!!S.band&&S.vw=='vocal');document.body.classList.toggle('vv',S.vw=='vocal');document.body.classList.toggle('bsongs',S.tab=='songs');document.body.classList.toggle('vblk',S.tab=='songs'&&S.vw!='vocal'&&S.vw!='cifra');document.body.classList.toggle('nofh',!PF.fh);document.body.classList.toggle('noblk',!PF.blk);setTimeout(stg,0);setTimeout(offAud,50);document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab));$('#q').style.display=(S.tab=='songs'&&S.hide)||S.tab=='hoje'||S.tab=='dash'||S.tab=='esp'||S.tab=='perf'||S.tab=='chat'?'none':'';$('#q').value=S.tab=='songs'?S.q:S.ql;$('#q').placeholder=S.tab=='songs'?'Buscar por nome, artista ou trecho da letra':'Buscar repertório, local, pregador, músico ou música';{const t=S.tab=='songs'?'Incluir música':'Novo repertório';$('#add').title=t;$('#add').setAttribute('aria-label',t)}{const h=$('#hti');if(h)h.textContent={hoje:'Hoje',lists:'Repertórios',songs:'Músicas',esc:'Escala',dash:'Painel',esp:'Espiritual',perf:'Meu perfil',chat:'Chat da banda'}[S.tab]||''}$('#m').innerHTML=(S.tab=='hoje'?vHoje():S.tab=='perf'?vPerf():S.tab=='chat'?vChat():S.tab=='esp'?vEspi():S.tab=='dash'?vDash():S.tab=='songs'?vSongs():vLists())+VFT;dkr();uiPost();if((S.tab=='songs'?S.q:S.ql))document.body.classList.add('qo');setTimeout(hhU,0);setTimeout(vftFit,0)}
 function vftFit(){const p=$('#vft p');if(!p||!p.offsetWidth)return;p.style.fontSize='';
  if(p.scrollWidth>p.clientWidth+1){const base=parseFloat(getComputedStyle(p).fontSize)||14.72,ratio=Math.max(.001,p.clientWidth/p.scrollWidth);p.style.fontSize=(base*ratio*.98)+'px'}}
 const tab=t=>{if(S.tab==t&&MOB()){if(t=='songs')S.hide=false;else S.lvm=0;S.ctx=null}S.tab=t;asc(0);R();scrollTo(0,0)};
@@ -1602,12 +1602,12 @@ async function audD(){const c=window.__SB;if(!c)return;dlg.innerHTML='<h2>Regist
 function privD(){const nm=esc((window.FV_CFG&&FV_CFG.nome_contato)||(window.__FVCFG&&window.__FVCFG().nome_contato)||'a facilitadora');
  dlg.innerHTML=`<h2>Privacidade e seus dados</h2><div class="prv">
  <p class="mut">Atualizado em 29/10/2026. O Fervor é a plataforma interna da equipe de louvor para organizar escalas, ensaios e repertórios. Ele não é vendido nem tem anúncios.</p>
- <h4>Quais dados guardamos</h4><ul><li><b>Escala e repertório:</b> seu nome nas escalas, quem canta cada música e o histórico dos cultos.</li><li><b>Perfil</b> (só quando o acesso com login estiver ativo): nome, funções, e-mail, WhatsApp, Instagram e foto, que você mesmo preenche.</li><li><b>Disponibilidade:</b> os cultos em que você marcou que vai ou que não pode, e o motivo, se informar.</li><li><b>Neste aparelho:</b> preferências de exibição, anotações, áudios baixados para usar sem internet e, se você ativar, a inscrição para receber avisos no celular.</li></ul>
+ <h4>Quais dados guardamos</h4><ul><li><b>Escala e repertório:</b> seu nome nas escalas, quem canta cada música e o histórico dos cultos.</li><li><b>Perfil</b> (só quando o acesso com login estiver ativo): nome, funções, e-mail, WhatsApp, Instagram e foto, que você mesmo preenche.</li><li><b>Disponibilidade:</b> os cultos em que você marcou que vai ou que não pode, e o motivo, se informar.</li><li><b>Chat da banda:</b> as mensagens que você enviar no grupo, com o seu nome. Só os membros da banda veem. Você pode apagar as suas a qualquer momento.</li><li><b>Neste aparelho:</b> preferências de exibição, anotações, áudios baixados para usar sem internet e, se você ativar, a inscrição para receber avisos no celular.</li></ul>
  <p><b>Erros técnicos:</b> quando algo falha no app, guardamos só a mensagem técnica do erro, a tela e o tipo de aparelho e navegador, sem nome ou contato, por até 90 dias, para corrigir o problema.</p>
  <h4>Para que usamos</h4><p>Somente para montar as escalas, avisar sobre ensaios e repertórios e permitir o contato entre a liderança e a banda. A base é o interesse legítimo da equipe em organizar o ministério e, para os avisos no celular, o seu consentimento (LGPD, art. 7º).</p>
  <h4>Quem vê</h4><p>Os administradores da plataforma veem os perfis e a disponibilidade. Os outros integrantes não veem seu e-mail, WhatsApp ou Instagram. Na visão da banda, os nomes aparecem abreviados.</p>
  <h4>Onde fica guardado</h4><p>No Supabase (banco de dados com acesso protegido por senha e regras de permissão) e numa cópia de segurança semanal num repositório privado do GitHub. Nada é compartilhado com terceiros.</p>
- <h4>Por quanto tempo</h4><p>Enquanto você fizer parte da equipe. Ao excluir a conta, o perfil, os contatos, a foto e a disponibilidade são apagados na hora. Seu nome continua apenas no histórico das escalas já realizadas. Se pedir, a liderança também remove seus dados das cópias de segurança.</p>
+ <h4>Por quanto tempo</h4><p>Enquanto você fizer parte da equipe. Ao excluir a conta, o perfil, os contatos, a foto e a disponibilidade são apagados na hora. Seu nome continua apenas no histórico das escalas já realizadas e nas mensagens que você enviou no chat (a liderança pode apagá-las se você pedir). Se pedir, a liderança também remove seus dados das cópias de segurança.</p>
  <h4>Seus direitos</h4><ul><li><b>Ver e corrigir:</b> em Meu perfil.</li><li><b>Excluir:</b> em Meu perfil › Excluir minha conta.</li><li><b>Dúvidas ou outros pedidos</b> (cópia dos dados, remoção do histórico ou das cópias de segurança): fale com ${nm}.</li></ul>
  </div><div class="ac"><button class="pri" onclick="dlg.close()">Entendi</button></div>`;if(!dlg.open)dlg.showModal()}
 function delConta(){if(!ME_M)return;if(!S.band&&!window.__SBB)return say('Administradores não excluem a própria conta por aqui. Peça a outro administrador para remover seu acesso.');
@@ -2011,7 +2011,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='08/11/2026 · 379';
+const VER='08/11/2026 · 380';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2170,7 +2170,7 @@ var SCK='';function uiPost(){const m=MOB()&&!FS&&!S.bandPrev,s=S.songs.find(x=>x
  document.querySelectorAll('#tbb [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab));
  {const a=$('#add');if(a){const tx=S.tab=='songs'?'+ Música':'+ Repertório';if(a.textContent!=tx)a.textContent=tx}}
  const k=[S.tab,S.tab=='songs'?(S.hide||S.ctx?S.sel:'L'):(S.lvm||!MOB()?S.lv:'L'),FS?1:0].join('|');if(k!=SCK){if(SCK){const mm=$('#m');mm.classList.remove('anim');mm.dataset.nv=S.tab=='songs'&&(S.hide||S.ctx)?'song':'';void mm.offsetWidth;mm.classList.add('anim')}SCK=k}
- try{const h=S.tab=='esp'?'#esp':S.tab=='perf'?'#perfil':S.tab=='lists'&&S.lv&&(S.lvm||!MOB())?'#r='+S.lv:S.tab=='songs'&&S.sel&&(S.hide||S.ctx||!MOB())?'#m='+S.sel:'#';if(location.hash!=h&&!(h=='#'&&!location.hash))history.replaceState(history.state,'',h=='#'?location.pathname+location.search:h)}catch(e){}
+ try{const h=S.tab=='esp'?'#esp':S.tab=='perf'?'#perfil':S.tab=='chat'?'#chat':S.tab=='lists'&&S.lv&&(S.lvm||!MOB())?'#r='+S.lv:S.tab=='songs'&&S.sel&&(S.hide||S.ctx||!MOB())?'#m='+S.sel:'#';if(location.hash!=h&&!(h=='#'&&!location.hash))history.replaceState(history.state,'',h=='#'?location.pathname+location.search:h)}catch(e){}
  document.documentElement.style.fontSize=(PF.ui||(window.sysUi?sysUi():100))+'%';document.body.classList.toggle('night',!!PF.night);document.body.classList.toggle('sun',!!PF.sun);try{themeApply()}catch(e){}uiMem()}
 /* lembrar escolhas (visão, graus) e a última tela por 6 horas */
 var UIM='';
@@ -2183,7 +2183,7 @@ function canBack(){if(dlg.open||(window.d2&&d2.open))return 1;if(FS)return 1;if(
 function doBack(){if(window.d2&&d2.open){d2.close();return}if(dlg.open){dlg.close();return}if(FS){fsExit();if(S.ctx&&S.fsl===0){}return}if(S.tab=='songs'&&S.ctx){const id=S.ctx;S.tab='lists';S.lv=id;S.lvm=1;S.ctx=null;R();return}if(S.tab=='songs'){S.hide=false;R();scrollTo(0,0);return}S.lvm=0;R();scrollTo(0,0)}
 try{history.replaceState({ep:0},'');history.pushState({ep:1},'');addEventListener('popstate',()=>{if(canBack()){doBack();try{history.pushState({ep:1},'')}catch(e){}}else{try{history.back()}catch(e){}}})}catch(e){}
 /* deep link (4) */
-function hashGo(){const h=location.hash||'';if(h=='#esp'){S.tab='esp';return 1}if(h=='#perfil'){S.tab='perf';return 1}let m=/^#r=(.+)$/.exec(h);if(m&&S.lists.some(l=>l.id==m[1])){S.tab='lists';S.lv=m[1];S.lvm=1;return 1}m=/^#m=(.+)$/.exec(h);if(m&&S.songs.some(s=>s.id==m[1])){S.tab='songs';S.sel=m[1];S.hide=true;S.ctx=null;return 1}return 0}
+function hashGo(){const h=location.hash||'';if(h=='#esp'){S.tab='esp';return 1}if(h=='#perfil'){S.tab='perf';return 1}if(h=='#chat'){S.tab='chat';return 1}let m=/^#r=(.+)$/.exec(h);if(m&&S.lists.some(l=>l.id==m[1])){S.tab='lists';S.lv=m[1];S.lvm=1;return 1}m=/^#m=(.+)$/.exec(h);if(m&&S.songs.some(s=>s.id==m[1])){S.tab='songs';S.sel=m[1];S.hide=true;S.ctx=null;return 1}return 0}
 
 /* swipe in stage (6) */
 {let sx=0,sy=0,st=0,ok=0;document.addEventListener('touchstart',e=>{if(!FS||e.touches.length!=1){ok=0;return}const t=e.target;ok=!t.closest('.field,.pj,.cf,.vlj,input,select,textarea,#stg,#stgl,#ink,button,a,pre');const p=e.touches[0];sx=p.clientX;sy=p.clientY;st=performance.now()},{passive:true});
@@ -2589,9 +2589,9 @@ function bkLbl(){if(FS||!MOB()||S.bandPrev||dlg.open||(window.d2&&d2.open))retur
  if(S.tab=='songs'&&S.ctx)return'Culto';
  if(S.tab=='songs'&&S.hide&&S.sel)return'Músicas';
  if(S.tab=='lists'&&S.lvm)return'Repertórios';
- if(S.tab=='perf'&&!S.band&&TABP&&TABP!='perf')return TABNM[TABP]||'Voltar';
+ if((S.tab=='perf'&&!S.band||S.tab=='chat')&&TABP&&TABP!='perf'&&TABP!='chat')return TABNM[TABP]||'Voltar';
  return''}
-function bkGo(){hap(8);if(S.tab=='perf'){S.tab=TABP&&TABP!='perf'?TABP:'hoje';R();scrollTo(0,0);return}doBack()}
+function bkGo(){hap(8);if(S.tab=='perf'||S.tab=='chat'){S.tab=TABP&&TABP!='perf'&&TABP!='chat'?TABP:'hoje';R();scrollTo(0,0);return}doBack()}
 function bkUp(){const b=$('#nvb');if(!b)return;if(S.tab!=TABC){TABP=TABC;TABC=S.tab}const t=bkLbl();b.hidden=!t;if(t)b.querySelector('span').textContent=t}
 {const _u=uiPost;uiPost=function(){_u.apply(this,arguments);bkUp()}}
 dlg.addEventListener('close',bkUp);
@@ -2641,3 +2641,53 @@ document.addEventListener('click',e=>{if(!FS||!e.target.closest)return;const c=e
 {const _u=uiPost;uiPost=function(){_u.apply(this,arguments);plSync()}}
 {const _fe=fsExit;fsExit=function(){plStop();PL.cp=-1;return _fe.apply(this,arguments)}}
 {const _s=stg;stg=function(){const r=_s.apply(this,arguments);const e=document.getElementById('stg');if(e&&!e.hidden&&FVC()&&!e.querySelector('.plb')){const b=document.createElement('button');b.type='button';b.className='plb';b.onclick=plT;e.appendChild(b)}plUi();return r}}
+/* 36 · Chat da banda: um grupo só, texto e emojis (tabela chat_mensagens, tempo real) */
+var CH={msgs:[],seen:0,sub:null,more:true,ok:0,err:'',del:'',stick:1,last:0,ld:0};
+const CHE=['😀','😄','😁','😂','🥰','😍','😎','🤗','😇','🙂','😉','😅','🤔','😮','😢','😭','🙏','🙌','👏','💪','👍','👎','✌️','🤝','❤️','💙','💚','🧡','💛','🔥','✨','🎉','🥳','🎶','🎵','🎸','🥁','🎹','🎤','🎧','📖','✝️','🕊️','⛪','☀️','🌙','⭐','💯','✅','❌','⚠️','⏰','📍','📅','🚗','🍕','☕','😴','🤞','👀','🙈'];
+const CHK='rep.chat.seen';
+function chOn(){return !!(FVC()&&ME_M)}
+function chMe(m){return !!(ME_M&&m&&m.user_id&&m.user_id==ME_M.user_id)}
+function chSeenGet(){try{return +localStorage.getItem(CHK)||0}catch(e){return 0}}
+function chSeenSet(n){CH.seen=n;try{localStorage.setItem(CHK,String(n))}catch(e){}}
+function chLastId(){for(let i=CH.msgs.length-1;i>=0;i--){const x=CH.msgs[i];if(typeof x.id=='number')return x.id}return 0}
+function chUnread(){return CH.msgs.filter(m=>typeof m.id=='number'&&m.id>CH.seen&&!chMe(m)).length}
+function chBadge(){const b=$('#chbd');if(!b)return;const n=S.tab=='chat'?0:chUnread();b.hidden=!n;b.textContent=n>99?'99+':String(n)}
+function chDay(iso){const d=new Date(iso),h=new Date(),y=new Date();y.setDate(h.getDate()-1);const k=x=>x.toDateString();return k(d)==k(h)?'Hoje':k(d)==k(y)?'Ontem':d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}
+function chHm(iso){return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+function chTxt(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}
+async function chLoad(older){const c=FVC();if(!c||CH.ld)return;CH.ld=1;try{let q=c.from('chat_mensagens').select('id,autor,texto,criado_em,user_id,membro_id').order('id',{ascending:false}).limit(60);if(older&&CH.msgs.length&&typeof CH.msgs[0].id=='number')q=q.lt('id',CH.msgs[0].id);
+  const r=await q;if(r.error)throw r.error;const rows=(r.data||[]).slice().reverse();CH.more=(r.data||[]).length>=60;CH.err='';CH.ok=1;
+  if(older){CH.stick=0;CH.msgs=rows.concat(CH.msgs)}else{const tmp=CH.msgs.filter(x=>x.tmp);CH.msgs=rows.concat(tmp);CH.stick=1}}catch(e){CH.err=String(e&&e.message||e);CH.ok=0}CH.ld=0;
+ if(S.tab=='chat')R();chBadge()}
+function chIn(m){if(!m||CH.msgs.some(x=>x.id===m.id))return;CH.msgs.push(m);if(S.tab=='chat'){chSeenSet(chLastId());CH.stick=1;R()}else{chBadge();if(!chMe(m)&&!FS)toastA('💬 '+m.autor+': '+String(m.texto).slice(0,60),'Abrir',()=>tab('chat'),6000)}}
+function chOut(id){const n=CH.msgs.length;CH.msgs=CH.msgs.filter(x=>x.id!==id);if(CH.msgs.length!=n&&S.tab=='chat'){CH.stick=0;R()}chBadge()}
+function chInit(){if(!chOn()||CH.sub)return;const c=FVC();CH.seen=chSeenGet();chLoad();
+ try{if(!c.channel)return;CH.sub=c.channel('chat-banda').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_mensagens'},p=>chIn(p.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'chat_mensagens'},p=>chOut(p.old&&p.old.id)).subscribe()}catch(e){}}
+async function chSend(){const t=$('#chi');if(!t)return;const v=t.value.trim();if(!v)return;if(v.length>2000)return say('A mensagem é grande demais (máximo de 2000 letras).');if(!chOn())return say('Entre na sua conta para usar o chat.');
+ const n=performance.now();if(n-CH.last<500)return;CH.last=n;const c=FVC(),tmp={id:'t'+Date.now(),autor:ME_M.nome,texto:v,criado_em:new Date().toISOString(),user_id:ME_M.user_id,tmp:1};
+ CH.msgs.push(tmp);t.value='';CH.stick=1;chEmo(0);R();hap(6);
+ try{const r=await c.from('chat_mensagens').insert({texto:v,membro_id:ME_M.id,autor:ME_M.nome}).select('id,autor,texto,criado_em,user_id,membro_id').single();if(r.error)throw r.error;
+  CH.msgs=CH.msgs.filter(x=>x!==tmp);if(!CH.msgs.some(x=>x.id===r.data.id))CH.msgs.push(r.data);chSeenSet(chLastId())}catch(e){tmp.fail=1;say('Não consegui enviar: '+String(e&&e.message||e))}
+ if(S.tab=='chat')R()}
+function chRetry(id){const m=CH.msgs.find(x=>x.id===id);if(!m)return;CH.msgs=CH.msgs.filter(x=>x!==m);const t=$('#chi');if(t)t.value=m.texto;R()}
+async function chDel(id){const c=FVC();if(!c)return;if(CH.del!==id){CH.del=id;R();setTimeout(()=>{if(CH.del===id){CH.del='';if(S.tab=='chat')R()}},3500);return}CH.del='';
+ try{const r=await c.from('chat_mensagens').delete().eq('id',id);if(r.error)throw r.error;chOut(id)}catch(e){say('Não consegui apagar: '+String(e&&e.message||e))}}
+function chEmo(on){const p=$('#chp');if(!p)return;p.hidden=on===0?true:on===1?false:!p.hidden}
+function chPut(e){const t=$('#chi');if(!t)return;const s=t.selectionStart==null?t.value.length:t.selectionStart,f=t.selectionEnd==null?s:t.selectionEnd;t.value=t.value.slice(0,s)+e+t.value.slice(f);const p=s+e.length;try{t.setSelectionRange(p,p)}catch(x){}t.focus();chGrow(t)}
+function chGrow(t){t.style.height='auto';t.style.height=Math.min(120,t.scrollHeight)+'px'}
+function chKey(ev){if(ev.key=='Enter'&&!ev.shiftKey&&!MOB()){ev.preventDefault();chSend()}}
+function vChat(){const hd='<div class="dbh"><div><h1>Chat da banda</h1><p class="mut">Mensagens de todos os membros. Só quem tem conta vê.</p></div></div>';
+ if(!chOn())return`<div class="dbw chw">${hd}<div class="dbc"><p class="mut">Para usar o chat, entre na sua conta da banda (Ajustes &rsaquo; Acesso). Se você já entrou e esta mensagem continua, peça à liderança para ligar o seu acesso.</p></div></div>`;
+ let h='',dy='';const L=CH.msgs;
+ for(const m of L){const d=chDay(m.criado_em);if(d!=dy){dy=d;h+=`<div class="chd">${esc(d)}</div>`}const me=chMe(m),can=!m.tmp&&(me||!S.band);
+  h+=`<div class="chb${me?' me':''}${m.tmp?' tmp':''}${m.fail?' fail':''}">${me?'':`<small class="chau">${esc(m.autor)}</small>`}<div class="chtx">${chTxt(m.texto)}</div><time>${m.fail?`<button type="button" class="chrt" onclick="chRetry('${m.id}')">Não enviou · tocar para editar</button>`:m.tmp?'enviando…':chHm(m.criado_em)}</time>${can?`<button type="button" class="chx${CH.del===m.id?' on':''}" onclick="chDel(${m.id})" aria-label="Apagar mensagem">${CH.del===m.id?'Apagar?':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M8 7l1 12h6l1-12"/></svg>'}</button>`:''}</div>`}
+ return`<div class="dbw chw">${hd}${CH.err?`<div class="dbc"><p class="mut">Não foi possível carregar o chat (${esc(CH.err)}). Se o banco ainda não foi preparado, rode o 16_chat.sql no Supabase.</p><button class="sm" onclick="chLoad()">Tentar de novo</button></div>`:''}
+ ${CH.more&&L.length?`<button type="button" class="sm chmo" onclick="chLoad(1)">Ver mensagens anteriores</button>`:''}
+ <div class="chm">${h||(CH.ok?'<p class="mut" style="text-align:center;margin:30px 0">Ainda não há mensagens. Escreva a primeira! 🙌</p>':'<p class="mut" style="text-align:center;margin:30px 0">Carregando…</p>')}</div></div>
+ <div class="chc"><div id="chp" class="chp" hidden>${CHE.map(e=>`<button type="button" onclick="chPut('${e}')">${e}</button>`).join('')}</div><div class="chr"><button type="button" class="che" onclick="chEmo()" aria-label="Emojis">😊</button><textarea id="chi" rows="1" maxlength="2000" placeholder="Mensagem" enterkeyhint="send" oninput="chGrow(this)" onkeydown="chKey(event)"></textarea><button type="button" class="chs" onclick="chSend()" aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7z"/></svg></button></div></div>`}
+function chAfter(){document.body.classList.toggle('chaton',S.tab=='chat');if(S.tab!='chat'){CH.in=0;chBadge();return}if(!CH.in){CH.in=1;CH.stick=1}if(chOn()){if(!CH.sub)chInit();if(chLastId()>CH.seen)chSeenSet(chLastId())}chBadge();if(CH.stick){CH.stick=0;const e=$('.chm');setTimeout(()=>{window.scrollTo(0,document.documentElement.scrollHeight)},0)}}
+{const _u=uiPost;uiPost=function(){_u.apply(this,arguments);chAfter()}}
+{const _fi=fvInit;fvInit=async function(){const r=await _fi.apply(this,arguments);try{chInit()}catch(e){}return r}}
+/* Voltar / botão do Android no chat e no perfil */
+{const _cb=canBack;canBack=function(){if((S.tab=='chat'||S.tab=='perf')&&!dlg.open&&!(window.d2&&d2.open)&&!FS)return 1;return _cb.apply(this,arguments)}}
+{const _db=doBack;doBack=function(){if((S.tab=='chat'||S.tab=='perf')&&!dlg.open&&!(window.d2&&d2.open)&&!FS){bkGo();return}return _db.apply(this,arguments)}}
