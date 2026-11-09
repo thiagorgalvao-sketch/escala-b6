@@ -2013,7 +2013,7 @@ function rn1(){if(S.mig.rn1)return;S.lists.forEach(l=>{const n=(l.name||'').trim
 function rn2(){if(S.mig.rn2)return;S.lists.forEach(l=>{const n=(l.name||'').trim();if(/^Domingo:\s*/i.test(n))l.name=n.replace(/^Domingo:\s*/i,'')});S.mig.rn2=1}
 const VMIMP={};
 const VMML={'PODEROSO DEUS ETERNO':'majestade','MESSIAS':'maranata','SOU GRATO POR SEU AMOR':'santo pra sempre','DIGNO É O SENHOR':'*'};function vm1(){if(S.mig.vm1)return;const M={};Object.keys(VMIMP).forEach(k=>M[nz(k)]=[VMIMP[k],VMML[k]]);S.songs.forEach(s=>{const e=M[nz(s.title)];if(!e||(s.vmap||[]).length)return;const md=s.medleys||[],ok=e[1]?(e[1]=='*'?md.length>0:md.some(x=>nz(x).includes(e[1]))):!md.length;if(ok)s.vmap=e[0].map(r=>{if(!r[0])return{t:''};const h=VH.test(r[0])?1:0;return{t:r[0],h,v:h?'':r[1]}})});S.mig.vm1=1}
-const VER='08/11/2026 · 387';
+const VER='09/11/2026 · 388';
 
 const td=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const asc2=s=>String(s||'').replace(/♭/g,'b').replace(/♯/g,'#').replace(/→/g,'>').replace(/←/g,'<').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018-\u201D\u2022\u2026]/g,'');
@@ -2656,13 +2656,13 @@ async function chFixos(){let a=null;try{const r=await chRest('rpc/chat_membros',
 function chOn(){return chEnabled()&&!!(CH.u||(CH.anon&&chEu()))}
 function chNome(){if(!CH.u)return chEu();const u=CH.u,md=u.user_metadata||{};return (ME_M&&ME_M.nome)||md.full_name||md.name||'Liderança'}
 function chDev(){let v='';try{v=localStorage.getItem('rep.chat.dev')||''}catch(e){}if(!v){v=(window.crypto&&crypto.randomUUID?crypto.randomUUID():'d'+Date.now()+Math.random().toString(36).slice(2,10));try{localStorage.setItem('rep.chat.dev',v)}catch(e){}}return v}
-function chMine(){try{return JSON.parse(localStorage.getItem('rep.chat.mine')||'[]')}catch(e){return[]}}
-function chMineAdd(id){const a=chMine();a.push(id);try{localStorage.setItem('rep.chat.mine',JSON.stringify(a.slice(-300)))}catch(e){}}
-function chMe(m){if(!m)return false;if(CH.u)return !!(m.user_id&&m.user_id==CH.u.id);return typeof m.id=='number'?chMine().includes(m.id):!!m.tmp}
+function chMine(){if(!CH.mine){let a=[];try{a=JSON.parse(localStorage.getItem('rep.chat.mine')||'[]')}catch(e){}CH.mine=new Set(a)}return CH.mine}
+function chMineAdd(id){const a=[...chMine(),id].slice(-300);CH.mine=new Set(a);try{localStorage.setItem('rep.chat.mine',JSON.stringify(a))}catch(e){}}
+function chMe(m){if(!m)return false;if(CH.u)return !!(m.user_id&&m.user_id==CH.u.id);return typeof m.id=='number'?chMine().has(m.id):!!m.tmp}
 function chRest(path,opt){const r=window.__FVREST;opt=opt||{};opt.headers=Object.assign({apikey:r.key,'Content-Type':'application/json'},opt.headers||{});opt.cache='no-store';return fetch(r.url+'/rest/v1/'+path,opt).then(async x=>{const tx=await x.text();let j=null;try{j=tx?JSON.parse(tx):null}catch(e){}if(!x.ok)throw new Error((j&&j.message)||('erro '+x.status));return j})}
-async function chRows(older){const lt=older&&CH.msgs.length&&typeof CH.msgs[0].id=='number'?CH.msgs[0].id:0;
- if(CH.u){const c=FVC();let q=c.from('chat_mensagens').select('id,autor,texto,criado_em,user_id,membro_id').order('id',{ascending:false}).limit(60);if(lt)q=q.lt('id',lt);const r=await q;if(r.error)throw r.error;return r.data||[]}
- return (await chRest('chat_mensagens?select=id,autor,texto,criado_em,user_id,membro_id&order=id.desc&limit=60'+(lt?'&id=lt.'+lt:'')))||[]}
+async function chRows(older,gt){const lt=older&&CH.msgs.length&&typeof CH.msgs[0].id=='number'?CH.msgs[0].id:0;
+ if(CH.u){const c=FVC();let q=c.from('chat_mensagens').select('id,autor,texto,criado_em,user_id,membro_id').order('id',{ascending:false}).limit(60);if(lt)q=q.lt('id',lt);if(gt)q=q.gt('id',gt);const r=await q;if(r.error)throw r.error;return r.data||[]}
+ return (await chRest('chat_mensagens?select=id,autor,texto,criado_em,user_id,membro_id&order=id.desc&limit=60'+(lt?'&id=lt.'+lt:'')+(gt?'&id=gt.'+gt:'')))||[]}
 function chR(){const t=$('#chi');CH.draft=t?t.value:null;CH.foc=!!(t&&document.activeElement===t);R()}
 function chWho(i){try{if(i<0)localStorage.setItem('rep.chat.me','-');else localStorage.setItem('rep.chat.me',(CH.fx||[])[i]||'')}catch(e){}CH.stick=1;R()}
 function chSeenGet(){try{return +localStorage.getItem(CHK)||0}catch(e){return 0}}
@@ -2672,18 +2672,28 @@ function chUnread(){return CH.msgs.filter(m=>typeof m.id=='number'&&m.id>CH.seen
 function chBadge(){const b=$('#chbd');if(!b)return;const n=S.tab=='chat'?0:chUnread();b.hidden=!n;b.textContent=n>99?'99+':String(n)}
 function chDay(iso){const d=new Date(iso),h=new Date(),y=new Date();y.setDate(h.getDate()-1);const k=x=>x.toDateString();return k(d)==k(h)?'Hoje':k(d)==k(y)?'Ontem':d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}
 function chHm(iso){return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
-function chTxt(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}
+function chTxt(t){return esc(t).replace(/https?:\/\/[^\s<]+/g,u=>{const m=u.match(/[.,;:!?)\]]+$/),k=m?u.slice(0,-m[0].length):u;return '<a href="'+k+'" target="_blank" rel="noopener">'+k+'</a>'+(m?m[0]:'')})}
+function chLow(){const e=document.documentElement;return e.scrollHeight-window.scrollY-window.innerHeight<160}
+function chDown(){CH.newb=0;const b=$('.chnw');if(b)b.remove();window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'})}
 async function chLoad(older){if(CH.ld)return;CH.ld=1;try{const all=await chRows(older);const rows=all.slice().reverse();CH.more=all.length>=60;CH.err='';CH.ok=1;
   if(older){CH.stick=0;CH.msgs=rows.concat(CH.msgs)}else{const tmp=CH.msgs.filter(x=>x.tmp);CH.msgs=rows.concat(tmp);CH.stick=1;if(!CH.seen&&!chSeenGet()&&!CH.msgs.some(x=>chMe(x)))chSeenSet(Math.max(0,chLastId()-3))}}catch(e){CH.err=String(e&&e.message||e);CH.ok=0}CH.ld=0;
  if(S.tab=='chat')chR();chBadge()}
-async function chPoll(){if(!(CH.anon||CH.u)||CH.live||CH.ld||document.hidden||CH.start||!chEnabled())return;CH.pn=(CH.pn||0)+1;if(S.tab!='chat'&&CH.pn%6)return;
- try{const rows=(await chRows()).slice().reverse(),sig=a=>a.map(x=>x.id).join(','),mn=rows.length?rows[0].id:0;
-  const cur=CH.msgs.filter(x=>typeof x.id=='number'&&x.id>=mn);if(CH.ok&&sig(cur)==sig(rows))return;
-  const have=new Set(CH.msgs.map(x=>x.id)),fresh=CH.ok?rows.filter(x=>!have.has(x.id)&&!chMe(x)):[];
-  CH.msgs=CH.msgs.filter(x=>typeof x.id=='number'&&x.id<mn).concat(rows,CH.msgs.filter(x=>x.tmp));CH.ok=1;CH.err='';
-  if(S.tab=='chat'){const e=document.documentElement;CH.stick=e.scrollHeight-window.scrollY-window.innerHeight<160?1:0;chSeenSet(chLastId());chR()}
-  else{chBadge();const m=fresh[fresh.length-1];if(m&&!FS)toastA('💬 '+m.autor+': '+String(m.texto).slice(0,60),'Abrir',()=>tab('chat'),6000)}}catch(e){}}
-function chIn(m){if(!m||CH.msgs.some(x=>x.id===m.id))return;CH.msgs.push(m);if(S.tab=='chat'){chSeenSet(chLastId());CH.stick=1;chR()}else{chBadge();if(!chMe(m)&&!FS)toastA('💬 '+m.autor+': '+String(m.texto).slice(0,60),'Abrir',()=>tab('chat'),6000)}}
+async function chPoll(force){if(!(CH.anon||CH.u)||CH.live||CH.ld||CH.pl||document.hidden||CH.start||!chEnabled())return;CH.pn=(CH.pn||0)+1;const on=S.tab=='chat';if(!on&&!force&&CH.pn%6)return;
+ const full=on&&CH.pn%6==0,last=chLastId();CH.pl=1;
+ try{let fresh=[],chg=0;
+  if(!full&&CH.ok&&last){const rows=(await chRows(0,last)).slice().reverse();const have=new Set(CH.msgs.map(x=>x.id));fresh=rows.filter(x=>!have.has(x.id));if(fresh.length){const tmp=CH.msgs.filter(x=>x.tmp);CH.msgs=CH.msgs.filter(x=>!x.tmp).concat(fresh,tmp);chg=1}}
+  else{const rows=(await chRows()).slice().reverse(),sig=a=>a.map(x=>x.id).join(','),mn=rows.length?rows[0].id:0;
+   const cur=CH.msgs.filter(x=>typeof x.id=='number'&&x.id>=mn);
+   if(!CH.ok||sig(cur)!=sig(rows)){const have=new Set(CH.msgs.map(x=>x.id));fresh=CH.ok?rows.filter(x=>!have.has(x.id)):[];CH.msgs=CH.msgs.filter(x=>typeof x.id=='number'&&x.id<mn).concat(rows,CH.msgs.filter(x=>x.tmp));chg=1}}
+  CH.ok=1;CH.err='';fresh=fresh.filter(x=>!chMe(x));
+  if(!chg)return;
+  if(on){if(chLow())CH.stick=1;else if(fresh.length)CH.newb=1;chSeenSet(chLastId());chR()}
+  else{chBadge();const m=fresh[fresh.length-1];if(m&&!FS)toastA('💬 '+m.autor+': '+String(m.texto).slice(0,60),'Abrir',()=>tab('chat'),6000)}}catch(e){}finally{CH.pl=0}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(CH.anon||CH.u))setTimeout(()=>chPoll(1),300)});
+window.addEventListener('scroll',()=>{if(CH.newb&&S.tab=='chat'&&chLow()){CH.newb=0;const b=$('.chnw');if(b)b.remove()}},{passive:true});
+document.addEventListener('focusin',e=>{if(e.target&&e.target.id=='chi')document.body.classList.add('chfoc')});
+document.addEventListener('focusout',e=>{if(e.target&&e.target.id=='chi')setTimeout(()=>{if(document.activeElement&&document.activeElement.id=='chi')return;document.body.classList.remove('chfoc')},150)});
+function chIn(m){if(!m||CH.msgs.some(x=>x.id===m.id))return;CH.msgs.push(m);if(S.tab=='chat'){chSeenSet(chLastId());if(chLow()||chMe(m))CH.stick=1;else CH.newb=1;chR()}else{chBadge();if(!chMe(m)&&!FS)toastA('💬 '+m.autor+': '+String(m.texto).slice(0,60),'Abrir',()=>tab('chat'),6000)}}
 function chOut(id){const n=CH.msgs.length;CH.msgs=CH.msgs.filter(x=>x.id!==id);if(CH.msgs.length!=n&&S.tab=='chat'){CH.stick=0;chR()}chBadge()}
 async function chInit(){if(CH.sub||CH.start||CH.anon)return;const c=FVC();if(!c&&!window.__FVREST)return;CH.start=1;chShow();
  if(c){try{let r=c.auth&&c.auth.getSession?await c.auth.getSession():null;CH.u=r&&r.data&&r.data.session&&r.data.session.user||null;if(!CH.u&&c.auth&&c.auth.getUser){r=await c.auth.getUser();CH.u=r&&r.data&&r.data.user||null}}catch(e){CH.u=null}}
@@ -2715,8 +2725,8 @@ function vChat(){const hd='<div class="dbh"><div><h1>Chat da banda</h1><p class=
  return`<div class="dbw chw">${hd}${CH.err?`<div class="dbc"><p class="mut">Não foi possível carregar o chat (${esc(CH.err)}). Se o banco ainda não foi preparado, rode o 16_chat.sql e o 17_chat_publico.sql no Supabase.</p><button class="sm" onclick="chLoad()">Tentar de novo</button></div>`:''}
  ${CH.more&&L.length?`<button type="button" class="sm chmo" onclick="chLoad(1)">Ver mensagens anteriores</button>`:''}
  <div class="chm">${h||(CH.ok?'<p class="mut" style="text-align:center;margin:30px 0">Ainda não há mensagens. Escreva a primeira! 🙌</p>':'<p class="mut" style="text-align:center;margin:30px 0">Carregando…</p>')}</div></div>
- <div class="chc"><div id="chp" class="chp" hidden>${CHE.map(e=>`<button type="button" onclick="chPut('${e}')">${e}</button>`).join('')}</div><div class="chr"><button type="button" class="che" onclick="chEmo()" aria-label="Emojis">😊</button><textarea id="chi" rows="1" maxlength="2000" placeholder="Mensagem" enterkeyhint="send" oninput="chGrow(this)" onkeydown="chKey(event)"></textarea><button type="button" class="chs" onclick="chSend()" aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7z"/></svg></button></div></div>`}
-function chAfter(){document.body.classList.toggle('chaton',S.tab=='chat');chShow();if(!CH.sub&&!CH.start&&!CH.anon&&chEnabled()&&(FVC()||window.__FVREST)&&Date.now()-(CH.try||0)>4000){CH.try=Date.now();chInit()}if(S.tab!='chat'){CH.in=0;chBadge();return}if(!CH.in){CH.in=1;CH.stick=1}if(chOn()){if(!CH.sub&&!CH.anon)chInit();if(chLastId()>CH.seen)chSeenSet(chLastId())}chBadge();{const i=$('#chi');if(i&&CH.draft!=null){i.value=CH.draft;chGrow(i);if(CH.foc){try{i.focus()}catch(e){}}CH.draft=null}}if(CH.stick){CH.stick=0;setTimeout(()=>{window.scrollTo(0,document.documentElement.scrollHeight)},0)}}
+ ${CH.newb?'<button type="button" class="chnw" onclick="chDown()">↓ Novas mensagens</button>':''}<div class="chc"><div id="chp" class="chp" hidden>${CHE.map(e=>`<button type="button" onclick="chPut('${e}')">${e}</button>`).join('')}</div><div class="chr"><button type="button" class="che" onclick="chEmo()" aria-label="Emojis">😊</button><textarea id="chi" rows="1" aria-label="Escreva sua mensagem" maxlength="2000" placeholder="Mensagem" enterkeyhint="send" oninput="chGrow(this)" onkeydown="chKey(event)"></textarea><button type="button" class="chs" onclick="chSend()" aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7z"/></svg></button></div></div>`}
+function chAfter(){document.body.classList.toggle('chaton',S.tab=='chat');chShow();if(!CH.sub&&!CH.start&&!CH.anon&&chEnabled()&&(FVC()||window.__FVREST)&&Date.now()-(CH.try||0)>4000){CH.try=Date.now();chInit()}if(S.tab!='chat'){CH.in=0;CH.newb=0;document.body.classList.remove('chfoc');chBadge();return}if(!CH.in){CH.in=1;CH.stick=1}if(chOn()){if(!CH.sub&&!CH.anon)chInit();if(chLastId()>CH.seen)chSeenSet(chLastId())}chBadge();{const i=$('#chi');if(i&&CH.draft!=null){i.value=CH.draft;chGrow(i);if(CH.foc){try{i.focus()}catch(e){}}CH.draft=null}}if(CH.stick){CH.stick=0;CH.newb=0;setTimeout(()=>{window.scrollTo(0,document.documentElement.scrollHeight)},0)}}
 {const _u=uiPost;uiPost=function(){_u.apply(this,arguments);chAfter()}}
 {const _fi=fvInit;fvInit=async function(){const r=await _fi.apply(this,arguments);try{chInit()}catch(e){}return r}}
 /* Voltar / botão do Android no chat e no perfil */
