@@ -257,8 +257,8 @@ body.band:not(.bsongs) #qb,body.band #mn,body.band #mnp{display:none!important}.
 .lnk{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.lkb{display:inline-flex;align-items:center;gap:6px;background:#1C1C1E;color:#fff;border-radius:999px;padding:7px 14px;text-decoration:none;font-weight:600}.lkb svg{width:14px;height:14px}
 .lnt{color:#ffe9a8;background:#14120a;border-radius:10px;padding:8px 12px;margin:8px 0;font-size:.92rem}
 .vsl{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:.85rem}.vsl .chip{font-size:.78rem;padding:2px 8px}
-#lvl{list-style:none;padding:0;margin:8px 0;display:flex;flex-direction:column;gap:6px;max-width:640px}
-#lvl li{display:flex;align-items:center;gap:6px}
+#lvl{list-style:none;position:relative;padding:0 0 0 28px;margin:0;display:flex;flex-direction:column;gap:6px}
+#lvl li{display:flex;align-items:center;gap:6px;position:relative}
 #lvl li#lvl li.lpd,.lpd{list-style:none;border:1px dashed #3a3c42;border-radius:14px;padding:16px 18px!important;margin:6px 0;color:#A6A6AD;font-weight:600;min-height:52px}
 .bbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
 .bbar .bb{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-radius:999px;background:#1b1c20;border:1px solid #2c2e34;color:#f2f0ea;font-weight:600;font-size:.92rem;text-decoration:none;cursor:pointer;min-height:44px}
@@ -559,8 +559,8 @@ body.dash #add,body.dash #fab,body.band [data-t="dash"]{display:none!important}
 .sld summary{cursor:pointer;font-size:.82rem;list-style:none}.sld summary::-webkit-details-marker{display:none}.sld summary b{color:#fff;font-weight:600}.sld[open] summary{margin-bottom:6px}.sld select{max-width:220px}
 
 /* roteiro */
-#lvl li.lrm{display:flex;flex-wrap:nowrap;align-items:center;gap:10px;background:transparent;border:1px dashed #3A3A3C;border-radius:12px;padding:8px 12px;margin:2px 0;color:#D1D1D6;font-size:.88rem}#lvl li.lrm b{color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.78rem}#lvl li.lrm small{color:#AEAEB2;font-size:.82rem}#lvl li.lrm svg{width:16px;height:16px;flex:none;stroke:#A6A6AD;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#lvl li.lrn{display:block;background:transparent;padding:0 12px;margin:-4px 0 0;font-size:.82rem;color:#ffd60a}
+#lvl li.lrm{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;background:transparent;border:0;border-radius:12px;padding:8px 0;margin:0;min-height:44px;color:#D1D1D6;font-size:.88rem}#lvl li.lrm b{color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.78rem}#lvl li.lrm small{color:#AEAEB2;font-size:.82rem}#lvl li.lrm svg{position:absolute;left:-28px;top:50%;transform:translateY(-50%);width:24px;height:24px;padding:5px;box-sizing:border-box;border-radius:50%;background:#000;border:2px solid #636366;flex:none;stroke:#EBEBF5;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#lvl li.lrn{display:block;background:transparent;padding:0 12px;margin:-2px 0 2px;font-size:.82rem;color:#ffd60a}
 #lvl li.ltr{display:flex;flex-wrap:wrap;align-items:center;gap:6px;background:transparent;padding:0 12px;margin:-2px 0;font-size:.78rem;color:#A6A6AD}#lvl li.ltr b{color:#64b5f6;font-weight:600}#lvl li.ltr i{font-style:normal;color:#D1D1D6}
 .rtl{display:flex;flex-direction:column;gap:6px}
 .rti{display:flex;align-items:flex-start;gap:8px;background:#1C1C1E;border-radius:12px;padding:8px 10px}.rti.m{background:transparent;border:1px dashed #3A3A3C}.rti .rtb{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}.rti .rtb b{font-size:.92rem}.rti .rtb small{color:#A6A6AD;font-size:.78rem}.rti input{width:100%;font-size:.85rem;padding:6px 8px}.rti .rtn{display:flex;gap:6px}.rti .rtn input:first-child{max-width:180px;font-weight:700}
@@ -949,6 +949,19 @@ dialog.hasback h2,dialog.hasback>h3:first-of-type:not(h2~h3),dialog.hasback .dba
 
 /* Alvos de toque de 44 px no celular e no tablet (área invisível, sem mexer no desenho) */
 @media (pointer:coarse){.ic,.vfp,.cxn,.ehp,.cxa{position:relative}.ic::after,.vfp::after,.cxn::after,.ehp::after,.cxa::after{content:'';position:absolute;inset:-8px -3px}.chip,.vlb,.wi,.sm,.dng,.mpb{min-height:44px}select{min-height:44px}}
+/* v404: repertório em linha do tempo (horários + músicas + momentos na mesma trilha) */
+.tll.tlr{margin:0 0 -2px;padding:0}
+.tll.tlr li{padding-left:28px}
+.tll.tlr li::before{left:6px;width:12px;height:12px;margin-top:-6px}
+.tll.tlr li:not(:last-child)::after{left:11.25px}
+.tll.tlr li.pas .tlx,.tll.tlr li.pas .tlm{font-weight:800}
+#lvl::before{content:'';position:absolute;left:11.25px;top:10px;bottom:34px;width:1.5px;background:#38383A}
+.tll.tlr+#lvl::before{top:-24px}
+#lvl li.nm>.it .sn,#lvl li.nm .sn{position:absolute;left:-28px;top:50%;transform:translateY(-50%);width:24px;height:24px;font-size:.78rem;background:#000;border:2px solid #00CDD3;box-sizing:border-box;z-index:1}
+#lvl li:not(.nm):not(.lrm):not(.lsh):not(.lpd):not(.lrn):not(.ltr)>.it .sn{position:absolute;left:-23px;top:50%;transform:translateY(-50%);width:12px;height:12px;font-size:0;background:#000;border:2px solid #00CDD3;box-sizing:border-box;z-index:1}
+#lvl li.lsh{margin:16px 0 2px}
+@media(max-width:700px){#lvl .sc{padding-right:6px}}
+@media(min-width:701px){.lvs .tll.tlr,.lvs #lvl{max-width:760px}}
 </style></head><body>
 <header><button type="button" id="nvb" class="nvb" hidden onclick="bkGo()" aria-label="Voltar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span></span></button><svg class="lg" height="30" viewBox="0 0 720 160" preserveAspectRatio="xMinYMid slice" role="img" aria-label="Escala B6"><g transform="scale(.3125)"><circle cx="256" cy="256" r="256" fill="#000"/><circle cx="256" cy="256" r="226" fill="none" stroke="#fff" stroke-width="14"/><text x="256" y="338" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="232" font-weight="800" letter-spacing="-6" fill="#fff">B6</text></g><text x="190" y="112" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif" font-size="92" font-weight="700" letter-spacing="-2" fill="currentColor">Escala</text></svg><span id="hti" aria-hidden="true"></span><div class="tabs"><button data-t="chat" class="tch" onclick="tab('chat')">Chat<i class="chbg" hidden></i></button> <button data-t="hoje" onclick="tab('hoje')">Hoje</button> <button data-t="lists" onclick="tab('lists')">Repertórios</button> <button data-t="songs" onclick="tab('songs')">Músicas</button> <button data-t="dash" onclick="tab('dash')">Painel</button> <button data-t="esp" onclick="tab('esp')">Espiritual</button></div>
 <input id="q" placeholder="Buscar por artista ou nome da música" oninput="qin(this.value)">
@@ -1017,6 +1030,6 @@ const db={collection:coll,doc:p=>{const i=p.lastIndexOf('/');return coll(p.slice
 const user={isOwner:async()=>false,canEdit:async()=>false,id:async()=>(window.__FVME&&window.__FVME.user_id)||'banda',profiles:async()=>({})};
 window.__B6SITE=1;window.claude={use:async n=>{await ready;return n=='db'?db:n=='user'?user:null}};})();
 </script>
-<script src="app.js?v=403"></script></body></html>
+<script src="app.js?v=404"></script></body></html>
 
 </body></html>

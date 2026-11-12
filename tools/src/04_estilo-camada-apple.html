@@ -188,3 +188,16 @@ dialog.hasback h2,dialog.hasback>h3:first-of-type:not(h2~h3),dialog.hasback .dba
 
 /* Alvos de toque de 44 px no celular e no tablet (área invisível, sem mexer no desenho) */
 @media (pointer:coarse){.ic,.vfp,.cxn,.ehp,.cxa{position:relative}.ic::after,.vfp::after,.cxn::after,.ehp::after,.cxa::after{content:'';position:absolute;inset:-8px -3px}.chip,.vlb,.wi,.sm,.dng,.mpb{min-height:44px}select{min-height:44px}}
+/* v404: repertório em linha do tempo (horários + músicas + momentos na mesma trilha) */
+.tll.tlr{margin:0 0 -2px;padding:0}
+.tll.tlr li{padding-left:28px}
+.tll.tlr li::before{left:6px;width:12px;height:12px;margin-top:-6px}
+.tll.tlr li:not(:last-child)::after{left:11.25px}
+.tll.tlr li.pas .tlx,.tll.tlr li.pas .tlm{font-weight:800}
+#lvl::before{content:'';position:absolute;left:11.25px;top:10px;bottom:34px;width:1.5px;background:#38383A}
+.tll.tlr+#lvl::before{top:-24px}
+#lvl li.nm>.it .sn,#lvl li.nm .sn{position:absolute;left:-28px;top:50%;transform:translateY(-50%);width:24px;height:24px;font-size:.78rem;background:#000;border:2px solid #00CDD3;box-sizing:border-box;z-index:1}
+#lvl li:not(.nm):not(.lrm):not(.lsh):not(.lpd):not(.lrn):not(.ltr)>.it .sn{position:absolute;left:-23px;top:50%;transform:translateY(-50%);width:12px;height:12px;font-size:0;background:#000;border:2px solid #00CDD3;box-sizing:border-box;z-index:1}
+#lvl li.lsh{margin:16px 0 2px}
+@media(max-width:700px){#lvl .sc{padding-right:6px}}
+@media(min-width:701px){.lvs .tll.tlr,.lvs #lvl{max-width:760px}}
