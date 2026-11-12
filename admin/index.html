@@ -615,7 +615,7 @@ dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(10px);-webkit-b
 #cfgRoot .cfv{flex:none;width:16px;height:16px;fill:none;stroke:#636366;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 #cfgRoot .cfm{color:#A6A6AD;font-style:normal;font-size:.95rem}
 #cfgRoot .cfs2{flex:none;max-width:40%;appearance:none;-webkit-appearance:none;background:transparent;border:0;color:#A6A6AD;font-size:.95rem;text-align:right;text-align-last:right;padding:8px 2px;min-height:44px}
-#cfgRoot .cfd .cfx b{color:#FF453A}
+#cfgRoot .cfd .cfx b{color:#FF6B62}
 #cfgRoot .swt{flex:none;appearance:none;-webkit-appearance:none;width:51px;height:31px;border-radius:16px;background:#48484A;position:relative;transition:background .2s;cursor:pointer;margin:0;border:0}
 #cfgRoot .swt::after{content:'';position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.4);transition:transform .2s}
 #cfgRoot .swt:checked{background:#34C759}
@@ -629,11 +629,11 @@ dialog.hasback h2,dialog.hasback>h3:first-of-type,dialog.hasback .dbar+h3,dialog
 #dlg2[data-k=alert] p{margin:0;padding:0 20px 20px;font-size:.98rem;line-height:1.45}
 #dlg2[data-k=alert] .ac{display:flex;flex-direction:row-reverse;gap:0;margin:0;border-top:.5px solid #545458}
 #dlg2[data-k=alert] .ac button{flex:1;min-height:50px;border:0!important;border-radius:0;background:transparent!important;color:#00CDD3!important;font-size:1.05rem;font-weight:600}
-#dlg2[data-k=alert] .ac button:first-child:not(:only-child){border-left:.5px solid #545458!important;color:#FF453A!important}
+#dlg2[data-k=alert] .ac button:first-child:not(:only-child){border-left:.5px solid #545458!important;color:#FF6B62!important}
 #dlg2[data-k=alert] .ac button:active{background:#3A3A3C!important}
 @keyframes alIn{from{opacity:0;transform:scale(1.08)}to{opacity:1;transform:none}}
 .mcn{display:none}
-.mni.dng{color:#FF453A}
+.mni.dng{color:#FF6B62}
 @media(max-width:700px){.mcn{display:block;width:100%;margin-top:8px;min-height:52px;border-radius:14px;background:#2C2C2E;color:#00CDD3;font-weight:700;border:0;font-size:1.05rem}dialog[open]{animation-duration:.32s;animation-timing-function:cubic-bezier(.32,.72,0,1)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 
@@ -903,7 +903,7 @@ body.tbon.chaton.chfoc #tbb{display:none}body.tbon.chfoc .chc{bottom:0;padding-b
 .chshb{position:absolute;inset:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .chshc{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;background:#1C1C1E;border-radius:18px 18px 0 0;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:4px}
 .chshc>button{min-height:48px;border:0;border-radius:12px;background:#2C2C2E;color:#fff;font:inherit;text-align:left;padding:0 14px}
-.chshc>button.dan{color:#FF453A}
+.chshc>button.dan{color:#FF6B62}
 .chrx{display:flex;justify-content:space-between;padding:4px 2px 8px}
 .chrx button{width:48px;height:48px;min-height:48px;border-radius:24px;border:0;background:#2C2C2E;font-size:1.5rem;padding:0}
 .chvs{font-size:.8rem;margin:6px 4px}
@@ -1055,6 +1055,6 @@ const go=()=>check().catch(e=>loginForm('Sem conexão com o servidor. Tente de n
 if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
 })();
 </script>
-<script src="app.js?v=402"></script></body></html>
+<script src="app.js?v=403"></script></body></html>
 
 </body></html>
