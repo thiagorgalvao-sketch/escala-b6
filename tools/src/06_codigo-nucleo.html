@@ -29,7 +29,6 @@ const LB=[[/youtu\.?be/i,'YouTube','#ff0033','<path d="M9.5 8v8l7-4z" fill="#fff
 
 function zSv(){try{localStorage.setItem('rep.z',String(S.z))}catch(e){}}
 try{const z=+localStorage.getItem('rep.z');if(z>=.6&&z<=2.4)S.z=z}catch(e){}
-function lux(m){PF.night=m=='n'?1:0;PF.sun=m=='s'?1:0;try{localStorage.setItem('rep.pf',JSON.stringify(PF))}catch(e){}R();toast(m=='n'?'Palco escuro: tela mais apagada':m=='s'?'Luz forte: fundo branco e alto contraste':'Luz normal')}
 function nxs(l,T){const it=[],SM={};S.songs.forEach(s=>SM[s.id]=s);
  if(l.ensData&&l.ensData>=T&&!l.semEns){const d=new Date(l.ensData+'T00:00');it.push(`<span class="nsi">Ensaio ${WD[d.getDay()].toLowerCase()} ${fd(l.ensData).slice(0,5)}${l.ensHora?' · '+esc(l.ensHora):''}</span>`)}
  const hb=l.hBanda||l.passHora;if(hb)it.push(`<span class="nsi">${l.hBanda?'Banda pronta':'Passagem'} ${esc(hb)} no dia</span>`);
@@ -190,7 +189,6 @@ function cfBackEnsure(){const b=dlg.querySelector('.dbar');if(!b)return;const ha
 function azL(){if(S.so||S.bm)return[];return[...new Set(fl().map(s=>(nz(s.title).match(/[a-z0-9]/)||['#'])[0]).map(c=>/[0-9]/.test(c)?'#':c.toUpperCase()))]}
 function azh(){return azL().map(L=>`<button onclick="azGo('${L}')" aria-label="Ir para ${L}">${L}</button>`).join('')}
 function azGo(L){const e=document.querySelector('#ls [data-l="'+L+'"]'),ls=$('#ls');if(!e)return;if(MOB()){const hh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh'))||56;scrollTo(0,e.getBoundingClientRect().top+scrollY-hh-8)}else{if(ls.scrollHeight>ls.clientHeight+4)ls.scrollTo({top:ls.scrollTop+e.getBoundingClientRect().top-ls.getBoundingClientRect().top-4});else{const hh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh'))||56;scrollTo(0,e.getBoundingClientRect().top+scrollY-hh-8)}e.classList.add('azh');setTimeout(()=>e.classList.remove('azh'),900)}}
-function qbT(){const o=document.body.classList.toggle('qo');if(o)setTimeout(()=>$('#q').focus(),30)}
 function mnT(){const m=$('#mnp');m.hidden=!m.hidden}
 document.addEventListener('click',e=>{const m=$('#mnp');if(m&&!m.hidden&&!e.target.closest('#mnp,#mn'))m.hidden=true});
 {let mw=innerWidth<=700,rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{hhU();const n=innerWidth<=700;if(n!=mw){mw=n;R()}else vftFit()},120)})}

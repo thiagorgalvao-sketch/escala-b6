@@ -2,7 +2,6 @@
 let LKM='',PRET=null;
 function lkMsg(t){LKM=t;const e=$('#lks');if(e)e.innerHTML=t}
 const slugT=s=>decodeURIComponent(s||'').replace(/\.html?$/,'').replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
-async function lkMeta(u){const m=/(?:cifraclub\.com\.br|letras\.mus\.br|cifras\.com\.br)\/([^\/?#]+)\/([^\/?#]+)/i.exec(u);if(m&&!/^\d+$/.test(m[2]))return{title:slugT(m[2]),author_name:slugT(m[1]),slug:1};return null}
 const keyOk=k=>/^[A-G][#b]?m?$/.test(k||'');
 async function aiSong(t,a,extra){let sm=null;try{sm=window.claude&&await claude.use('sample')}catch(e){}if(!sm)return null;
  try{const r=await sm.json(`Você ajuda um ministério de louvor brasileiro a cadastrar músicas. ${extra||''}
@@ -24,14 +23,6 @@ async function ccLk(u,force){u=String(u||'').trim();const m=CCRX.exec(u);if(!m){
  if(ccLk.busy)return;ccLk.busy=1;lkMsg('Trazendo a cifra do Cifra Club…');let o=null;try{o=await ccGet(dns,url)}finally{ccLk.busy=0}
  if(!o){lkMsg(`Não consegui trazer esta cifra agora. <a href="${esc(D.cc)}" target="_blank" rel="noopener">Abra a cifra</a>, copie o texto e cole na aba Cifra.`);return}
  cifImp({cifra:o.cifra,tom:o.tom,bpm:o.bpm,titulo:o.titulo,artista:TC(slugT(dns).toUpperCase()),link:D.cc});LKM='';}
-async function nmAuto(force){const t=(D.title||'').trim();if(!t)return;const hasA=!!(D.artist||'').trim(),hasK=keyOk((D.key||'').trim())&&D._kt;if(hasA&&hasK&&!force)return;
- lkMsg('Identificando artista e tom original de “'+esc(t)+'”…');const r=await aiSong(t,D.artist||'','O usuário digitou o nome da música'+(hasA?' e o artista':'')+'. Mantenha o nome como está.');
- if(!r){lkMsg('Não foi possível identificar agora. Preencha o artista e o tom manualmente.');return}
- const ch=[];if(!hasA&&r.artista){D.artist=String(r.artista).slice(0,80);ch.push('artista')}const kk=(r.tom||'').replace('♯','#').replace('♭','b').trim();let km='';
- if(keyOk(kk)){if(!keyOk((D.key||'').trim())||(!D.id&&!D._kt)){D.key=kk;ch.push('tom')}else if(kk!=D.key)km=` <button type="button" class="sm" onclick="D.key=${ja(kk)};sfR()">Usar ${esc(kk)}</button>`}
- sfR();lkMsg((ch.length?'✓ Preenchido automaticamente: '+ch.join(' e ')+'. ':'')+(keyOk(kk)?`<span class="mut">Tom original ${esc(kk)}${r.confianca?' (confiança '+esc(String(r.confianca))+')':''} — sugerido pela IA, confira.</span>`:'<span class="mut">Tom original não identificado com segurança.</span>')+km+(r.artista&&hasA&&nz(r.artista)!=nz(D.artist)?` <span class="mut">Artista provável: ${esc(r.artista)}.</span>`:''))}
-async function keyAI(){if(!(D.title||'').trim())return say('Preencha o nome da música primeiro.');lkMsg('Buscando o tom original…');DT='info';const r=await aiSong(D.title,D.artist,'Identifique o tom original desta música.'),kk=(r&&r.tom||'').replace('♯','#').replace('♭','b').trim();
- if(!keyOk(kk))return lkMsg('Não foi possível sugerir o tom com segurança.');if(!keyOk((D.key||'').trim())){D.key=kk;sfR();lkMsg(`✓ Tom original sugerido pela IA: <b>${esc(kk)}</b> (confiança ${esc(String(r.confianca||'?'))}). Confira.`)}else lkMsg(`Tom original sugerido pela IA: <b>${esc(kk)}</b> (confiança ${esc(String(r.confianca||'?'))}). <button type="button" class="sm" onclick="D.key=${ja(kk)};sfR()">Usar ${esc(kk)}</button>`)}
 function repCard(){const ls=S.lists.filter(l=>D.id&&l.songIds.includes(D.id)).sort((a,b)=>(b.date||'').localeCompare(a.date||'')),T=td();if(PRET)return`<div class="ecard"><div class="ect">Repertório</div><p class="mut" style="margin:0">Ao salvar, esta música entra no repertório que você está editando${PRET.date?' ('+fd(PRET.date)+')':''}.</p></div>`;
  const op=[...S.lists].filter(l=>!(D.id&&l.songIds.includes(D.id))).sort((a,b)=>{const fa=(a.date||'')>=T,fb=(b.date||'')>=T;return fa!=fb?(fa?-1:1):fa?(a.date||'').localeCompare(b.date||''):(b.date||'').localeCompare(a.date||'')});
  return`<div class="ecard"><div class="ect">Repertórios</div>${ls.length?`<p class="mut" style="margin:0 0 6px">Está em ${ls.length} repertório(s); o mais recente: ${fd(ls[0].date)||esc(ls[0].name)}.</p>`:''}<label class="ef">Adicionar a um repertório<select onchange="D._addL=this.value;$('#rcs').textContent=this.value?'Será adicionada ao salvar a música.':''"><option value="">— escolher —</option>${op.map(l=>`<option value="${l.id}"${D._addL==l.id?' selected':''}>${(l.date||'')>=T?'':'(passado) '}${fd(l.date)||'sem data'} · ${esc(lnm(l)||l.name||'')}${l.place?' · '+esc(l.place):''}</option>`).join('')}</select></label><small id="rcs" class="mut">${D._addL?'Será adicionada ao salvar a música.':''}</small></div>`}

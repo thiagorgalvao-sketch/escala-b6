@@ -416,17 +416,6 @@ function fxWaveSeek(e,k){if(!FXA.length||!FXDUR)return;const r=e.currentTarget.g
 
 /* ---- transposição de tom (pitch-shift) sem alterar a velocidade ---- */
 function fxHann(n){const w=new Float32Array(n);for(let i=0;i<n;i++)w[i]=0.5-0.5*Math.cos(2*Math.PI*i/(n-1));return w}
-function fxResampleCh(ch,ratio){const outLen=Math.max(1,Math.round(ch.length/ratio));const out=new Float32Array(outLen);
- for(let i=0;i<outLen;i++){const sp=i*ratio,i0=Math.floor(sp),i1=Math.min(i0+1,ch.length-1),fr=sp-i0;out[i]=(ch[i0]||0)*(1-fr)+(ch[i1]||0)*fr}
- return out}
-function fxStretchCh(ch,stretch,win){const grain=win.length,hopOut=Math.floor(grain/4),hopIn=hopOut/stretch;
- const outLen=Math.max(1,Math.round(ch.length*stretch));const out=new Float32Array(outLen),wsum=new Float32Array(outLen);
- let outPos=0,inPosF=0;
- while(outPos<outLen){const inPos=Math.floor(inPosF);
-  for(let i=0;i<grain;i++){const oi=outPos+i,ii=inPos+i;if(oi<outLen&&ii>=0&&ii<ch.length){out[oi]+=ch[ii]*win[i];wsum[oi]+=win[i]}}
-  outPos+=hopOut;inPosF+=hopIn}
- for(let i=0;i<outLen;i++)if(wsum[i]>1e-6)out[i]/=wsum[i];
- return out}
 const fxYield=()=>new Promise(r=>setTimeout(r,0));
 /* muda o tom sem mudar o andamento, em pedaços (não trava a tela) e escrevendo direto no buffer final (pouca memória) */
 async function fxPitchShiftBuffer(buf,semitones,ctx){if(!semitones||!buf)return buf;
@@ -594,7 +583,7 @@ async function faixasSep(hk){hk=hk||'o';const myD=D,url=stSrc(D,hk);if(!url)retu
    const st=await fxInv({acao:'status',call_id:ini.call_id});
    if(st.status=='pronto'){
     if(D!==myD||stSrc(D,hk)!==url){toast('Faixas separadas, mas a tela mudou — abra a música de novo.');return}
-    stSet(D,hk,{...st.faixas,em:new Date().toISOString().slice(0,10)});set('');prog(null);sfR();toast('Faixas separadas com sucesso');return}
+    stSet(D,hk,{...st.faixas,em:td()});set('');prog(null);sfR();toast('Faixas separadas com sucesso');return}
    if(st.status=='erro')throw new Error(st.erro||'erro no processamento')}
   throw new Error('demorou demais, tente de novo mais tarde')}
  catch(e){set('');prog(null);if(D===myD)say('Não consegui separar as faixas: '+(e&&e.message||'erro')+'. Confira se a função "separar-faixas" está publicada no Supabase e o serviço no Modal está no ar.')}
@@ -608,12 +597,6 @@ function vqGo(d){if(!Q)return;const i=Q.i+d;if(i<0||i>=Q.q.length)return;Q.i=i;v
 function vqX(){const a=$('#vqa');a.dataset.want='0';a.pause();a.removeAttribute('src');$('#vsq').hidden=true;Q=null;document.body.style.paddingBottom=''}
 function vqPos(){const b=$('#vsq'),d=$('#dk');if(!b||b.hidden)return;const t=$('#tbb'),th=document.body.classList.contains('tbon')&&t?t.offsetHeight:0,dh=d&&!d.hidden?d.offsetHeight:0;b.style.bottom=(Math.max(th,dh)+8)+'px';document.body.style.paddingBottom=(b.offsetHeight+Math.max(th,dh)+16)+'px'}
 document.addEventListener('DOMContentLoaded',()=>{const a=$('#vqa');if(a)a.addEventListener('ended',()=>{if(Q&&Q.i<Q.q.length-1)vqGo(1)})});
-async function vsBulk(lid,inp){const fs=[...inp.files||[]];inp.value='';if(!fs.length)return;const l=S.lists.find(x=>x.id==lid);let as=null;try{as=window.claude&&await claude.use('assets')}catch(e){}if(!as)return say('O envio de áudio precisa de internet e login de administrador.');
- const ss=l.songIds.map(i=>S.songs.find(x=>x.id==i)).filter(Boolean),ok=[],bad=[],del=[];
- for(const f of fs){const n=nz(f.name.replace(/\.[^.]+$/,'').replace(/[_\-]+/g,' ').replace(/\bvs\b/ig,' ')),m=ss.filter(s=>{const t=nz(s.title);return t&&(n.includes(t)||t.includes(n))}).sort((a,b)=>b.title.length-a.title.length)[0];
-  if(!m){bad.push(f.name+' (nenhuma música do setlist com esse nome)');continue}
-  try{const b=await vsPrep(f),r=await bigUp(as,b);if(m.vs&&m.vs.id)del.push(m.vs.id);m.vs={id:r.id,url:r.url,name:b===f?f.name:f.name.replace(/\.[^.]+$/,'')+'.wav',size:r.size};ok.push(m.title)}catch(e){bad.push(f.name+' ('+(e&&e.message||e&&e.code||'erro')+')')}}
- save();R();vsClean(del,'');say((ok.length?'VS importado em: '+ok.join(', ')+'. ':'')+(bad.length?'Não importados: '+bad.join('; ')+'.':''))}
 const TUN=[['Padrão','E A D G B E',0],['1/2 tom abaixo','Eb Ab Db Gb Bb Eb',1],['1 tom abaixo','D G C F A D',2],['1 tom e 1/2 abaixo','Db Gb B E Ab Db',3],['2 tons abaixo','C F Bb Eb G C',4]];
 function sdisp(s){const d=md((+s.tun||0)-(+s.capo||0));if(!d)return s;const p=pk(s.key),nk=['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'][md(p.pc+d)]+(p.min?'m':'');const c=evS(s,nk);return c}
 function dupSong(){uSnap('Cópia da música criada');const c=JSON.parse(JSON.stringify(D));delete c._del;c.id=uid();delete c.hist;delete c.fav;c.title=TC(((c.title||'').trim()+' (CÓPIA)').toUpperCase());(c.parts||[]).forEach(q=>q.id=uid());S.songs.push(c);S.sel=c.id;save();editSong(c.id)}
@@ -721,7 +704,6 @@ document.addEventListener('pointercancel',()=>{src=tgt=null;clr()})})();
 function reordL(l,sid,did){if(lockG(l.id,()=>reordL(l,sid,did)))return;uSnap('Ordem alterada');l.ord=l.ord||{};const ids=l.songIds,slots=[];ids.forEach((id,i)=>{if(/^\d+$/.test(oo(l,id)))slots.push(i)});const seq=slots.map(i=>ids[i]),vals=seq.map(id=>l.ord[id]);const a=seq.indexOf(sid),b=seq.indexOf(did);if(a<0||b<0)return;const [x]=seq.splice(a,1);seq.splice(b,0,x);slots.forEach((pos,k)=>{ids[pos]=seq[k];l.ord[seq[k]]=vals[k]});save();R()}
 var LTB='ev';function ltG(x){LTB=x;dlg.dataset.lt=x;dlg.querySelectorAll('.ltb .tb').forEach(b=>b.classList.toggle('on',b.dataset.lt==x));dlg.scrollTop=0}
 function editList(id){if(id&&lockG(id,()=>editList(id)))return;PRET=null;LTB='ev';const l=S.lists.find(x=>x.id==id);P=l?cl(l):{id:null,ord:{},name:'',date:'',place:'',turno:'',pregador:'',banda:Object.assign({},fixB()),dm:fixDM(),ensData:'',ensHora:'',ensLocal:'',passHora:'',songIds:[]};P.q='';lfR();P0=JSON.stringify(P);dlg.showModal();drfOffer('l',P.id);setTimeout(()=>{dlg.scrollTop=0;const e=document.activeElement;if(e&&e.classList&&e.classList.contains('etb'))e.blur()},0)}
-function viewList(id){editList(id);P.ro=1;roUp()}
 function roUp(){if(!P.ro)return;dlg.dataset.lt='all';const h=dlg.querySelector('h2');if(h)h.textContent='Detalhes do repertório';dlg.querySelectorAll('input,select,textarea,button').forEach(e=>{if(e.closest('.ac')&&e.textContent=='Cancelar'){e.textContent='Fechar';return}e.disabled=true});dlg.querySelectorAll('.ac').forEach(a=>{[...a.children].forEach(c=>{if(c.tagName=='BUTTON'&&c.textContent!='Fechar')c.style.display='none';if(c.tagName=='SPAN')c.style.display='none'})});dlg.querySelectorAll('.sli .dh2,.cp,[onclick^="flDel"]').forEach(e=>e.style.display='none');dlg.querySelectorAll('details.sec').forEach(d=>d.open=true)}
 function cpBase(id){const l=S.lists.find(x=>x.id==id);if(!l)return;const c=cl(l);['name','place','turno','pregador','banda','dm','songIds','ord','keys','cant','nota','passHora','semEns','ensHora','ensLocal','sing'].forEach(k=>{if(c[k]!==undefined)P[k]=c[k]});P.date='';P.ensData='';P.q='';lfR();toast('Copiado de "'+l.name+'". Escolha a data.')}
 function lfR(){LTB=LTB||'ev';dlg.dataset.lt=P.ro?'all':LTB;const HLP=t=>`<button type="button" class="ehp" title="${esc(t)}" aria-label="Ajuda" onclick="say(this.title)">?</button>`,ST=[['ev',1,'Culto'],['eq',2,'Equipe'],['mu',3,'Músicas'],['rt',4,'Roteiro'],['en',5,'Ensaio'],['pa',6,'Paleta'],['rs',7,'Resumo']];

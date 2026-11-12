@@ -19,7 +19,6 @@ function ui(html){if(!box){const s=document.createElement('style');s.textContent
 const hide=()=>{if(box)box.hidden=true};
 const head='<div class="bd">B6</div><h1>Escala B6 · Administração</h1>';
 let okRes;const ready=new Promise(r=>okRes=r);
-async function isAdm(){const {data,error}=await sb.rpc('is_admin');return !error&&data===true}
 function loginForm(msg){ui(`<form id="b6f">${head}<p>Entre com o seu e-mail e senha.</p><input id="b6e" type="email" autocomplete="username" placeholder="E-mail" required><input id="b6p" type="password" autocomplete="current-password" placeholder="Senha" required><div class="er">${msg||''}</div><button type="submit">Entrar</button><button type="button" class="l" id="b6r">Esqueci minha senha</button></form>`);
  box.querySelector('#b6f').onsubmit=async e=>{e.preventDefault();const er=box.querySelector('.er');er.textContent='Entrando…';
   const {error}=await sb.auth.signInWithPassword({email:box.querySelector('#b6e').value.trim(),password:box.querySelector('#b6p').value});

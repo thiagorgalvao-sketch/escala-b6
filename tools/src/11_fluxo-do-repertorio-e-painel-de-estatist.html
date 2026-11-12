@@ -65,4 +65,3 @@ const ddm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
 const addD=(d,n)=>{const x=new Date(d+'T12:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
 function devAtual(){const T=td(),A=espA('dev').filter(x=>x.d&&x.d<=T).sort((a,b)=>b.d.localeCompare(a.d));return A[0]||null}
 function espNovo(){const d=devAtual();return d&&!espLs('feito')[d.id]&&d.d>=addD(td(),-7)}
-function jejAtivo(){const T=td();return espA('jej').filter(x=>x.ini&&x.fim>=T).sort((a,b)=>a.ini.localeCompare(b.ini))}
